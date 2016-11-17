@@ -1,0 +1,8 @@
+mappingsFile="property_mappings.json"
+redmineUrl="https://redmine.acdh.oeaw.ac.at"
+redmineKey=""
+sparqlUrl="http://fedora.localhost/blazegraph/sparql"
+fedoraUrl="http://fedora.localhost/rest"
+fedoraUser="admin"
+fedoraPswd="admin"
+
