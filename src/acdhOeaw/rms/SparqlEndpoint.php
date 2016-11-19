@@ -27,7 +27,6 @@
 namespace acdhOeaw\rms;
 
 use EasyRdf_Sparql_Client;
-use EasyRdf_Graph;
 
 /**
  * Provides SPARQL queries execution against the RMS triplestore.

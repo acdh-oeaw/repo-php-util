@@ -24,30 +24,17 @@
  * THE SOFTWARE.
  */
 
-namespace acdhOeaw\redmine;
+namespace acdhOeaw;
+
+use EasyRdf_Namespace;
 
 /**
- * Represents a Redmine user
- * and provides mapping to ACDH repository resource representing a person.
+ * Class implementing workarounds for the EasyRdf library bugs
  *
  * @author zozlak
  */
-class User extends Redmine {
-
-    static private $cache = [];
-
-    static public function getById(int $id): Redmine {
-//echo 'get user ' . $id . "\n";
-        if (!isset(self::$cache[$id])) {
-            $url = self::$apiUrl . '/users/' . urlencode($id) . '.json?key=' . urlencode(self::$apiKey);
-            $data = json_decode(file_get_contents($url));
-            self::$cache[$id] = new User($data->user);
-        }
-        return self::$cache[$id];
+class EasyRdfUtil {
+    static public function fixPropName($property){
+        return join(':', EasyRdf_Namespace::splitUri($property, true));
     }
-
-    protected function getIdValue(): string {
-        return self::$apiUrl . '/users/' . $this->id;
-    }
-
 }

@@ -29,7 +29,7 @@ namespace acdhOeaw\redmine;
 /**
  * Represents a Redmine issue
  * and provides mapping to ACDH repository resource representing a resource.
-  *
+ *
  * @author zozlak
  */
 class Issue extends Redmine {
@@ -39,7 +39,7 @@ class Issue extends Redmine {
     static public function getById(int $id): Redmine {
 //echo 'get issue ' . $id . "\n";
         if (!isset(self::$cache[$id])) {
-            $url = self::$baseUrl . '/issues/' . urlencode($id) . '.json?key=' . urlencode(self::$apiKey);
+            $url = self::$apiUrl . '/issues/' . urlencode($id) . '.json?key=' . urlencode(self::$apiKey);
             $data = json_decode(file_get_contents($url));
             self::$cache[$id] = new Issue($data->issue);
         }
@@ -47,7 +47,7 @@ class Issue extends Redmine {
     }
 
     public function getIdValue(): string {
-        return self::$baseUrl . '/issues/' . $this->id;
+        return self::$apiUrl . '/issues/' . $this->id;
     }
 
 }

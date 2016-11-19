@@ -1,8 +1,23 @@
 mappingsFile="property_mappings.json"
+
+redmineApiUrl="https://redmine.acdh.oeaw.ac.at"
+redmineApiKey="putYourKeyHere"
+redmineIdProp="http://www.w3.org/2000/01/rdf-schema#seeAlso"
+
+sparqlUrl="http://fedora.localhost/blazegraph/sparql"
+
+fedoraIdProp="http://purl.org/dc/terms/identifier"
+fedoraIdNamespace="https://id.acdh.oeaw.ac.at/"
+fedoraApiUrl="http://fedora.localhost/rest"
+fedoraUser="admin"
+fedoraPswd="admin"
+
+containerDir="/mnt/acdh_resources/container/"mappingsFile="property_mappings.json"
 redmineUrl="https://redmine.acdh.oeaw.ac.at"
 redmineKey=""
 sparqlUrl="http://fedora.localhost/blazegraph/sparql"
 fedoraUrl="http://fedora.localhost/rest"
 fedoraUser="admin"
 fedoraPswd="admin"
+containerDir="/mnt/acdh_resources/container/"
 

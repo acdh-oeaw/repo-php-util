@@ -29,6 +29,10 @@ namespace acdhOeaw\rms;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
 use EasyRdf_Graph;
+use EasyRdf_Resource;
+use acdhOeaw\EasyRdfUtil;
+use zozlak\util\UUID;
+use zozlak\util\Config;
 
 /**
  * Description of Fedora
@@ -40,10 +44,14 @@ class Fedora {
     static private $apiUrl;
     static private $txUrl;
     static private $client;
+    static private $idProp;
+    static private $idNamespace;
 
-    static public function init(string $apiUrl, string $user, string $password) {
-        self::$apiUrl = preg_replace('|/$|', '', $apiUrl);
-        $authHeader = 'Basic ' . base64_encode($user . ':' . $password);
+    static public function init(Config $cfg) {
+        self::$apiUrl = preg_replace('|/$|', '', $cfg->get('fedoraApiUrl'));
+        self::$idProp = $cfg->get('fedoraIdProp');
+        self::$idNamespace = $cfg->get('fedoraIdNamespace');
+        $authHeader = 'Basic ' . base64_encode($cfg->get('fedoraUser') . ':' . $cfg->get('fedoraPswd'));
         self::$client = new Client(['headers' => ['Authorization' => $authHeader]]);
     }
 
@@ -66,6 +74,10 @@ class Fedora {
             $resp = self::$client->post(self::$txUrl, $options);
         }
         $uri = $resp->getHeader('Location')[0];
+
+        $res = $metadata->resources();
+        $res = array_pop($res);
+        $res->addResource(self::$idProp, self::$idNamespace . UUID::v4());
 
         self::updateResourceMetadata($uri, $metadata);
 
@@ -92,7 +104,7 @@ class Fedora {
         return $uri;
     }
 
-    static public function getResourceMetadata($uri, bool $skipTx = false) {
+    static private function sanitizeUri(string $uri, bool $skipTx) {
         $baseUrl = $skipTx || !self::$txUrl ? self::$apiUrl : self::$txUrl;
 
         if (self::$txUrl && mb_strpos($uri, self::$txUrl) === 0) {
@@ -101,6 +113,16 @@ class Fedora {
             $uri = mb_substr($uri, mb_strlen(self::$apiUrl) + 1);
         }
         $uri = $baseUrl . '/' . $uri;
+        return $uri;
+    }
+
+    static public function getResouceIds(string $uri, bool $skipTx = false): array {
+        $res = self::getResourceMetadata($uri);
+        return $res->allResources(EasyRdfUtil::fixPropName(self::$idProp));
+    }
+
+    static public function getResourceMetadata($uri, bool $skipTx = false): EasyRdf_Resource {
+        $uri = self::sanitizeUri($uri, $skipTx);
         $resp = self::$client->get($uri . '/fcr:metadata');
 
         $graph = new EasyRdf_Graph();

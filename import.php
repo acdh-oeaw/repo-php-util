@@ -29,53 +29,78 @@ require_once './vendor/autoload.php';
 use acdhOeaw\redmine\Redmine;
 use acdhOeaw\rms\SparqlEndpoint;
 use acdhOeaw\rms\Fedora;
+use acdhOeaw\storage\Indexer;
 use zozlak\util\ClassLoader;
 use zozlak\util\Config;
+use zozlak\util\ProgressBar;
 
 $loader = new ClassLoader();
 
 $conf = new Config('config.ini');
 
-Redmine::init($conf->get('mappingsFile'), $conf->get('redmineUrl'), $conf->get('redmineKey'));
+Redmine::init($conf);
 SparqlEndpoint::init($conf->get('sparqlUrl'));
-Fedora::init($conf->get('fedoraUrl'), $conf->get('fedoraUser'), $conf->get('fedoraPswd'));
+Fedora::init($conf);
 Fedora::begin();
 
 echo "\nProjects:\n";
-$projects = Redmine::fetchAllProjects();
-echo "\tsaving: ";
+$projects = Redmine::fetchAllProjects(true);
+echo "\n\tsaving:\n";
+$pb = new ProgressBar(count($projects), 5);
 foreach ($projects as $i) {
-    echo '#';
+    $pb->next();
     try {
         $i->updateRms();
     } catch (Exception $ex) {
         
     }
 }
+$pb->finish();
 
 echo "\nUsers:\n";
-$users = Redmine::fetchAllUsers();
-echo "\tsaving: ";
+$users = Redmine::fetchAllUsers(true);
+echo "\n\tsaving:\n";
+$pb = new ProgressBar(count($users), 5);
 foreach ($users as $i) {
-    echo '#';
+    $pb->next();
     try {
         $i->updateRms();
     } catch (Exception $e) {
         
     }
 }
+$pb->finish();
 
 echo "\nIssues:\n";
-$issues = Redmine::fetchAllIssues(['tracker_id' => 5]);
-echo "\tsaving: ";
-//file_put_contents('data', serialize($issues));
-//$issues = unserialize(file_get_contents('data'));
+$issues = Redmine::fetchAllIssues(true, ['tracker_id' => 5]);
+echo "\n\tsaving:\n";
+$pb = new ProgressBar(count($issues), 5);
 foreach ($issues as $i) {
-    echo '#';
+    $pb->next();
     try {
         $i->updateRms();
     } catch (Exception $e) {
         
     }
 }
-Fedora::commit();
+$pb->finish();
+
+//Fedora::commit();
+
+/*
+$res = SparqlEndpoint::query('SELECT ?subject ?path WHERE {?subject <https://vocabs.acdh.oeaw.ac.at/#locationpath> ?path}');
+foreach ($res as $i) {
+    $resUri = $i->subject->getUri();
+    $resPath = $conf->get('containerDir') . $i->path->getValue();
+    $resPath = preg_replace('|^(/mnt/)?(acdh_resources/)?container/?|', '', $resPath);
+    $ind = new Indexer();
+    echo '# ' . $resPath . "\n";
+    try {
+        $ind->index($resPath, true, true);
+break;
+    } catch (UnexpectedValueException $e) {
+        
+    }
+}
+*/
+    

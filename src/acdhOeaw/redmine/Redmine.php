@@ -31,6 +31,8 @@ use RuntimeException;
 use EasyRdf_Graph;
 use EasyRdf_Resource;
 use acdhOeaw\rms\Fedora;
+use zozlak\util\Config;
+use zozlak\util\ProgressBar;
 
 /**
  * Base class for all kind of resources in the Redmine
@@ -40,9 +42,9 @@ use acdhOeaw\rms\Fedora;
  */
 abstract class Redmine {
 
-    static private $idProperty = 'http://vocabs.acdh.oeaw.ac.at/#pid';
+    static private $idProp;
     static protected $propMap;
-    static protected $baseUrl;
+    static protected $apiUrl;
     static protected $apiKey;
 
     /**
@@ -60,54 +62,64 @@ abstract class Redmine {
      */
     protected abstract function getIdValue(): string;
 
-    static public function init(string $propMappingsFile, string $baseUrl, string $apiKey = '') {
-        self::$propMap = (array) json_decode(file_get_contents($propMappingsFile));
-        self::$baseUrl = $baseUrl;
-        self::$apiKey = $apiKey;
+    static public function init(Config $cfg) {
+        self::$propMap = (array) json_decode(file_get_contents($cfg->get('mappingsFile')));
+        self::$apiUrl = $cfg->get('redmineApiUrl');
+        self::$apiKey = $cfg->get('redmineApiKey');
+        self::$idProp = $cfg->get('redmineIdProp');
     }
 
-    static private function redmineFetchLoop(string $endpoint, string $param, string $class) {
+    static private function redmineFetchLoop(bool $progressBar, string $endpoint, string $param, string $class): array {
+        if ($progressBar) {
+            $pb = new ProgressBar(null, 10);
+        }
         $objects = [];
         $offset = 0;
         do {
             $flag = false;
-            $url = self::$baseUrl . '/' . $endpoint . '.json?offset=' . $offset . '&' . $param;
-            $data = @file_get_contents($url);
+            $url = self::$apiUrl . '/' . $endpoint . '.json?offset=' . $offset . '&' . $param;
+            $data = file_get_contents($url);
             if ($data) {
                 $data = json_decode($data);
                 foreach ($data->$endpoint as $i) {
                     $objects[] = new $class($i);
+                    if ($progressBar) {
+                        $pb->next();
+                    }
                 }
                 $flag = $data->offset + $data->limit < $data->total_count;
                 $offset += $data->limit;
             }
         } while ($flag);
+        if ($progressBar) {
+            $pb->finish();
+        }
         return $objects;
     }
 
-    static public function fetchAllProjects() {
+    static public function fetchAllProjects(bool $progressBar): array {
         $param = 'limit=100000&key=' . urlencode(self::$apiKey);
-        return self::redmineFetchLoop('projects', $param, 'acdhOeaw\\redmine\\Project');
+        return self::redmineFetchLoop($progressBar, 'projects', $param, 'acdhOeaw\\redmine\\Project');
     }
 
-    static public function fetchAllUsers() {
+    static public function fetchAllUsers(bool $progressBar): array {
         $param = 'limit=100000&key=' . urlencode(self::$apiKey);
-        return self::redmineFetchLoop('users', $param, 'acdhOeaw\\redmine\\User');
+        return self::redmineFetchLoop($progressBar, 'users', $param, 'acdhOeaw\\redmine\\User');
     }
 
-    static public function fetchAllIssues(array $filters = []) {
+    static public function fetchAllIssues(bool $progressBar, array $filters = []): array {
         $param = ['key=' . urlencode(self::$apiKey), 'limit' => 1000000];
         foreach ($filters as $k => $v) {
             $param[] = urlencode($k) . '=' . urlencode($v);
         }
         $param = implode('&', $param);
 
-        return self::redmineFetchLoop('issues', $param, 'acdhOeaw\\redmine\\Issue');
+        return self::redmineFetchLoop($progressBar, 'issues', $param, 'acdhOeaw\\redmine\\Issue');
     }
 
     protected $id;
     protected $metadata;
-    protected $uri = '';
+    protected $rmsUri = '';
 
     public function __construct(stdClass $data) {
 //echo 'New ' . get_class($this) . ' ' . $data->id . "\n";
@@ -122,7 +134,7 @@ abstract class Redmine {
 
         $value = str_replace('\\', '/', $value);
         if ($prop->template !== '') {
-            $value = str_replace(['%REDMINE_URL%', '%VALUE%'], [self::$baseUrl, $value], $prop->template);
+            $value = str_replace(['%REDMINE_URL%', '%VALUE%'], [self::$apiUrl, $value], $prop->template);
         }
 
         if ($prop->redmineClass) {
@@ -131,7 +143,7 @@ abstract class Redmine {
             } else {
                 $value = $prop->redmineClass::getById($value);
             }
-            $value = $value->getIdValue();
+            $value = $value->getRmsId();
         }
 
         if ($prop->class === 'dataProperty') {
@@ -148,7 +160,7 @@ abstract class Redmine {
     protected function mapProperties(array $data) {
         $graph = new EasyRdf_Graph();
         $res = $graph->resource('.');
-        $res->addResource(self::$idProperty, $this->getIdValue());
+        $res->addResource(self::$idProp, $this->getIdValue());
         foreach (self::$propMap as $redmineProp => $rdfProp) {
             $value = null;
             if (isset($data[$redmineProp])) {
@@ -179,28 +191,37 @@ abstract class Redmine {
         return $res;
     }
 
-    public function getUri(bool $create = false) {
-        if ($this->uri) {
-            return $this->uri;
+    public function getRmsUri(bool $create = false) {
+        if ($this->rmsUri) {
+            return $this->rmsUri;
         }
-        $resources = Fedora::getResourcesByProperty(self::$idProperty, $this->getIdValue());
+        $resources = Fedora::getResourcesByProperty(self::$idProp, $this->getIdValue());
         if (count($resources) > 1) {
             throw new RuntimeException('Many matching Fedora resources');
         } elseif (count($resources) == 1) {
-            $this->uri = $resources[0];
+            $this->rmsUri = $resources[0];
         } elseif ($create) {
             $this->updateRms();
         }
-        return $this->uri;
+        return $this->rmsUri;
     }
 
     public function updateRms() {
-        $uri = $this->getUri(false);
-        if ($uri) {
-            Fedora::updateResourceMetadata($uri, $this->metadata);
+        $rmsUri = $this->getRmsUri(false);
+        if ($rmsUri) {
+            Fedora::updateResourceMetadata($rmsUri, $this->metadata);
         } else {
-            $this->uri = Fedora::createResource($this->metadata);
+            $this->rmsUri = Fedora::createResource($this->metadata);
         }
+    }
+
+    protected function getRmsId() {
+        $rmsUri = $this->getRmsUri(true);
+        $ids = Fedora::getResouceIds($rmsUri);
+        if (count($ids) !== 1) {
+            throw new RuntimeException((count($ids) == 0 ? 'No' : 'Many') . ' ids found');
+        }
+        return $ids[0]->getUri();
     }
 
 }

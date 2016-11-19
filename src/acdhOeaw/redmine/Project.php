@@ -39,7 +39,7 @@ class Project extends Redmine {
     static public function getById(int $id): Redmine {
 //echo 'get project ' . $id . "\n";
         if (!isset(self::$cache[$id])) {
-            $url = self::$baseUrl . '/projects/' . urlencode($id) . '.json?key=' . urlencode(self::$apiKey);
+            $url = self::$apiUrl . '/projects/' . urlencode($id) . '.json?key=' . urlencode(self::$apiKey);
             $data = json_decode(file_get_contents($url));
             self::$cache[$id] = new Project($data->project);
         }
@@ -47,7 +47,7 @@ class Project extends Redmine {
     }
 
     public function getIdValue(): string {
-        return self::$baseUrl . '/projects/' . $this->id;
+        return self::$apiUrl . '/projects/' . $this->id;
     }
 
 }
