@@ -30,7 +30,7 @@ use stdClass;
 use RuntimeException;
 use EasyRdf_Graph;
 use EasyRdf_Resource;
-use acdhOeaw\rms\Fedora;
+use acdhOeaw\rms\Resource;
 use zozlak\util\Config;
 use zozlak\util\ProgressBar;
 
@@ -118,13 +118,22 @@ abstract class Redmine {
     }
 
     protected $id;
+
+    /**
+     * @var \EasyRdf_Resource
+     */
     protected $metadata;
-    protected $rmsUri = '';
+
+    /**
+     *
+     * @var \acdhOeaw\rms\Resource
+     */
+    protected $fedoraRes = '';
 
     public function __construct(stdClass $data) {
 //echo 'New ' . get_class($this) . ' ' . $data->id . "\n";
         $this->id = $data->id;
-        $this->metadata = $this->mapProperties((array) $data)->getGraph();
+        $this->metadata = $this->mapProperties((array) $data);
     }
 
     protected function addValue(EasyRdf_Resource $res, stdClass $prop, string $value) {
@@ -132,7 +141,7 @@ abstract class Redmine {
             return;
         }
 
-        $value = str_replace('\\', '/', $value);
+        $value = str_replace('\\', '/', $value); // ugly workaround for windows-like paths; should be applied only to location_path property
         if ($prop->template !== '') {
             $value = str_replace(['%REDMINE_URL%', '%VALUE%'], [self::$apiUrl, $value], $prop->template);
         }
@@ -192,36 +201,37 @@ abstract class Redmine {
     }
 
     public function getRmsUri(bool $create = false) {
-        if ($this->rmsUri) {
-            return $this->rmsUri;
+        if ($this->fedoraRes) {
+            return $this->fedoraRes;
         }
-        $resources = Fedora::getResourcesByProperty(self::$idProp, $this->getIdValue());
+        $resources = Resource::getResourcesByProperty(self::$idProp, $this->getIdValue());
         if (count($resources) > 1) {
             throw new RuntimeException('Many matching Fedora resources');
         } elseif (count($resources) == 1) {
-            $this->rmsUri = $resources[0];
+            $this->fedoraRes = $resources[0];
         } elseif ($create) {
             $this->updateRms();
         }
-        return $this->rmsUri;
+        return $this->fedoraRes;
     }
 
     public function updateRms() {
-        $rmsUri = $this->getRmsUri(false);
-        if ($rmsUri) {
-            Fedora::updateResourceMetadata($rmsUri, $this->metadata);
+        $this->getRmsUri(false);
+        if ($this->fedoraRes) {
+            $this->fedoraRes->setMetadata($this->metadata);
+            $this->fedoraRes->update();
         } else {
-            $this->rmsUri = Fedora::createResource($this->metadata);
+            $this->fedoraRes = Resource::factory($this->metadata);
         }
     }
 
     protected function getRmsId() {
-        $rmsUri = $this->getRmsUri(true);
-        $ids = Fedora::getResouceIds($rmsUri);
+        $this->getRmsUri(true);
+        $ids = $this->fedoraRes->getIds();
         if (count($ids) !== 1) {
             throw new RuntimeException((count($ids) == 0 ? 'No' : 'Many') . ' ids found');
         }
-        return $ids[0]->getUri();
+        return $ids[0];
     }
 
 }

@@ -27,6 +27,7 @@
 namespace acdhOeaw\rms;
 
 use EasyRdf_Sparql_Client;
+use EasyRdf_Sparql_Result;
 
 /**
  * Provides SPARQL queries execution against the RMS triplestore.
@@ -43,7 +44,7 @@ class SparqlEndpoint {
         self::$client = new EasyRdf_Sparql_Client($apiUrl);
     }
 
-    static public function query(string $query) {
+    static public function query(string $query): EasyRdf_Sparql_Result {
         return self::$client->query($query);
     }
 

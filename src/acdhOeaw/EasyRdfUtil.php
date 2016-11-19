@@ -27,6 +27,9 @@
 namespace acdhOeaw;
 
 use EasyRdf_Namespace;
+use EasyRdf_Literal;
+use EasyRdf_Resource;
+use EasyRdf_Serialiser_Ntriples;
 
 /**
  * Class implementing workarounds for the EasyRdf library bugs
@@ -34,7 +37,30 @@ use EasyRdf_Namespace;
  * @author zozlak
  */
 class EasyRdfUtil {
-    static public function fixPropName($property){
+
+    /**
+     * @var \EasyRdf_Serialiser_Ntriples
+     */
+    static private $serializer;
+
+    static public function fixPropName(string $property): string {
         return join(':', EasyRdf_Namespace::splitUri($property, true));
     }
+
+    static public function escapeUri(string $uri): string {
+        self::initSerializer();
+        return self::$serializer->serialiseValue(new EasyRdf_Resource($uri));
+    }
+
+    static public function escapeLiteral(string $literal): string {
+        self::initSerializer();
+        return self::$serializer->serialiseValue(new EasyRdf_Literal($literal));
+    }
+
+    static private function initSerializer() {
+        if (!self::$serializer) {
+            self::$serializer = new EasyRdf_Serialiser_Ntriples();
+        }
+    }
+
 }

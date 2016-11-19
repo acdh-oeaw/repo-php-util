@@ -35,11 +35,14 @@ use zozlak\util\UUID;
 use zozlak\util\Config;
 
 /**
- * Description of Fedora
+ * Represents already existing Fedora resource
+ * 
+ * Static functions allow to manage Fedora session
+ * create new resources and search for existing ones
  *
  * @author zozlak
  */
-class Fedora {
+class Resource {
 
     static private $apiUrl;
     static private $txUrl;
@@ -55,17 +58,29 @@ class Fedora {
         self::$client = new Client(['headers' => ['Authorization' => $authHeader]]);
     }
 
-    static public function createResource(EasyRdf_Graph $metadata, $data = '', string $path = '') {
-        $options = [
-            'body' => Psr7\stream_for($data),
-            'headers' => []
-        ];
+    /**
+     * Creates a resource in the Fedora and returns corresponding Resource object
+     * 
+     * @param EasyRdf_Resource $metadata resource metadata
+     * @param mixed $data optional resource data as a string, file name or an array: ['content-type' => 'foo', 'data' => 'bar']
+     * @param string $path optional Fedora resource path (if empty, resource will be created in the Fedora root)
+     * @return type
+     */
+    static public function factory(EasyRdf_Resource $metadata, $data = '', string $path = ''): Resource {
+        $headers = array();
         if (file_exists($data)) {
-            $options['headers']['Content-Type'] = mime_content_type($data);
+            $headers['Content-Type'] = mime_content_type($data);
+            $data = fopen($data, 'rb');
         } elseif (is_array($data) && isset($data['contentType']) && isset($data['data'])) {
-            $options['headers']['Content-Type'] = $data['contentType'];
-            $data = $data['data'];
+            $headers['Content-Type'] = $data['contentType'];
+            if (file_exists($data['data'])) {
+                $data = fopen($data, 'rb');
+            }
         }
+        $options = array(
+            'body' => Psr7\stream_for($data),
+            'headers' => $headers
+        );
 
         if ($path) {
             $reqUrl = self::$txUrl . '/' . preg_replace('|^/|', '', $path);
@@ -75,33 +90,28 @@ class Fedora {
         }
         $uri = $resp->getHeader('Location')[0];
 
-        $res = $metadata->resources();
-        $res = array_pop($res);
-        $res->addResource(self::$idProp, self::$idNamespace . UUID::v4());
+        $metadata->addResource(self::$idProp, self::$idNamespace . UUID::v4());
+        $res = new Resource($uri, false);
+        $res->setMetadata($metadata);
+        $res->update();
 
-        self::updateResourceMetadata($uri, $metadata);
-
-        return mb_substr($uri, mb_strlen(self::$txUrl) + 1);
+        return $res;
     }
 
-    static public function updateResourceMetadata(string $uri, EasyRdf_Graph $metadata) {
-        $options = [
-            'body' => sprintf('INSERT {%s} WHERE {}', self::getSparqlTriples($metadata)),
-            'headers' => ['Content-Type' => 'application/sparql-update']
-        ];
-        self::$client->patch($uri . '/fcr:metadata', $options);
+    static public function getResourcesById(string $value) {
+        return self::getResourcesByProperty(self::$idProp, $value);
     }
 
     static public function getResourcesByProperty(string $property, string $value = '') {
-        $query = sprintf('SELECT ?uri ?val WHERE { ?uri <%s> ?val } ORDER BY ( ?val )', $property);
+        $query = sprintf('SELECT ?uri ?val WHERE { ?uri %s ?val } ORDER BY ( ?val )', EasyRdfUtil::escapeUri($property));
         $res = SparqlEndpoint::query($query);
-        $uri = [];
+        $resources = array();
         foreach ($res as $i) {
             if ($value === '' || (string) $i->val === $value) {
-                $uri[] = (string) $i->uri;
+                $resources[] = new Resource((string) $i->uri, false);
             }
         }
-        return $uri;
+        return $resources;
     }
 
     static private function sanitizeUri(string $uri, bool $skipTx) {
@@ -114,20 +124,6 @@ class Fedora {
         }
         $uri = $baseUrl . '/' . $uri;
         return $uri;
-    }
-
-    static public function getResouceIds(string $uri, bool $skipTx = false): array {
-        $res = self::getResourceMetadata($uri);
-        return $res->allResources(EasyRdfUtil::fixPropName(self::$idProp));
-    }
-
-    static public function getResourceMetadata($uri, bool $skipTx = false): EasyRdf_Resource {
-        $uri = self::sanitizeUri($uri, $skipTx);
-        $resp = self::$client->get($uri . '/fcr:metadata');
-
-        $graph = new EasyRdf_Graph();
-        $graph->parse($resp->getBody());
-        return $graph->resource($uri);
     }
 
     static public function begin() {
@@ -145,10 +141,57 @@ class Fedora {
         self::$txUrl = null;
     }
 
-    static private function getSparqlTriples(EasyRdf_Graph $graph) {
-        $rdf = "\n" . $graph->serialise('ntriples') . "\n";
+    private $uri;
+
+    /**
+     * @var EasyRdf_Resource
+     */
+    private $metadata;
+
+    public function __construct(string $uri, bool $skipTx = false) {
+        $this->uri = self::sanitizeUri($uri, $skipTx);
+    }
+
+    public function getUri(): string {
+        return $this->uri;
+    }
+
+    public function getIds(): array {
+        $this->getMetadata();
+        $ids = array();
+        foreach ($this->metadata->allResources(EasyRdfUtil::fixPropName(self::$idProp)) as $i) {
+            $ids[] = $i->getUri();
+        }
+        return $ids;
+    }
+
+    public function setMetadata(EasyRdf_Resource $metadata) {
+        $this->metadata = $metadata;
+    }
+
+    public function update() {
+        $options = [
+            'body' => sprintf('INSERT {%s} WHERE {}', $this->getSparqlTriples()),
+            'headers' => ['Content-Type' => 'application/sparql-update']
+        ];
+        self::$client->patch($this->uri . '/fcr:metadata', $options);
+    }
+
+    public function getMetadata(): EasyRdf_Resource {
+        if (!$this->metadata) {
+            $resp = self::$client->get($this->uri . '/fcr:metadata');
+
+            $graph = new EasyRdf_Graph();
+            $graph->parse($resp->getBody());
+            $this->metadata = $graph->resource($this->uri);
+        }
+        return $this->metadata;
+    }
+
+    private function getSparqlTriples(): string {
+        $rdf = "\n" . $this->metadata->getGraph()->serialise('ntriples') . "\n";
         $rdf = preg_replace('|\n<[^>]*>|', "\n<>", $rdf);
         return $rdf;
     }
-
+    
 }

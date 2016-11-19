@@ -28,7 +28,7 @@ require_once './vendor/autoload.php';
 
 use acdhOeaw\redmine\Redmine;
 use acdhOeaw\rms\SparqlEndpoint;
-use acdhOeaw\rms\Fedora;
+use acdhOeaw\rms\Resource;
 use acdhOeaw\storage\Indexer;
 use zozlak\util\ClassLoader;
 use zozlak\util\Config;
@@ -40,9 +40,11 @@ $conf = new Config('config.ini');
 
 Redmine::init($conf);
 SparqlEndpoint::init($conf->get('sparqlUrl'));
-Fedora::init($conf);
-Fedora::begin();
+Resource::init($conf);
+Indexer::init($conf);
+Resource::begin();
 
+/*
 echo "\nProjects:\n";
 $projects = Redmine::fetchAllProjects(true);
 echo "\n\tsaving:\n";
@@ -85,22 +87,15 @@ foreach ($issues as $i) {
 }
 $pb->finish();
 
-//Fedora::commit();
+Resource::commit();
 
-/*
-$res = SparqlEndpoint::query('SELECT ?subject ?path WHERE {?subject <https://vocabs.acdh.oeaw.ac.at/#locationpath> ?path}');
-foreach ($res as $i) {
-    $resUri = $i->subject->getUri();
-    $resPath = $conf->get('containerDir') . $i->path->getValue();
-    $resPath = preg_replace('|^(/mnt/)?(acdh_resources/)?container/?|', '', $resPath);
-    $ind = new Indexer();
-    echo '# ' . $resPath . "\n";
-    try {
-        $ind->index($resPath, true, true);
-break;
-    } catch (UnexpectedValueException $e) {
-        
-    }
-}
+exit();
 */
-    
+
+$res = new Resource('http://fedora.localhost/rest/0c/c3/d0/ba/0cc3d0ba-2836-41d2-aa97-9c1d56907068'); // SELECT ?id WHERE {?uri <https://vocabs.acdh.oeaw.ac.at/#locationpath> "R_durmlemmatizer_4745"^^xsd:string . }
+$ind = new Indexer($res);
+$ind->index(false, 1);
+
+//Resource::commit();
+
+//$res = SparqlEndpoint::query('SELECT ?subject ?path WHERE {?subject <https://vocabs.acdh.oeaw.ac.at/#locationpath> ?path}');
