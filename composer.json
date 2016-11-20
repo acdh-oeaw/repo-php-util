@@ -1,7 +1,26 @@
 {
+    "name": "acdh-oeaw/repo-php-util",
+    "type": "library",
+    "description": "Set o classes for working with our repository stack",
+    "keywords": [],
+    "homepage": "https://github.com/acdh-oeaw/repo-php-util",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mateusz Żółtak",
+            "email": "mateusz.zoltak@acdh.oeaw.ac.at",
+            "role": "Developer"
+        }
+    ],
     "require": {
+        "php": ">=7.0",
         "guzzlehttp/guzzle": "~6.0",
         "easyrdf/easyrdf": "*",
         "zozlak/util": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "acdhOeaw\\": "src/acdhOeaw/"
+        }
     }
 }
