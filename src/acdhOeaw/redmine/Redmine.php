@@ -30,7 +30,7 @@ use stdClass;
 use RuntimeException;
 use EasyRdf_Graph;
 use EasyRdf_Resource;
-use acdhOeaw\rms\Resource;
+use acdhOeaw\fedora\FedoraResource;
 use zozlak\util\Config;
 use zozlak\util\ProgressBar;
 
@@ -126,7 +126,7 @@ abstract class Redmine {
 
     /**
      *
-     * @var \acdhOeaw\rms\Resource
+     * @var \acdhOeaw\rms\FedoraResource
      */
     protected $fedoraRes = '';
 
@@ -204,7 +204,7 @@ abstract class Redmine {
         if ($this->fedoraRes) {
             return $this->fedoraRes;
         }
-        $resources = Resource::getResourcesByProperty(self::$idProp, $this->getIdValue());
+        $resources = FedoraResource::getResourceByProperty(self::$idProp, $this->getIdValue());
         if (count($resources) > 1) {
             throw new RuntimeException('Many matching Fedora resources');
         } elseif (count($resources) == 1) {
@@ -219,9 +219,9 @@ abstract class Redmine {
         $this->getRmsUri(false);
         if ($this->fedoraRes) {
             $this->fedoraRes->setMetadata($this->metadata);
-            $this->fedoraRes->update();
+            $this->fedoraRes->updateMetadata();
         } else {
-            $this->fedoraRes = Resource::factory($this->metadata);
+            $this->fedoraRes = FedoraResource::factory($this->metadata);
         }
     }
 

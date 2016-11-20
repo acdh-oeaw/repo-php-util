@@ -26,14 +26,15 @@
 
 namespace acdhOeaw\storage;
 
-use FilesystemIterator;
+use acdhOeaw\fedora\FedoraResource;
+use acdhOeaw\util\EasyRdfUtil;
+use acdhOeaw\util\SparqlEndpoint;
 use DirectoryIterator;
 use DomainException;
-use RuntimeException;
+use EasyRdf_Graph;
 use EasyRdf_Resource;
-use acdhOeaw\rms\Resource;
-use acdhOeaw\rms\SparqlEndpoint;
-use acdhOeaw\EasyRdfUtil;
+use EasyRdf_Sparql_Result;
+use RuntimeException;
 use zozlak\util\Config;
 
 /**
@@ -59,12 +60,18 @@ class Indexer {
     }
 
     /**
-     * @var \acdhOeaw\rms\Resource
+     * @var FedoraResource
      */
     private $resource;
     private $paths = array();
 
-    public function __construct(Resource $resource) {
+    /**
+     * Creates an indexer object for a given Fedora resource.
+     * 
+     * @param FedoraResource $resource
+     * @throws RuntimeException
+     */
+    public function __construct(FedoraResource $resource) {
         $this->resource = $resource;
 
         $metadata = $this->resource->getMetadata();
@@ -74,46 +81,65 @@ class Indexer {
         }
         foreach ($locations as $i) {
             $loc = preg_replace('|/$|', '', self::$containerDir . $i->getValue());
-            if (!is_dir($loc)) {
+            if (!file_exists($loc)) {
                 throw new RuntimeException('Locationpath does not exist: ' . $loc);
             }
-            $this->paths[] = $i->getValue();
+            if (is_dir($loc)) {
+                $this->paths[] = $i->getValue();
+            }
         }
     }
 
     /**
+     * Indexes files in the resource directory.
      * 
-     * @param bool $upload should resource be uploaded to the repository
+     * @param bool $uploadSizeLimit maximum size of files uploaded to the repo (0 will cause no files upload)
      * @param int $depth maximum insexing depth (0 - only initial Resource dir, 1 - also its direct subdirectories, etc.)
-     * @param bool $empty should resources be created for empty directories
+     * @param bool $includeEmpty should resources be created for empty directories
+     * @param bool $verbose should be verbose
      */
-    public function index(bool $upload = false, int $depth = 1000000, bool $empty = false) {
+    public function index(int $uploadSizeLimit = 0, int $depth = 1000000, bool $includeEmpty = false, bool $verbose = false) {
         foreach ($this->paths as $path) {
             foreach (new DirectoryIterator(self::$containerDir . $path) as $i) {
                 if ($i->isDot()) {
                     continue;
                 }
 
+                $skip = $this->isSkipped($i, $depth, $includeEmpty);
+                $upload = $i->isFile() && $uploadSizeLimit > $i->getSize();
+
                 $metadata = $this->createMetadata($path, $i);
+
                 try {
+                    // resource already exists and should be updated
                     $res = $this->getResource($path, $i);
+                    echo $verbose ? "update " : "";
+
                     $res->setMetadata($metadata);
-                    $res->update();
-                    echo "found ";
+                    $res->updateMetadata();
+                    if ($upload) {
+                        echo $verbose ? "+ upload " : "";
+                        $res->updateContent($i->getPathname(), true);
+                    }
                 } catch (DomainException $e) {
-                    if (!$this->isEmpty($i, $depth, $empty)) {
-                        $res = Resource::factory($metadata, $upload && $i->isFile() ? $i->getPathname() : '');
-                        echo "created ";
+                    // resource does not exist and must be created
+                    if (!$skip) {
+                        $res = FedoraResource::factory($metadata, $upload ? $i->getPathname() : '');
+                        echo $verbose ? "create " : "";
                     } else {
-                        echo "skipped ";
+                        echo $verbose ? "skip " : "";
                     }
                 }
-                echo $i->getPathname() . "\n\t" . $this->getResourceId() . "\n\t" . $this->resource->getUri() . "\n";
 
-                if ($i->isDir() && $depth > 0) {
-                    echo "entering subdir\n";
+                echo $verbose ? $i->getPathname() . "\n" : "";
+                echo $verbose && !$skip ? "\t" . $res->getId() . "\n\t" . $res->getUri() . "\n" : "";
+
+                // recursion
+                if ($i->isDir() && !$skip) {
+                    echo $verbose ? "entering " . $i->getPathname() . "\n" : "";
                     $ind = new Indexer($res);
-                    $ind->index($upload, $depth - 1, $empty);
+                    $ind->index($uploadSizeLimit, $depth - 1, $includeEmpty, $verbose);
+                    echo $verbose ? "returning " . $path . "\n" : "";
                 }
             }
         }
@@ -127,43 +153,35 @@ class Indexer {
      * 
      * @param DirectoryIterator $i
      * @param int $depth
-     * @param bool $empty
+     * @param bool $incEmpty
      * @return bool
      */
-    private function isEmpty(DirectoryIterator $i, int $depth, bool $empty): bool {
+    private function isSkipped(DirectoryIterator $i, int $depth, bool $incEmpty): bool {
         $isEmptyDir = true;
         if ($i->isDir()) {
             foreach (new DirectoryIterator($i->getPathname()) as $j) {
-                if (!$i->isDot()) {
+                if (!$j->isDot()) {
                     $isEmptyDir = false;
                     break;
                 }
             }
         }
-        return !$empty && $i->isDir() && ($depth == 0 || $isEmptyDir);
-    }
-
-    private function getResourceId(): string {
-        $ids = $this->resource->getIds();
-        if (count($ids) !== 1) {
-            throw new RuntimeException((count($ids) == 0 ? 'No' : 'Many') . ' ids');
-        }
-        return $ids[0];
+        return !$incEmpty && $i->isDir() && ($depth == 0 || $isEmptyDir);
     }
 
     private function createMetadata(string $path, DirectoryIterator $i): EasyRdf_Resource {
-        $graph = new \EasyRdf_Graph;
+        $graph = new EasyRdf_Graph;
         $metadata = $graph->resource('newResource');
         $metadata->addLiteral(self::$locProp, $path . '/' . $i->getFilename());
         $metadata->addLiteral('ebucore:filename', $i->getFilename());
-        $metadata->addResource(self::$relProp, $this->getResourceId());
+        $metadata->addResource(self::$relProp, $this->resource->getId());
         if ($i->isFile()) {
             $metadata->addLiteral(self::$sizeProp, $i->getSize());
         }
         return $metadata;
     }
 
-    private function getResource(string $path, DirectoryIterator $i): Resource {
+    private function getResource(string $path, DirectoryIterator $i): FedoraResource {
         $path = $path . '/' . $i->getFilename();
         if (!isset(self::$resourceCache[$path])) {
             $query = '
@@ -175,7 +193,7 @@ class Indexer {
                 }
             ';
             $relProp = EasyRdfUtil::escapeUri(self::$relProp);
-            $resId = EasyRdfUtil::escapeUri($this->getResourceId());
+            $resId = EasyRdfUtil::escapeUri($this->resource->getId());
             $idProp = EasyRdfUtil::escapeUri(self::$idProp);
             $locProp = EasyRdfUtil::escapeUri(self::$locProp);
             $resPath = EasyRdfUtil::escapeLiteral($path);
@@ -189,9 +207,66 @@ class Indexer {
             if ($res->numRows() > 1) {
                 throw new RuntimeException('Many resources with a given location path');
             }
-            self::$resourceCache[$path] = new Resource($res[0]->child);
+            self::$resourceCache[$path] = new FedoraResource($res[0]->child);
         }
         return self::$resourceCache[$path];
     }
 
+    /**
+     * Returns an array of the locations listed in Fedora resources
+     * location path properties which don't exist in the filesystem.
+     * 
+     * An array of MissingLocation objects is returned.
+     * 
+     * Only location paths with literal values are taken into account.
+     * Support for location paths being URIs may be added in the future.
+     * 
+     * The location path property is defined by the "fedoraLocProp" 
+     * configuration option (see init()).
+     * 
+     * @return array 
+     * @throws RuntimeException
+     */
+    public function getMissingLocations(): array {
+        $missing = array();
+        foreach($this->getLocations() as $i){
+            if(!get_class($i->path) === 'EasyRdf_Literal'){
+                continue; // skip locations being URIs
+            }
+            
+            $fullPath = self::$containerDir . (string) $i->path;
+            if(!file_exists($fullPath)){
+                $missing[] = new Location($fullPath, (string) $i->path, (string) $i->uri);
+            }
+        }
+        return $missing;
+    }
+
+    /**
+     * Fetches all child resources locations.
+     * 
+     * @return \EasyRdf_Sparql_Result
+     * @throws RuntimeException
+     */
+    private function getLocations(): EasyRdf_Sparql_Result {
+        if(FedoraResource::inTransaction()){
+            throw new RuntimeException('Fedora transaction is active');
+        }
+        
+        $query = '
+            SELECT DISTINCT ?uri ?path
+            WHERE { 
+                ?uri %s ?path .
+                ?uri (%s / ^%s)+ %s
+            }
+        ';
+        $locProp = EasyRdfUtil::escapeUri(self::$locProp);
+        $relProp = EasyRdfUtil::escapeUri(self::$relProp);
+        $idProp = EasyRdfUtil::escapeUri(self::$idProp);
+        $thisUri = EasyRdfUtil::escapeUri($this->resource->getUri());
+        $query = sprintf($query, $locProp, $relProp, $idProp, $thisUri);
+        
+        $locations = SparqlEndpoint::query($query);
+        return $locations;
+    }
 }

@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-namespace acdhOeaw\rms;
+namespace acdhOeaw\util;
 
 use EasyRdf_Sparql_Client;
 use EasyRdf_Sparql_Result;

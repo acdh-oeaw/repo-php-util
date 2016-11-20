@@ -24,43 +24,35 @@
  * THE SOFTWARE.
  */
 
-namespace acdhOeaw;
+namespace acdhOeaw\storage;
 
-use EasyRdf_Namespace;
-use EasyRdf_Literal;
-use EasyRdf_Resource;
-use EasyRdf_Serialiser_Ntriples;
+use acdhOeaw\fedora\FedoraResource;
 
 /**
- * Class implementing workarounds for the EasyRdf library bugs
+ * Description of MissingLocation
  *
  * @author zozlak
  */
-class EasyRdfUtil {
+class Location {
 
     /**
-     * @var \EasyRdf_Serialiser_Ntriples
+     * @var string
      */
-    static private $serializer;
+    public $fullPath;
 
-    static public function fixPropName(string $property): string {
-        return join(':', EasyRdf_Namespace::splitUri($property, true));
+    /**
+     * @var string
+     */
+    public $relativePath;
+
+    /**
+     * @var \acdhOeaw\fedora\FedoraResource
+     */
+    public $resource;
+
+    public function __construct(string $fullPath, string $relPath, string $resUri) {
+        $this->fullPath = $fullPath;
+        $this->relativePath = $relPath;
+        $this->resource = new FedoraResource($resUri);
     }
-
-    static public function escapeUri(string $uri): string {
-        self::initSerializer();
-        return self::$serializer->serialiseValue(new EasyRdf_Resource($uri));
-    }
-
-    static public function escapeLiteral(string $literal): string {
-        self::initSerializer();
-        return self::$serializer->serialiseValue(new EasyRdf_Literal($literal));
-    }
-
-    static private function initSerializer() {
-        if (!self::$serializer) {
-            self::$serializer = new EasyRdf_Serialiser_Ntriples();
-        }
-    }
-
 }
