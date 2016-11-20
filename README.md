@@ -13,10 +13,10 @@ Set of classes for working with the ACDH repository stack.
     }
   }
   ```
-* run `composer install`
-* copy and adjust files:
-    * `vendor/acdhOeaw/config.ini.sample` (service URLs, credentials, metadata schema fundamentals)
-    * `vendor/acdhOeaw/property_mappings.json` (Redmine issues property mappings)
+* Run `composer install`
+* Copy and adjust files:
+    * `vendor/acdh-oeaw/repo-php-util/config.ini.sample` (service URLs, credentials, metadata schema fundamentals)
+    * `vendor/acdh-oeaw/repo-php-util/property_mappings.json` (Redmine issues property mappings)
 
 ## Initialization
 
