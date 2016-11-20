@@ -2,3 +2,4 @@
 /vendor
 /composer.lock
 /playground.php
+/docs/phpdoc-cache*
