@@ -204,7 +204,7 @@ abstract class Redmine {
         if ($this->fedoraRes) {
             return $this->fedoraRes;
         }
-        $resources = FedoraResource::getResourceByProperty(self::$idProp, $this->getIdValue());
+        $resources = FedoraResource::getResourcesByProperty(self::$idProp, $this->getIdValue());
         if (count($resources) > 1) {
             throw new RuntimeException('Many matching Fedora resources');
         } elseif (count($resources) == 1) {
