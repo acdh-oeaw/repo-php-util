@@ -1,7 +1,7 @@
 {
     "name": "acdh-oeaw/repo-php-util",
     "type": "library",
-    "description": "Set o classes for working with our repository stack",
+    "description": "Set of classes for working with our repository stack",
     "keywords": [],
     "homepage": "https://github.com/acdh-oeaw/repo-php-util",
     "license": "MIT",
