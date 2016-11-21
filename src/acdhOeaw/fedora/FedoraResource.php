@@ -385,7 +385,7 @@ class FedoraResource {
      * @see getId()
      */
     public function getIds(): array {
-        $this->getMetadata();
+        $this->loadMetadata();
         $ids = array();
         foreach ($this->metadata->allResources(EasyRdfUtil::fixPropName(self::$idProp)) as $i) {
             $ids[] = $i->getUri();
@@ -431,13 +431,17 @@ class FedoraResource {
         self::$client->patch($this->uri . '/fcr:metadata', $options);
 
         // read metadata after the update
-        $this->getMetadata(true);
+        $this->loadMetadata(true);
     }
 
     /**
      * Returns resource metadata.
      * 
      * Fetches them from the Fedora if they were not fetched already.
+     * 
+     * A deep copy of metadata is returned meaning adjusting the returned object
+     * does not automatically affect the resource metadata.
+     * Use the setMetadata() method to write back the changes you made.
      * 
      * @param bool $force enforce fetch from Fedora 
      *   (when you want to make sure metadata are in line with ones in the Fedora 
@@ -447,6 +451,18 @@ class FedoraResource {
      * @see setMetadata()
      */
     public function getMetadata(bool $force = false): EasyRdf_Resource {
+        $this->loadMetadata($force);
+        return $this->cloneMetadata(array(), '|^$|');
+    }
+
+    /**
+     * Loads current metadata from the Fedora.
+     * 
+     * @param bool $force enforce fetch from Fedora 
+     *   (when you want to make sure metadata are in line with ones in the Fedora 
+     *   or e.g. reset them back to their current state in Fedora)
+     */
+    private function loadMetadata(bool $force = false) {
         if (!$this->metadata || $force) {
             $resp = self::$client->get($this->uri . '/fcr:metadata');
 
@@ -454,7 +470,6 @@ class FedoraResource {
             $graph->parse($resp->getBody());
             $this->metadata = $graph->resource($this->uri);
         }
-        return $this->metadata;
     }
 
     /**
@@ -477,7 +492,7 @@ class FedoraResource {
      * @see init()
      */
     public function updateContent($data, bool $convert = false) {
-        $this->getMetadata();
+        $this->loadMetadata();
         if ($this->isA('http://www.w3.org/ns/ldp#RDFSource')) {
             self::uploadContent('PUT', $this->getUri(), $data);
         } else if ($convert) {
@@ -499,7 +514,7 @@ class FedoraResource {
      * @return bool
      */
     public function isA(string $class): bool {
-        $this->getMetadata();
+        $this->loadMetadata();
         $types = $this->metadata->allResources('http://www.w3.org/2000/01/rdf-schema#type');
         foreach ($types as $i) {
             if ($i->getUri() === $class) {
@@ -521,7 +536,7 @@ class FedoraResource {
      * 
      * @return string
      */
-    private function getSparqlTriples(): string {
+    public function getSparqlTriples(): string {
         // make a deep copy of the metadata graph excluding forbidden properties
         static $skipProp = array(
             'http://www.loc.gov/premis/rdf/v1#hasSize',
@@ -529,7 +544,24 @@ class FedoraResource {
             'http://www.iana.org/assignments/relation/describedby'
         );
         static $skipRegExp = '|^http://fedora[.]info/definitions/v4/repository#|';
+        $res = $this->cloneMetadata($skipProp, $skipRegExp);
 
+        // serialize graph to ntriples format and convert all subjects to <>
+        $rdf = "\n" . $res->getGraph()->serialise('ntriples') . "\n";
+        $pattern = '|\n' . EasyRdfUtil::escapeUri($this->getUri()) . '|';
+        $rdf = preg_replace($pattern, "\n<>", $rdf);
+
+        return $rdf;
+    }
+    
+    /**
+     * Returns a deep copy of the resource metadata
+     * 
+     * @param array $skipProp a list of fully qualified property URIs to skip
+     * @param string $skipRegExp regular expression matchin fully qualified property URIs to skip
+     * @return EasyRdf_Resource
+     */
+    private function cloneMetadata(array $skipProp, string $skipRegExp): EasyRdf_Resource{
         $graph = new EasyRdf_Graph();
         $res = $graph->resource($this->getUri());
 
@@ -545,16 +577,12 @@ class FedoraResource {
                 $res->addResource($prop, $i->getUri());
             }
         }
-
-        // serialize graph to ntriples format and convert all subjects to <>
-        $rdf = "\n" . $graph->serialise('ntriples') . "\n";
-        $pattern = '|\n' . EasyRdfUtil::escapeUri($this->getUri()) . '|';
-        $rdf = preg_replace($pattern, "\n<>", $rdf);
-
-        return $rdf;
+        
+        return $res;
     }
 
     public function __toString() {
         return $this->getUri();
     }
+
 }
