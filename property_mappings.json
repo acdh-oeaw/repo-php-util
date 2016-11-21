@@ -1,16 +1,17 @@
 {
-    "assigned_to":   {"uri": "https://vocabs.acdh.oeaw.ac.at/#maintainer",     "class": "objectProperty", "template": "",               "redmineClass": "acdhOeaw\\redmine\\User"},
-    "annotation":    {"uri": "https://vocabs.acdh.oeaw.ac.at/#annotation",     "class": "dataProperty",   "template": "",               "redmineClass": ""},
+    "annotation":    {"uri": "https://vocabs.acdh.oeaw.ac.at/#annotation",    "class": "dataProperty",   "template": "",               "redmineClass": ""},
+    "assigned_to":   {"uri": "https://vocabs.acdh.oeaw.ac.at/#maintainer",    "class": "objectProperty", "template": "",               "redmineClass": "acdhOeaw\\redmine\\User"},
     "description":   {"uri": "http://purl.org/dc/terms/description",          "class": "dataProperty",   "template": "",               "redmineClass": ""},
-    "endpoint":      {"uri": "https://vocabs.acdh.oeaw.ac.at/#locationpath",   "class": "dataProperty",   "template": "",               "redmineClass": ""},
+    "endpoint":      {"uri": "https://vocabs.acdh.oeaw.ac.at/#locationpath",  "class": "dataProperty",   "template": "",               "redmineClass": ""},
+    "firstname":     {"uri": "http://xmlns.com/foaf/0.1/givenName",           "class": "dataProperty",   "template": "",               "redmineClass": ""},
     "format":        {"uri": "http://purl.org/dc/terms/format",               "class": "dataProperty",   "template": "",               "redmineClass": ""},
-    "location_path": {"uri": "https://vocabs.acdh.oeaw.ac.at/#locationpath",   "class": "dataProperty",   "template": "",               "redmineClass": ""},
-    "pid":           {"uri": "https://vocabs.acdh.oeaw.ac.at/#pid",            "class": "objectProperty", "template": "",               "redmineClass": ""},
+    "lastname":      {"uri": "http://xmlns.com/foaf/0.1/familyName",          "class": "dataProperty",   "template": "",               "redmineClass": ""},
+    "location_path": {"uri": "https://vocabs.acdh.oeaw.ac.at/#locationpath",  "class": "dataProperty",   "template": "",               "redmineClass": ""},
+    "mail":          {"uri": "http://xmlns.com/foaf/0.1/mbox",                "class": "objectProperty", "template": "mailto:%VALUE%", "redmineClass": ""},
+    "name":          {"uri": "http://purl.org/dc/elements/1.1/title",         "class": "dataProperty",   "template": "",               "redmineClass": ""},
     "parent":        {"uri": "http://purl.org/dc/terms/isPartOf",             "class": "objectProperty", "template": "",               "redmineClass": "self"},
+    "pid":           {"uri": "https://vocabs.acdh.oeaw.ac.at/#pid",           "class": "objectProperty", "template": "",               "redmineClass": ""},
     "project":       {"uri": "http://purl.org/dc/terms/isPartOf",             "class": "objectProperty", "template": "",               "redmineClass": "acdhOeaw\\redmine\\Project"},
     "size":          {"uri": "http://purl.org/dc/terms/extent",               "class": "dataProperty",   "template": "",               "redmineClass": ""},
-    "subject":       {"uri": "http://www.w3.org/2004/02/skos/core#prefLabel", "class": "dataProperty",   "template": "",               "redmineClass": ""},
-    "mail":          {"uri": "http://xmlns.com/foaf/0.1/mbox",                "class": "objectProperty", "template": "mailto:%VALUE%", "redmineClass": ""},
-    "firstname":     {"uri": "http://xmlns.com/foaf/0.1/givenName",           "class": "dataProperty",   "template": "",               "redmineClass": ""},
-    "lastname":      {"uri": "http://xmlns.com/foaf/0.1/familyName",          "class": "dataProperty",   "template": "",               "redmineClass": ""}
+    "subject":       {"uri": "http://purl.org/dc/elements/1.1/title",         "class": "dataProperty",   "template": "",               "redmineClass": ""}
 }
