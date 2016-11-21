@@ -31,7 +31,7 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request;
 use EasyRdf_Graph;
 use EasyRdf_Resource;
-use DomainException;
+use InvalidArgumentException;
 use RuntimeException;
 use acdhOeaw\util\EasyRdfUtil;
 use acdhOeaw\util\SparqlEndpoint;
@@ -50,6 +50,23 @@ use zozlak\util\Config;
  * @author zozlak
  */
 class FedoraResource {
+
+    /**
+     * List of metadata properties managed exclusively by the Fedora
+     * @var array
+     */
+    static private $skipProp = array(
+        'http://www.loc.gov/premis/rdf/v1#hasSize',
+        'http://www.loc.gov/premis/rdf/v1#hasMessageDigest',
+        'http://www.iana.org/assignments/relation/describedby'
+    );
+
+    /**
+     * Regular expression for filtering out metadata properties managed
+     * exclusively by the Fedora
+     * @var string
+     */
+    static private $skipPropRegExp = '|^http://fedora[.]info/definitions/v4/repository#|';
 
     /**
      * Fedora API base URL
@@ -261,6 +278,31 @@ class FedoraResource {
     }
 
     /**
+     * Serialises metadata to a form suitable for Fedora's SPARQL-update query.
+     * 
+     * This means the "ntriples" format with blank subject URIs and excluding
+     * properties Fedora reserves for itself (and rises errors when they are
+     * provided from the outside).
+     * 
+     * Reserved Fedora properties include all in the http://fedora.info/definitions/v4/repository#
+     * namespace as well as premis:hasSize, premis:hasMessageDigest, iana:describedby.
+     * 
+     * @param \EasyRdf_Resource $metadata metadata to serialise
+     * @return string
+     */
+    static private function getSparqlTriples(EasyRdf_Resource $metadata): string {
+        // make a deep copy of the metadata graph excluding forbidden properties
+        $res = EasyRdfUtil::cloneResource($metadata, self::$skipProp, self::$skipPropRegExp);
+
+        // serialize graph to ntriples format and convert all subjects to <>
+        $rdf = "\n" . $res->getGraph()->serialise('ntriples') . "\n";
+        $pattern = '|\n' . EasyRdfUtil::escapeUri($metadata->getUri()) . '|';
+        $rdf = preg_replace($pattern, "\n<>", $rdf);
+
+        return $rdf;
+    }
+
+    /**
      * Starts new Fedora transaction.
      * 
      * Only one transaction can be opened at the same time, 
@@ -328,6 +370,17 @@ class FedoraResource {
      * @see updateMetadata()
      */
     private $metadata;
+
+    /**
+     * Resource metadata fetched from the Fedora
+     * enabling us to perform triples update.
+     * 
+     * @var \EasyRdf_Resource 
+     * @see getMetadata()
+     * @see setMetadata()
+     * @see updateMetadata()
+     */
+    private $metadataOld;
 
     /**
      * Creates new resource based on its Fedora URI.
@@ -419,17 +472,51 @@ class FedoraResource {
      * Fedora considers its private once, such properties will be ommited in the
      * update (see getSparqlTriples() method documentation for details).
      * 
+     * @param string $mode chooses the way the update is done:
+     *   ADD simply adds current triples. All already existing triples 
+     *     (also old value of the triples you altered) are kept.
+     *   UPDATE old values of already existing triples are updated with current
+     *     values, new triples are added and all other triples are kept.
+     *   OVERWRITE all existing triples are removed, then all current triples
+     *     are added.
      * @see getMetadata()
      * @see setMetadata()
      * @see getSparqlTriples()
      */
-    public function updateMetadata() {
+    public function updateMetadata(string $mode = 'UPDATE') {
+        if (!in_array($mode, array('ADD', 'UPDATE', 'OVERWRITE'))) {
+            throw new InvalidArgumentException('Mode should be one of ADD, UPDATE or OVERWITE');
+        }
+        if (!$this->metadata){
+            throw new RuntimeException('Get or set metadata first with getMetadata() or setMetadata()');
+        }
+
+        switch ($mode) {
+            case 'ADD':
+                $delete = '';
+                $where = '';
+                break;
+            case 'UPDATE':
+                $delete = $this->metadataOld ? self::getSparqlTriples($this->metadataOld) : '';
+                $where = '';
+                break;
+            case 'OVERWRITE':
+                $delete = '<> ?prop ?value .';
+                $where = '<> ?prop ?value . FILTER (!regex(str(?prop), "^http://fedora[.]info")';
+                foreach(self::$skipProp as $i){
+                    $where .= ' && str(?prop) != str(' . EasyRdfUtil::escapeUri($i). ')';
+                }
+                $where .= ')';
+                break;
+        }
+        $insert = self::getSparqlTriples($this->metadata);
+        $body = sprintf('DELETE {%s} INSERT {%s} WHERE {%s}', $delete, $insert, $where);
+
         $options = [
-            'body' => sprintf('INSERT {%s} WHERE {}', $this->getSparqlTriples()),
+            'body' => $body,
             'headers' => ['Content-Type' => 'application/sparql-update']
         ];
         self::$client->patch($this->uri . '/fcr:metadata', $options);
-
         // read metadata after the update
         $this->loadMetadata(true);
     }
@@ -452,7 +539,7 @@ class FedoraResource {
      */
     public function getMetadata(bool $force = false): EasyRdf_Resource {
         $this->loadMetadata($force);
-        return $this->cloneMetadata(array(), '|^$|');
+        return EasyRdfUtil::cloneResource($this->metadata);
     }
 
     /**
@@ -469,6 +556,8 @@ class FedoraResource {
             $graph = new EasyRdf_Graph();
             $graph->parse($resp->getBody());
             $this->metadata = $graph->resource($this->uri);
+
+            $this->metadataOld = EasyRdfUtil::cloneResource($this->metadata);
         }
     }
 
@@ -525,60 +614,13 @@ class FedoraResource {
     }
 
     /**
-     * Transforms metadata to a form suitable for Fedora's SPARQL-update query.
-     * 
-     * This means the "ntriples" format with blank subject URIs and excluding
-     * properties Fedora reserves for itself (and rises errors when they are
-     * provided from the outside).
-     * 
-     * Reserved Fedora properties include all in the http://fedora.info/definitions/v4/repository#
-     * namespace as well as premis:hasSize, premis:hasMessageDigest, iana:describedby.
+     * Debugging helper allowing to take a look at the resource metadata 
+     * in a console-friendly way
      * 
      * @return string
      */
-    public function getSparqlTriples(): string {
-        // make a deep copy of the metadata graph excluding forbidden properties
-        static $skipProp = array(
-            'http://www.loc.gov/premis/rdf/v1#hasSize',
-            'http://www.loc.gov/premis/rdf/v1#hasMessageDigest',
-            'http://www.iana.org/assignments/relation/describedby'
-        );
-        static $skipRegExp = '|^http://fedora[.]info/definitions/v4/repository#|';
-        $res = $this->cloneMetadata($skipProp, $skipRegExp);
-
-        // serialize graph to ntriples format and convert all subjects to <>
-        $rdf = "\n" . $res->getGraph()->serialise('ntriples') . "\n";
-        $pattern = '|\n' . EasyRdfUtil::escapeUri($this->getUri()) . '|';
-        $rdf = preg_replace($pattern, "\n<>", $rdf);
-
-        return $rdf;
-    }
-    
-    /**
-     * Returns a deep copy of the resource metadata
-     * 
-     * @param array $skipProp a list of fully qualified property URIs to skip
-     * @param string $skipRegExp regular expression matchin fully qualified property URIs to skip
-     * @return EasyRdf_Resource
-     */
-    private function cloneMetadata(array $skipProp, string $skipRegExp): EasyRdf_Resource{
-        $graph = new EasyRdf_Graph();
-        $res = $graph->resource($this->getUri());
-
-        foreach ($this->metadata->propertyUris() as $prop) {
-            if (in_array($prop, $skipProp) || preg_match($skipRegExp, $prop)) {
-                continue;
-            }
-            $prop = EasyRdfUtil::fixPropName($prop);
-            foreach ($this->metadata->allLiterals($prop) as $i) {
-                $res->addLiteral($prop, $i->getValue());
-            }
-            foreach ($this->metadata->allResources($prop) as $i) {
-                $res->addResource($prop, $i->getUri());
-            }
-        }
-        
-        return $res;
+    public function __getSparqlTriples(): string {
+        return self::getSparqlTriples($this->metadata);
     }
 
     public function __toString() {

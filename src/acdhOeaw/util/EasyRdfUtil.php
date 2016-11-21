@@ -28,6 +28,7 @@ namespace acdhOeaw\util;
 
 use EasyRdf_Namespace;
 use EasyRdf_Literal;
+use EasyRdf_Graph;
 use EasyRdf_Resource;
 use EasyRdf_Serialiser_Ntriples;
 
@@ -63,4 +64,32 @@ class EasyRdfUtil {
         }
     }
 
+    /**
+     * Returns a deep copy of the given EasyRdf_Resouerce 
+     * optionally excluding given properties.
+     * 
+     * @param \EasyRdf_Resource $resource metadata to clone
+     * @param array $skipProp a list of fully qualified property URIs to skip
+     * @param string $skipRegExp regular expression matchin fully qualified property URIs to skip
+     * @return \EasyRdf_Resource
+     */
+    static public function cloneResource(EasyRdf_Resource $resource, array $skipProp = array(), string $skipRegExp = '/^$/'): EasyRdf_Resource {
+        $graph = new EasyRdf_Graph();
+        $res = $graph->resource($resource->getUri());
+
+        foreach ($resource->propertyUris() as $prop) {
+            if (in_array($prop, $skipProp) || preg_match($skipRegExp, $prop)) {
+                continue;
+            }
+            $prop = EasyRdfUtil::fixPropName($prop);
+            foreach ($resource->allLiterals($prop) as $i) {
+                $res->addLiteral($prop, $i->getValue());
+            }
+            foreach ($resource->allResources($prop) as $i) {
+                $res->addResource($prop, $i->getUri());
+            }
+        }
+
+        return $res;
+    }
 }
