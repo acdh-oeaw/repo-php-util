@@ -258,21 +258,19 @@ class FedoraResource {
     }
 
     /**
-     * Cleans up the resource URI by attaching missing Fedora API base URL 
-     * and attaching or skipping current transaction URI.
+     * Cleans up the resource URI by skipping Fedora base URL and transation
+     * URI (if they exist) and prepending the Fedora base URL or current 
+     * transaction URI (based on the $skipTx parameter).
      * 
      * @param string $uri resource URI
-     * @param bool $skipTx should current transaction by ommited
+     * @param bool $skipTx should Fedora base URL be prepended instead of 
+     *   current transaction URI (if transaction is not opened, Fedora base
+     *   URL is used no matter this parameter value)
      * @return string 
      */
     static private function sanitizeUri(string $uri, bool $skipTx) {
         $baseUrl = $skipTx || !self::$txUrl ? self::$apiUrl : self::$txUrl;
-
-        if (self::$txUrl && mb_strpos($uri, self::$txUrl) === 0) {
-            $uri = mb_substr($uri, mb_strlen(self::$txUrl) + 1);
-        } elseif (self::$apiUrl && mb_strpos($uri, self::$apiUrl) === 0) {
-            $uri = mb_substr($uri, mb_strlen(self::$apiUrl) + 1);
-        }
+        $uri = preg_replace('|^https?://[^/]+/rest/(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
         $uri = $baseUrl . '/' . $uri;
         return $uri;
     }
@@ -497,7 +495,12 @@ class FedoraResource {
                 $where = '';
                 break;
             case 'UPDATE':
-                $delete = $this->metadataOld ? self::getSparqlTriples($this->metadataOld) : '';
+                if(!$this->metadataOld){
+                    $metadataTmp = $this->metadata;
+                    $this->loadMetadata(true);
+                    $this->metadata = $metadataTmp;
+                }
+                $delete = self::getSparqlTriples($this->metadataOld);
                 $where = '';
                 break;
             case 'OVERWRITE':
