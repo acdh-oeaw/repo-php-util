@@ -126,14 +126,15 @@ abstract class Redmine {
 
     /**
      *
-     * @var \acdhOeaw\rms\FedoraResource
+     * @var \acdhOeaw\fedora\FedoraResource
      */
-    protected $fedoraRes = '';
+    protected $fedoraRes;
 
     public function __construct(stdClass $data) {
 //echo 'New ' . get_class($this) . ' ' . $data->id . "\n";
         $this->id = $data->id;
         $this->metadata = $this->mapProperties((array) $data);
+        $this::$cache[$this->id] = $this;
     }
 
     protected function addValue(EasyRdf_Resource $res, stdClass $prop, string $value) {
@@ -200,38 +201,33 @@ abstract class Redmine {
         return $res;
     }
 
-    public function getRmsUri(bool $create = false) {
-        if ($this->fedoraRes) {
-            return $this->fedoraRes;
+    public function getRmsUri(bool $create = false): string {
+        if (!$this->fedoraRes) {
+            $resources = FedoraResource::getResourcesByProperty(self::$idProp, $this->getIdValue());
+            if (count($resources) > 1) {
+                throw new RuntimeException('Many matching Fedora resources');
+            } elseif (count($resources) == 1) {
+                $this->fedoraRes = $resources[0];
+            } else if ($create) {
+                $this->fedoraRes = FedoraResource::factory($this->metadata);
+            }
         }
-        $resources = FedoraResource::getResourcesByProperty(self::$idProp, $this->getIdValue());
-        if (count($resources) > 1) {
-            throw new RuntimeException('Many matching Fedora resources');
-        } elseif (count($resources) == 1) {
-            $this->fedoraRes = $resources[0];
-        } elseif ($create) {
-            $this->updateRms();
-        }
-        return $this->fedoraRes;
+        return $this->fedoraRes->getUri();
     }
 
     public function updateRms() {
-        $this->getRmsUri(false);
-        if ($this->fedoraRes) {
-            $this->fedoraRes->setMetadata($this->metadata);
-            $this->fedoraRes->updateMetadata();
-        } else {
-            $this->fedoraRes = FedoraResource::factory($this->metadata);
+        if (!$this->fedoraRes) {
+            $this->getRmsUri(true);
         }
+        $this->fedoraRes->setMetadata($this->metadata);
+        $this->fedoraRes->updateMetadata();
     }
 
-    protected function getRmsId() {
-        $this->getRmsUri(true);
-        $ids = $this->fedoraRes->getIds();
-        if (count($ids) !== 1) {
-            throw new RuntimeException((count($ids) == 0 ? 'No' : 'Many') . ' ids found');
+    protected function getRmsId(): string {
+        if (!$this->fedoraRes) {
+            $this->getRmsUri(true);
         }
-        return $ids[0];
+        return $this->fedoraRes->getId();
     }
 
 }

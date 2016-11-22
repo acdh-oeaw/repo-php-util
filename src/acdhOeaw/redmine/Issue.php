@@ -34,7 +34,7 @@ namespace acdhOeaw\redmine;
  */
 class Issue extends Redmine {
 
-    static private $cache = [];
+    static protected $cache = [];
 
     static public function getById(int $id): Redmine {
 //echo 'get issue ' . $id . "\n";
