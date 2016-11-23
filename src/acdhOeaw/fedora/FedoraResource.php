@@ -585,7 +585,7 @@ class FedoraResource {
      */
     public function updateContent($data, bool $convert = false) {
         $this->loadMetadata();
-        if ($this->isA('http://www.w3.org/ns/ldp#RDFSource')) {
+        if ($this->isA('http://www.w3.org/ns/ldp#Binary')) {
             self::uploadContent('PUT', $this->getUri(), $data);
         } else if ($convert) {
             self::$client->send(new Request('DELETE', $this->getUri()));
