@@ -161,7 +161,7 @@ class FedoraResource {
 
         return $res;
     }
-
+ 
     /**
      * Makes an HTTP request with a given method and body.
      * 
@@ -607,7 +607,7 @@ class FedoraResource {
      */
     public function isA(string $class): bool {
         $this->loadMetadata();
-        $types = $this->metadata->allResources('http://www.w3.org/2000/01/rdf-schema#type');
+        $types = $this->metadata->allResources(EasyRdfUtil::fixPropName('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'));
         foreach ($types as $i) {
             if ($i->getUri() === $class) {
                 return true;
