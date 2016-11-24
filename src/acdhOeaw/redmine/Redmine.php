@@ -134,14 +134,6 @@ abstract class Redmine {
 
         $this->id = $data->id;
         $this->metadata = $this->mapProperties((array) $data);
-//        static $flag = false;
-//        if (preg_match('/Issue/', get_class($this)) && $data->id == 4757 && $flag) {
-//            throw new \Exception('duplicate!');
-//        }
-//        if (preg_match('/Issue/', get_class($this)) && $data->id == 4757) {
-//            echo "creating 4757\n";
-//            $flag = true;
-//        }
     }
 
     private function addValue(EasyRdf_Resource $res, stdClass $prop, string $value) {
