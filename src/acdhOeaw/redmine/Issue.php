@@ -38,12 +38,25 @@ class Issue extends Redmine {
 
     static public function getById(int $id): Redmine {
 //echo 'get issue ' . $id . "\n";
+//        if ($id == 4757) {
+//            echo "\n get 4757: " . ((int) isset(self::$cache[$id])) . "\n";
+//        }
         if (!isset(self::$cache[$id])) {
             $url = self::$apiUrl . '/issues/' . urlencode($id) . '.json?key=' . urlencode(self::$apiKey);
             $data = json_decode(file_get_contents($url));
             self::$cache[$id] = new Issue($data->issue);
         }
         return self::$cache[$id];
+    }
+
+    static public function fetchAll(bool $progressBar, array $filters = array()): array {
+        $param = ['key=' . urlencode(self::$apiKey), 'limit' => 1000000];
+        foreach ($filters as $k => $v) {
+            $param[] = urlencode($k) . '=' . urlencode($v);
+        }
+        $param = implode('&', $param);
+
+        return self::redmineFetchLoop($progressBar, 'issues', $param, 'acdhOeaw\\redmine\\Issue');
     }
 
     public function getIdValue(): string {

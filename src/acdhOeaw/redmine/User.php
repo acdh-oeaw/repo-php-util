@@ -46,6 +46,11 @@ class User extends Redmine {
         return self::$cache[$id];
     }
 
+    static public function fetchAll(bool $progressBar): array {
+        $param = 'limit=100000&key=' . urlencode(self::$apiKey);
+        return self::redmineFetchLoop($progressBar, 'users', $param, 'acdhOeaw\\redmine\\User');
+    }
+
     protected function getIdValue(): string {
         return self::$apiUrl . '/users/' . $this->id;
     }

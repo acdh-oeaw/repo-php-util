@@ -46,6 +46,12 @@ class Project extends Redmine {
         return self::$cache[$id];
     }
 
+    static public function fetchAll(bool $progressBar): array {
+        $param = 'limit=100000&key=' . urlencode(self::$apiKey);
+        $param .= "&project_id=34";
+        return self::redmineFetchLoop($progressBar, 'projects', $param, 'acdhOeaw\\redmine\\Project');
+    }
+
     public function getIdValue(): string {
         return self::$apiUrl . '/projects/' . $this->id;
     }

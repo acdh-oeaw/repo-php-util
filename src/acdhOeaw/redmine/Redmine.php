@@ -28,9 +28,11 @@ namespace acdhOeaw\redmine;
 
 use stdClass;
 use RuntimeException;
+use BadMethodCallException;
 use EasyRdf_Graph;
 use EasyRdf_Resource;
-use acdhOeaw\fedora\FedoraResource;
+use acdhOeaw\fedora\Fedora;
+use acdhOeaw\util\EasyRdfUtil;
 use zozlak\util\Config;
 use zozlak\util\ProgressBar;
 
@@ -42,10 +44,15 @@ use zozlak\util\ProgressBar;
  */
 abstract class Redmine {
 
-    static private $idProp;
-    static protected $propMap;
     static protected $apiUrl;
     static protected $apiKey;
+    static private $idProp;
+    static private $propMap;
+
+    /**
+     * @var \acdhOeaw\fedora\Fedora
+     */
+    static private $fedora;
 
     /**
      * Creates a redmine object based on its redmine ID
@@ -55,6 +62,8 @@ abstract class Redmine {
      */
     static public abstract function getById(int $id): Redmine;
 
+    static public abstract function fetchAll(bool $progressBar): array;
+
     /**
      * Returns redmine's API URI corresponding to a given object.
      * 
@@ -62,14 +71,15 @@ abstract class Redmine {
      */
     protected abstract function getIdValue(): string;
 
-    static public function init(Config $cfg) {
+    static public function init(Config $cfg, Fedora $fedora) {
         self::$propMap = (array) json_decode(file_get_contents($cfg->get('mappingsFile')));
         self::$apiUrl = $cfg->get('redmineApiUrl');
         self::$apiKey = $cfg->get('redmineApiKey');
         self::$idProp = $cfg->get('redmineIdProp');
+        self::$fedora = $fedora;
     }
 
-    static private function redmineFetchLoop(bool $progressBar, string $endpoint, string $param, string $class): array {
+    static protected function redmineFetchLoop(bool $progressBar, string $endpoint, string $param, string $class): array {
         if ($progressBar) {
             $pb = new ProgressBar(null, 10);
         }
@@ -82,7 +92,7 @@ abstract class Redmine {
             if ($data) {
                 $data = json_decode($data);
                 foreach ($data->$endpoint as $i) {
-                    $objects[] = new $class($i);
+                    $objects[] = get_called_class()::getById($i->id);
                     if ($progressBar) {
                         $pb->next();
                     }
@@ -95,26 +105,6 @@ abstract class Redmine {
             $pb->finish();
         }
         return $objects;
-    }
-
-    static public function fetchAllProjects(bool $progressBar): array {
-        $param = 'limit=100000&key=' . urlencode(self::$apiKey);
-        return self::redmineFetchLoop($progressBar, 'projects', $param, 'acdhOeaw\\redmine\\Project');
-    }
-
-    static public function fetchAllUsers(bool $progressBar): array {
-        $param = 'limit=100000&key=' . urlencode(self::$apiKey);
-        return self::redmineFetchLoop($progressBar, 'users', $param, 'acdhOeaw\\redmine\\User');
-    }
-
-    static public function fetchAllIssues(bool $progressBar, array $filters = []): array {
-        $param = ['key=' . urlencode(self::$apiKey), 'limit' => 1000000];
-        foreach ($filters as $k => $v) {
-            $param[] = urlencode($k) . '=' . urlencode($v);
-        }
-        $param = implode('&', $param);
-
-        return self::redmineFetchLoop($progressBar, 'issues', $param, 'acdhOeaw\\redmine\\Issue');
     }
 
     protected $id;
@@ -130,14 +120,31 @@ abstract class Redmine {
      */
     protected $fedoraRes;
 
+    /**
+     * Must not be called directly as this can lead to duplication
+     * 
+     * @param stdClass $data
+     * @throws BadMethodCallException
+     */
     public function __construct(stdClass $data) {
+        if (isset(get_called_class()::$cache[$data->id])) {
+            throw new BadMethodCallException('Object already exists, call ' . get_called_class() . '::getById() instead');
+        }
 //echo 'New ' . get_class($this) . ' ' . $data->id . "\n";
+
         $this->id = $data->id;
         $this->metadata = $this->mapProperties((array) $data);
-        $this::$cache[$this->id] = $this;
+//        static $flag = false;
+//        if (preg_match('/Issue/', get_class($this)) && $data->id == 4757 && $flag) {
+//            throw new \Exception('duplicate!');
+//        }
+//        if (preg_match('/Issue/', get_class($this)) && $data->id == 4757) {
+//            echo "creating 4757\n";
+//            $flag = true;
+//        }
     }
 
-    protected function addValue(EasyRdf_Resource $res, stdClass $prop, string $value) {
+    private function addValue(EasyRdf_Resource $res, stdClass $prop, string $value) {
         if (!$value) {
             return;
         }
@@ -167,11 +174,33 @@ abstract class Redmine {
         }
     }
 
-    protected function mapProperties(array $data) {
-        $graph = new EasyRdf_Graph();
-        $res = $graph->resource('.');
+    /**
+     * If resource already exists mapping must preserve already existing
+     * properties (especialy fedoraId!) and also take care about deleting
+     * ones being "updated".
+     * That is because in RDF there is nothing like updating a triple.
+     * Triples can be only deleted or added.
+     * "Updating a triple" means deleting its old value and inserting 
+     * the new one.
+     * 
+     * @param array $data
+     * @return type
+     */
+    private function mapProperties(array $data) {
+        $this->getRmsUri(false); // to load metadata if resource already exists
+
+        if ($this->fedoraRes) {
+            $res = $this->fedoraRes->getMetadata();
+        } else {
+            $graph = new EasyRdf_Graph();
+            $res = $graph->resource('.');
+        }
+
+        $res->delete(EasyRdfUtil::fixPropName(self::$idProp));
         $res->addResource(self::$idProp, $this->getIdValue());
         foreach (self::$propMap as $redmineProp => $rdfProp) {
+            $res->delete(EasyRdfUtil::fixPropName($rdfProp->uri));
+
             $value = null;
             if (isset($data[$redmineProp])) {
                 $value = $data[$redmineProp];
@@ -194,6 +223,7 @@ abstract class Redmine {
                         $this->addValue($res, $rdfProp, $v);
                     } catch (RuntimeException $e) {
                         echo "\n" . 'Adding value for the ' . $redmineProp . ' of the ' . $this->getIdValue() . ' failed: ' . $e->getMessage() . "\n";
+                        throw $e;
                     }
                 }
             }
@@ -201,18 +231,21 @@ abstract class Redmine {
         return $res;
     }
 
-    public function getRmsUri(bool $create = false): string {
+    private function getRmsUri(bool $create = false): string {
         if (!$this->fedoraRes) {
-            $resources = FedoraResource::getResourcesByProperty(self::$idProp, $this->getIdValue());
+            $resources = self::$fedora->getResourcesByProperty(self::$idProp, $this->getIdValue());
             if (count($resources) > 1) {
+                foreach ($resources as $i) {
+                    print_r([$i->getUri(), $i->getIds()]);
+                }
                 throw new RuntimeException('Many matching Fedora resources');
             } elseif (count($resources) == 1) {
                 $this->fedoraRes = $resources[0];
             } else if ($create) {
-                $this->fedoraRes = FedoraResource::factory($this->metadata);
+                $this->fedoraRes = self::$fedora->createResource($this->metadata);
             }
         }
-        return $this->fedoraRes->getUri();
+        return $this->fedoraRes ? $this->fedoraRes->getUri() : '';
     }
 
     public function updateRms() {
@@ -223,7 +256,7 @@ abstract class Redmine {
         $this->fedoraRes->updateMetadata();
     }
 
-    protected function getRmsId(): string {
+    private function getRmsId(): string {
         if (!$this->fedoraRes) {
             $this->getRmsUri(true);
         }
