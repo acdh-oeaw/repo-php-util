@@ -180,7 +180,7 @@ class Indexer {
                 echo $verbose && !$skip ? "\t" . $res->getId() . "\n\t" . $res->getUri() . "\n" : "";
 
                 // recursion
-                if ($i->isDir() && (!$skip || $this->flatStructure)) {
+                if ($i->isDir() && (!$skip || $this->flatStructure && $this->depth > 0)) {
                     echo $verbose ? "entering " . $i->getPathname() . "\n" : "";
                     $ind = clone($this);
                     $ind->setDepth($this->depth - 1);
