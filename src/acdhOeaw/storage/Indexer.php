@@ -254,7 +254,7 @@ class Indexer {
             if ($res->numRows() > 1) {
                 throw new RuntimeException('Many resources with a given location path');
             }
-            self::$resourceCache[$path] = new FedoraResource($res[0]->child);
+            self::$resourceCache[$path] = new FedoraResource($this->resource->getFedora(), $res[0]->child);
         }
         return self::$resourceCache[$path];
     }
