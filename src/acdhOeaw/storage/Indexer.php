@@ -110,7 +110,7 @@ class Indexer {
         $this->filter = $filter;
     }
 
-    public function setFlatStracture(bool $ifFlat) {
+    public function setFlatStructure(bool $ifFlat) {
         $this->flatStructure = $ifFlat;
     }
 
@@ -180,7 +180,7 @@ class Indexer {
                 echo $verbose && !$skip ? "\t" . $res->getId() . "\n\t" . $res->getUri() . "\n" : "";
 
                 // recursion
-                if ($i->isDir() && !$skip) {
+                if ($i->isDir() && (!$skip || $this->flatStructure)) {
                     echo $verbose ? "entering " . $i->getPathname() . "\n" : "";
                     $ind = clone($this);
                     $ind->setDepth($this->depth - 1);
@@ -211,7 +211,9 @@ class Indexer {
                 }
             }
         }
-        return !$this->includeEmpty && $i->isDir() && ($this->depth == 0 || $isEmptyDir) || !$i->isDir() && !preg_match($this->filter, $i->getFilename());
+        $skipDir = (!$this->includeEmpty && ($this->depth == 0 || $isEmptyDir) || $this->flatStructure);
+        $skipFile = !preg_match($this->filter, $i->getFilename());
+        return $i->isDir() && $skipDir || !$i->isDir() && $skipFile;
     }
 
     private function createMetadata(string $path, DirectoryIterator $i): EasyRdf_Resource {
