@@ -183,6 +183,10 @@ class FedoraResource {
         return $ids;
     }
 
+    public function getFedora(): Fedora {
+        return $this->fedora;
+    }
+
     /**
      * Replaces resource metadata with a given RDF graph.
      * 
