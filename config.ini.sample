@@ -17,3 +17,7 @@ fedoraUser="admin"
 fedoraPswd="admin"
 
 containerDir="/mnt/acdh_resources/container/"
+
+redmineClasses[acdhOeaw\redmine\Project]="http://vocabs.acdh.ac.at/#Project"
+redmineClasses[acdhOeaw\redmine\User]="http://xmlns.com/foaf/0.1/Agent"
+redmineClasses[acdhOeaw\redmine\Issue]="http://vocabs.acdh.ac.at/#DigitalResource"

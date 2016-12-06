@@ -49,6 +49,7 @@ class Indexer {
     static private $relProp;
     static private $locProp;
     static private $sizeProp;
+    static private $titleProp;
     static private $containerDir;
     static private $resourceCache = array();
 
@@ -62,6 +63,7 @@ class Indexer {
         self::$relProp = $cfg->get('fedoraRelProp');
         self::$locProp = $cfg->get('fedoraLocProp');
         self::$sizeProp = $cfg->get('fedoraSizeProp');
+        self::$titleProp = $cfg->get('fedoraTitleProp');
         self::$containerDir = preg_replace('|/$|', '', $cfg->get('containerDir')) . '/';
         self::$sparqlClient = new EasyRdf_Sparql_Client($cfg->get('sparqlUrl'));
     }
@@ -71,7 +73,7 @@ class Indexer {
      */
     private $resource;
     private $paths = array();
-    private $filter = '';
+    private $filter = '//';
     private $flatStructure = false;
     private $uploadSizeLimit = 0;
     private $depth = 1000;
@@ -220,7 +222,9 @@ class Indexer {
         $graph = new EasyRdf_Graph;
         $metadata = $graph->resource('newResource');
         $metadata->addLiteral(self::$locProp, $path . '/' . $i->getFilename());
+        $metadata->addLiteral(self::$titleProp, $i->getFilename());
         $metadata->addLiteral('ebucore:filename', $i->getFilename());
+        $metadata->addLiteral('ebucore:hasMimeType', mime_content_type($i->getPathname()));
         $metadata->addResource(self::$relProp, $this->resource->getId());
         if ($i->isFile()) {
             $metadata->addLiteral(self::$sizeProp, $i->getSize());

@@ -48,12 +48,13 @@ abstract class Redmine {
     static protected $apiKey;
     static private $idProp;
     static private $propMap;
+    static private $classes = array();
 
     /**
      * @var \acdhOeaw\fedora\Fedora
      */
     static private $fedora;
-
+    
     /**
      * Creates a redmine object based on its redmine ID
      * 
@@ -77,6 +78,7 @@ abstract class Redmine {
         self::$apiKey = $cfg->get('redmineApiKey');
         self::$idProp = $cfg->get('redmineIdProp');
         self::$fedora = $fedora;
+        self::$classes = $cfg->get('redmineClasses');
     }
 
     static protected function redmineFetchLoop(bool $progressBar, string $endpoint, string $param, string $class): array {
@@ -190,6 +192,9 @@ abstract class Redmine {
 
         $res->delete(EasyRdfUtil::fixPropName(self::$idProp));
         $res->addResource(self::$idProp, $this->getIdValue());
+        
+        $res->delete('rdf:type');
+        $res->addResource('rdf:type', self::$classes[get_called_class()]);
         
         $deletedProps = array();
         foreach (self::$propMap as $redmineProp => $rdfProp) {
