@@ -2,7 +2,7 @@
 
 Set of classes for working with the ACDH repository stack.
 
-## Installation
+# Installation
 
 * obtain composer (https://getcomposer.org/)
 * prepare `composer.json` file containing:
@@ -18,7 +18,7 @@ Set of classes for working with the ACDH repository stack.
     * `vendor/acdh-oeaw/repo-php-util/config.ini.sample` (service URLs, credentials, metadata schema fundamentals)
     * `vendor/acdh-oeaw/repo-php-util/property_mappings.json` (Redmine issues property mappings)
 
-## Initialization
+# Initialization
 
 * Load composer
 * Read config from `config.ini`
@@ -35,11 +35,11 @@ acdhOeaw\redmine\Redmine::init($config, $fedora);
 acdhOeaw\storage\Indexer::init($config);
 ```
 
-## Usage
+# Usage
 
 (it is assumed that you already run the initialization code, especially that the `$fedora` object is created)
 
-### Working with Fedora resources
+## Working with Fedora resources
 
 A Fedora resource is represented by the `achdOeaw\fedora\FedoraResource` class.
 
@@ -54,7 +54,7 @@ The metadata are represented by the [EasyRdf Resource](http://www.easyrdf.org/do
 
 **All resource modifications must be done within a Fedora transaction** so all the `$fedora->begin()` and `$fedora->commit()` in the code examples are really needed.
 
-#### Creating a new Fedora resource
+### Creating a new Fedora resource
 
 Prepare resource metadata and (optionally) its binary content and call the `createResource()` method of the `Fedora` class.
 
@@ -71,7 +71,7 @@ $resource2 = $fedora->createResource($metadata); // without binary data
 $fedora->commit();
 ```
 
-#### Finding already existing Fedora resources
+### Finding already existing Fedora resources
 
 If you know the resource ACDH ID you can use the `getResourceById()` method.
 
@@ -95,7 +95,7 @@ $resource = $fedora->getResourceByUri('http://fedora.apollo.arz.oeaw.ac.at/rest/
 echo $resource->__getSparqlTriples();
 ```
 
-#### Updating resource metadata
+### Updating resource metadata
 
 **Updating RDF metadata is a little tricky.**
 The main problem is that an update of a metadata property value is not well defined therefore can not be done automatically for you.
@@ -194,7 +194,7 @@ $resource->updateMetadata();
 $fedora->commit();
 ```
 
-#### Updating resource binary data
+### Updating resource binary data
 
 Updating resource binary data is easy. Just obtain the `acdhOeaw\fedora\FedoraResource` object (see above) and call the `updateContent()` method.
 
@@ -208,7 +208,7 @@ $resource->updateContent('new content of the resource'); // with data passed dir
 $fedora->commit();
 ```
 
-### Synchronizing Redmine with Fedora
+## Synchronizing Redmine with Fedora
 
 There is a set of classes for syncing various Redmine objects (projects, users and issues) with Fedora: 
 `acdhOeaw\redmine\Project`, `acdhOeaw\redmine\User` and `acdhOeaw\redmine\Issue`
@@ -231,7 +231,7 @@ foreach ($issues as $i) {
 $fedora->commit();
 ```
 
-### Indexing files in the filesystem
+## Indexing files in the filesystem
 
 Library providex the `acdhOeaw\storage\Indexer` class which automates the process of ingesting/updating binary content into the Fedora.
 
