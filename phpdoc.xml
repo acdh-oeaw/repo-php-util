@@ -6,6 +6,9 @@
   <transformer>
     <target>docs</target>
   </transformer>
+  <transformations>
+    <template name="responsive-twig"/>
+  </transformations>
   <files>
     <directory>src/acdhOeaw</directory>
   </files>

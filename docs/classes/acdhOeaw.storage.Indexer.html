@@ -3,947 +3,1183 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta charset="utf-8"/>
-    <title>API Documentation</title>
+    <title>    API Documentation &raquo; \acdhOeaw\storage\Indexer
+</title>
     <meta name="author" content=""/>
     <meta name="description" content=""/>
 
-    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
-    <link href="../css/font-awesome.min.css" rel="stylesheet">
-    <link href="../css/prism.css" rel="stylesheet" media="all"/>
-    <link href="../css/template.css" rel="stylesheet" media="all"/>
+            <link href="../css/template.css" rel="stylesheet" media="all"/>
     
-    <!--[if lt IE 9]>
-    <script src="../js/html5.js"></script>
-    <![endif]-->
-    <script src="../js/jquery-1.11.0.min.js"></script>
-    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
-    <script src="../js/bootstrap.min.js"></script>
-    <script src="../js/jquery.smooth-scroll.js"></script>
-    <script src="../js/prism.min.js"></script>
-    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
-    <script type="text/javascript">
-    function loadExternalCodeSnippets() {
-        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
-            var src = pre.getAttribute('data-src');
-            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
-            var language = 'php';
-
-            var code = document.createElement('code');
-            code.className = 'language-' + language;
-
-            pre.textContent = '';
-
-            code.textContent = 'Loading…';
-
-            pre.appendChild(code);
-
-            var xhr = new XMLHttpRequest();
-
-            xhr.open('GET', src, true);
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4) {
-
-                    if (xhr.status < 400 && xhr.responseText) {
-                        code.textContent = xhr.responseText;
-
-                        Prism.highlightElement(code);
-                    }
-                    else if (xhr.status >= 400) {
-                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
-                    }
-                    else {
-                        code.textContent = '✖ Error: File does not exist or is empty';
-                    }
-                }
-            };
-
-            xhr.send(null);
-        });
-    }
-
-    $(document).ready(function(){
-        loadExternalCodeSnippets();
-    });
-    $('#source-view').on('shown', function () {
-        loadExternalCodeSnippets();
-    })
-</script>
-
-    <link rel="shortcut icon" href="../images/favicon.ico"/>
-    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
-    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
-    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
-</head>
+            <!--[if lt IE 9]>
+        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+        <![endif]-->
+        <script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script>
+        <script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
+        <script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script>
+        <script src="../js/bootstrap.js" type="text/javascript"></script>
+        <script src="../js/template.js" type="text/javascript"></script>
+        <script src="../js/prettify/prettify.min.js" type="text/javascript"></script>
+    
+            <link rel="shortcut icon" href="../img/favicon.ico"/>
+        <link rel="apple-touch-icon" href="../img/apple-touch-icon.png"/>
+        <link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png"/>
+        <link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png"/>
+    </head>
 <body>
 
-<div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <i class="icon-ellipsis-vertical"></i>
-            </a>
-            <a class="brand" href="../index.html">API Documentation</a>
+        <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span> <span class="icon-bar"></span>
+                    <span class="icon-bar"></span> </a>
+                <a class="brand" href="../index.html">API Documentation</a>
 
-            <div class="nav-collapse">
-                <ul class="nav pull-right">
-                                        <li class="dropdown">
-                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
-                            API Documentation <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                                                        <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
-                                                    </ul>
-                    </li>
-                                        <li class="dropdown" id="charts-menu">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            Charts <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="../graphs/class.html">
-                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="dropdown" id="reports-menu">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            Reports <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="../reports/errors.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">58</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="../reports/markers.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="../reports/deprecated.html">
-                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <!--<div class="go_to_top">-->
-    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
-    <!--</div>-->
-</div>
-
-<div id="___" class="container-fluid">
-        <section class="row-fluid">
-        <div class="span2 sidebar">
-                                <div class="accordion" style="margin-bottom: 0">
-        <div class="accordion-group">
-            <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1933667238"></a>
-                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
-            </div>
-            <div id="namespace-1933667238" class="accordion-body collapse in">
-                <div class="accordion-inner">
-
-                                                    <div class="accordion" style="margin-bottom: 0">
-        <div class="accordion-group">
-            <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-153860189"></a>
-                                <a href="../namespaces/acdhOeaw.html" style="margin-left: 30px; padding-left: 0">acdhOeaw</a>
-            </div>
-            <div id="namespace-153860189" class="accordion-body collapse ">
-                <div class="accordion-inner">
-
-                                                    <div class="accordion" style="margin-bottom: 0">
-        <div class="accordion-group">
-            <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1184274148"></a>
-                                <a href="../namespaces/acdhOeaw.fedora.html" style="margin-left: 30px; padding-left: 0">fedora</a>
-            </div>
-            <div id="namespace-1184274148" class="accordion-body collapse ">
-                <div class="accordion-inner">
-
-                    
-                    <ul>
-                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.FedoraResource.html">FedoraResource</a></li>
-                                            </ul>
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li class="dropdown">
+                            <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                                API Documentation <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                                                    <li><a>Namespaces</a></li>
+                                                                        <li><a href="../namespaces/acdhOeaw.html">acdhOeaw</a></li>
+                                                                                                                                </ul>
+                        </li>
+                        <li class="dropdown" id="charts-menu">
+                            <a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                                Charts <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="../graph_class.html">
+                                        <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown" id="reports-menu">
+                            <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                                Reports <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="../errors.html">
+                                        <i class="icon-list-alt"></i>&#160;Errors
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="../markers.html">
+                                        <i class="icon-list-alt"></i>&#160;Markers
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="../deprecated.html">
+                                        <i class="icon-list-alt"></i>&#160;Deprecated
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </div>
-
-                                                    <div class="accordion" style="margin-bottom: 0">
-        <div class="accordion-group">
-            <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1569465051"></a>
-                                <a href="../namespaces/acdhOeaw.redmine.html" style="margin-left: 30px; padding-left: 0">redmine</a>
-            </div>
-            <div id="namespace-1569465051" class="accordion-body collapse ">
-                <div class="accordion-inner">
-
-                    
-                    <ul>
-                                                                                                    <li class="class"><a href="../classes/acdhOeaw.redmine.Issue.html">Issue</a></li>
-                                                    <li class="class"><a href="../classes/acdhOeaw.redmine.Project.html">Project</a></li>
-                                                    <li class="class"><a href="../classes/acdhOeaw.redmine.User.html">User</a></li>
-                                            </ul>
-                </div>
-            </div>
+        <div class="go_to_top">
+            <a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>
         </div>
     </div>
-
-                                                    <div class="accordion" style="margin-bottom: 0">
-        <div class="accordion-group">
-            <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1578106439"></a>
-                                <a href="../namespaces/acdhOeaw.storage.html" style="margin-left: 30px; padding-left: 0">storage</a>
+    
+    <div id="___" class="container">
+        <noscript>
+            <div class="alert alert-warning">
+                Javascript is disabled; several features are only available if Javascript is enabled.
             </div>
-            <div id="namespace-1578106439" class="accordion-body collapse ">
-                <div class="accordion-inner">
+        </noscript>
 
-                    
-                    <ul>
-                                                                                                    <li class="class"><a href="../classes/acdhOeaw.storage.Indexer.html">Indexer</a></li>
-                                                    <li class="class"><a href="../classes/acdhOeaw.storage.Location.html">Location</a></li>
-                                            </ul>
-                </div>
-            </div>
-        </div>
+        
+            <style>
+        .deprecated h2 {
+            text-decoration: line-through;
+        }
+    </style>
+    <div class="row">
+        <div class="span4">
+                    <div class="btn-group view pull-right" data-toggle="buttons-radio">
+        <button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button>
+        <button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+    </div>
+    <div class="btn-group visibility" data-toggle="buttons-checkbox">
+        <button class="btn public active" title="Show public elements">Public</button>
+        <button class="btn protected" title="Show protected elements">Protected</button>
+        <button class="btn private" title="Show private elements">Private</button>
+        <button class="btn inherited active" title="Show inherited elements">Inherited</button>
     </div>
 
-                                                    <div class="accordion" style="margin-bottom: 0">
-        <div class="accordion-group">
-            <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2056487946"></a>
-                                <a href="../namespaces/acdhOeaw.util.html" style="margin-left: 30px; padding-left: 0">util</a>
-            </div>
-            <div id="namespace-2056487946" class="accordion-body collapse ">
-                <div class="accordion-inner">
+        <ul class="side-nav nav nav-list">
+        <li class="nav-header">
+            <i class="icon-custom icon-method"></i> Methods
+            <ul>
+                                                                                                    <li class="method public">
+        <a href="#method___construct" title="__construct :: Creates an indexer object for a given Fedora resource.">
+            <span class="description">Creates an indexer object for a given Fedora resource.</span><pre>__construct</pre>
+        </a>
+    </li>
 
-                    
-                    <ul>
-                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.EasyRdfUtil.html">EasyRdfUtil</a></li>
-                                                    <li class="class"><a href="../classes/acdhOeaw.util.SparqlEndpoint.html">SparqlEndpoint</a></li>
-                                            </ul>
-                </div>
-            </div>
+                                                                                                                                                                                                                        <li class="method public">
+        <a href="#method_getMissingLocations" title="getMissingLocations :: Returns an array of locations listed in Fedora resources
+location path properties which don&#039;t exist in the filesystem.">
+            <span class="description">Returns an array of locations listed in Fedora resources
+location path properties which don&#039;t exist in the filesystem.</span><pre>getMissingLocations</pre>
+        </a>
+    </li>
+
+                                                                                                                                                                <li class="method public">
+        <a href="#method_index" title="index :: Does the indexing.">
+            <span class="description">Does the indexing.</span><pre>index</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_init" title="init :: Initializes class with configuration settings.">
+            <span class="description">Initializes class with configuration settings.</span><pre>init</pre>
+        </a>
+    </li>
+
+                                                                                                                                                                <li class="method public">
+        <a href="#method_setDepth" title="setDepth :: Sets maximum indexing depth.">
+            <span class="description">Sets maximum indexing depth.</span><pre>setDepth</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_setFilter" title="setFilter :: Sets file name filter for child resources.">
+            <span class="description">Sets file name filter for child resources.</span><pre>setFilter</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_setFlatStructure" title="setFlatStructure :: Sets if child resources be directly attached to the indexed FedoraResource
+(`$ifFlat` equals to `true`) or a separate collection Fedora resource
+be created for each subdirectory (`$ifFlat` equals to `false`).">
+            <span class="description">Sets if child resources be directly attached to the indexed FedoraResource
+(`$ifFlat` equals to `true`) or a separate collection Fedora resource
+be created for each subdirectory (`$ifFlat` equals to `false`).</span><pre>setFlatStructure</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_setIncludeEmptyDirs" title="setIncludeEmptyDirs :: Sets if Fedora resources should be created for empty directories.">
+            <span class="description">Sets if Fedora resources should be created for empty directories.</span><pre>setIncludeEmptyDirs</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_setPaths" title="setPaths :: Overrides file system paths to look into for child resources.">
+            <span class="description">Overrides file system paths to look into for child resources.</span><pre>setPaths</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_setUploadSizeLimit" title="setUploadSizeLimit :: Sets size treshold for uploading child resources as binary resources.">
+            <span class="description">Sets size treshold for uploading child resources as binary resources.</span><pre>setUploadSizeLimit</pre>
+        </a>
+    </li>
+
+                                                </ul>
+        </li>
+        <li class="nav-header protected">» Protected
+            <ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </ul>
+        </li>
+        <li class="nav-header private">» Private
+            <ul>
+                                                                                                                <li class="method private">
+                            <a href="#method_createMetadata" title="createMetadata :: Creates metadata for an indexed file system node">
+                                <span class="description">Creates metadata for an indexed file system node</span><pre>createMetadata</pre>
+                            </a>
+                        </li>
+                                                                                <li class="method private">
+                            <a href="#method_getLocations" title="getLocations :: Fetches all child resource locations.">
+                                <span class="description">Fetches all child resource locations.</span><pre>getLocations</pre>
+                            </a>
+                        </li>
+                                                                                                                    <li class="method private">
+                            <a href="#method_getResource" title="getResource :: Finds Fedora resource corresponding to a given file system entry.">
+                                <span class="description">Finds Fedora resource corresponding to a given file system entry.</span><pre>getResource</pre>
+                            </a>
+                        </li>
+                                                                                                                                                        <li class="method private">
+                            <a href="#method_isSkipped" title="isSkipped :: Checks if a given file system node should be skipped during import.">
+                                <span class="description">Checks if a given file system node should be skipped during import.</span><pre>isSkipped</pre>
+                            </a>
+                        </li>
+                                                                                                                                                                                                                                                                        </ul>
+        </li>
+        <li class="nav-header">
+            <i class="icon-custom icon-constant"></i> Constants
+            <ul>
+                            </ul>
+        </li>
+    </ul>
+
+
         </div>
-    </div>
 
-                    
-                    <ul>
-                                                                                            </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-                    
-                    <ul>
-                                                                                            </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-        </div>
-    </section>
-    <section class="row-fluid">
-        <div class="span10 offset2">
-            <div class="row-fluid">
-                <div class="span8 content class">
-                    <nav>
-                                                <a href="../namespaces/acdhOeaw.storage.html">\acdhOeaw\storage</a> <i class="icon-level-up"></i>
-                                            </nav>
-                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
-
-                    <h1><small>\acdhOeaw\storage</small>Indexer</h1>
-                    <p><em>Indexes resources in a filesystem</em></p>
-                    
-                    
-                                        
-                    <section id="summary">
-                        <h2>Summary</h2>
-                        <section class="row-fluid heading">
-                            <section class="span4">
-                                <a href="#methods">Methods</a>
-                            </section>
-                            <section class="span4">
-                                <a href="#properties">Properties</a>
-                            </section>
-                            <section class="span4">
-                                <a href="#constants">Constants</a>
-                            </section>
-                        </section>
-                        <section class="row-fluid public">
-                            <section class="span4">
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#method_init" class="">init()</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#method___construct" class="">__construct()</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#method_index" class="">index()</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#method_getMissingLocations" class="">getMissingLocations()</a><br />
-                                                            </section>
-                            <section class="span4">
-                                                                    <em>No public properties found</em>
-                                                            </section>
-                            <section class="span4">
-                                                                    <em>No constants found</em>
-                                                            </section>
-                        </section>
-                        <section class="row-fluid protected">
-                            <section class="span4">
-                                                                    <em>No protected methods found</em>
-                                                            </section>
-                            <section class="span4">
-                                                                    <em>No protected properties found</em>
-                                                            </section>
-                            <section class="span4">
-                                <em>N/A</em>
-                            </section>
-                        </section>
-                        <section class="row-fluid private">
-                            <section class="span4">
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#method_isSkipped" class="">isSkipped()</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#method_createMetadata" class="">createMetadata()</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#method_getResource" class="">getResource()</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#method_getLocations" class="">getLocations()</a><br />
-                                                            </section>
-                            <section class="span4">
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#property_idProp" class="">$idProp</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#property_relProp" class="">$relProp</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#property_locProp" class="">$locProp</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#property_sizeProp" class="">$sizeProp</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#property_containerDir" class="">$containerDir</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#property_resourceCache" class="">$resourceCache</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#property_resource" class="">$resource</a><br />
-                                                                    <a href="../classes/acdhOeaw.storage.Indexer.html#property_paths" class="">$paths</a><br />
-                                                            </section>
-                            <section class="span4">
-                                <em>N/A</em>
-                            </section>
-                        </section>
-                    </section>
-                </div>
-                <aside class="span4 detailsbar">
-                                        
-                    
-                    <dl>
-                        <dt>File</dt>
-                            <dd><a href="../files/storage.Indexer.html"><div class="path-wrapper">storage/Indexer.php</div></a></dd>
-                                                <dt>Package</dt>
-                            <dd><div class="namespace-wrapper">Default</div></dd>
-                                                <dt>Class hierarchy</dt>
-                            <dd class="hierarchy">
-                                                                                                                                                                    <div class="namespace-wrapper">\acdhOeaw\storage\Indexer</div>
-                            </dd>
-
+        <div class="span8">
+            <div class="element class">
+                <h1>Indexer</h1>
+                <small style="display: block; text-align: right">
+                                                        </small>
+                <p class="short_description">Indexes children of a given FedoraResource in a file system</p>
+                <div class="details">
+                    <div class="long_description">
                         
-                        
-                        
-                        
-                                                                        </dl>
-                    <h2>Tags</h2>
-                    <table class="table table-condensed">
-                                            <tr>
-                            <th>
-                                author
-                            </th>
-                            <td>
-                                                                    <p>zozlak</p>
-                                                            </td>
-                        </tr>
-                                        </table>
-                </aside>
-            </div>
+                    </div>
+                    <table class="table table-bordered">
+                                                                                    <tr>
+                                    <th>
+                                        author
+                                                                            </th>
+                                    <td>
+                                                                                    
+                                                                                <p>zozlak</p>
+                                    </td>
+                                </tr>
+                                                                                                                <tr>
+                                    <th>
+                                        package
+                                                                            </th>
+                                    <td>
+                                                                                    
+                                                                                <p>Default</p>
+                                    </td>
+                                </tr>
+                                                                                                                                                                                </table>
 
-                        
-                                    <a id="properties" name="properties"></a>
-            <div class="row-fluid">
-                <div class="span8 content class">
-                    <h2>Properties</h2>
-                </div>
-                <aside class="span4 detailsbar"></aside>
-            </div>
-
-                                                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="property_idProp" name="property_idProp" class="anchor"></a>
-            <article class="property">
-                <h3 class="private ">$idProp</h3>
-                <pre class="signature">$idProp : </pre>
-                <p><em></em></p>
-                
-
-                                <h4>Type</h4>
-                
-                                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                        <dl>
-                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="property_relProp" name="property_relProp" class="anchor"></a>
-            <article class="property">
-                <h3 class="private ">$relProp</h3>
-                <pre class="signature">$relProp : </pre>
-                <p><em></em></p>
-                
-
-                                <h4>Type</h4>
-                
-                                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                        <dl>
-                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="property_locProp" name="property_locProp" class="anchor"></a>
-            <article class="property">
-                <h3 class="private ">$locProp</h3>
-                <pre class="signature">$locProp : </pre>
-                <p><em></em></p>
-                
-
-                                <h4>Type</h4>
-                
-                                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                        <dl>
-                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="property_sizeProp" name="property_sizeProp" class="anchor"></a>
-            <article class="property">
-                <h3 class="private ">$sizeProp</h3>
-                <pre class="signature">$sizeProp : </pre>
-                <p><em></em></p>
-                
-
-                                <h4>Type</h4>
-                
-                                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                        <dl>
-                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="property_containerDir" name="property_containerDir" class="anchor"></a>
-            <article class="property">
-                <h3 class="private ">$containerDir</h3>
-                <pre class="signature">$containerDir : </pre>
-                <p><em></em></p>
-                
-
-                                <h4>Type</h4>
-                
-                                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                        <dl>
-                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="property_resourceCache" name="property_resourceCache" class="anchor"></a>
-            <article class="property">
-                <h3 class="private ">$resourceCache</h3>
-                <pre class="signature">$resourceCache : </pre>
-                <p><em></em></p>
-                
-
-                                <h4>Type</h4>
-                
-                                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                        <dl>
-                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="property_resource" name="property_resource" class="anchor"></a>
-            <article class="property">
-                <h3 class="private ">$resource</h3>
-                <pre class="signature">$resource : \acdhOeaw\fedora\FedoraResource</pre>
-                <p><em></em></p>
-                
-
-                                <h4>Type</h4>
-                <a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a>
-                                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                        <dl>
-                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="property_paths" name="property_paths" class="anchor"></a>
-            <article class="property">
-                <h3 class="private ">$paths</h3>
-                <pre class="signature">$paths : </pre>
-                <p><em></em></p>
-                
-
-                                <h4>Type</h4>
-                
-                                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                        <dl>
-                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
+                    <h3><i class="icon-custom icon-method"></i> Methods</h3>
+                                                                <a id="method___construct"></a>
+                        <div class="element clickable method public  method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
+                            <h2>Creates an indexer object for a given Fedora resource.</h2>
+                            <pre>__construct(\acdhOeaw\fedora\FedoraResource $resource) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
 
                             
-                                    <a id="methods" name="methods"></a>
-            <div class="row-fluid">
-                <div class="span8 content class"><h2>Methods</h2></div>
-                <aside class="span4 detailsbar"></aside>
-            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
 
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_init" name="method_init" class="anchor"></a>
-            <article class="method">
-                <h3 class="public ">init()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">init(\zozlak\util\Config  <span class="argument">$cfg</span>) </pre>
-                <p><em></em></p>
-                
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\RuntimeException</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
 
-                                    <h4>Parameters</h4>
-                    <table class="table table-condensed table-hover">
-                                                    <tr>
-                                <td>\zozlak\util\Config</td>
-                                <td>$cfg </td>
-                                <td></td>
-                            </tr>
-                                            </table>
-                
-                
-                				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                            <span class="label label-info">static</span>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$resource</h4>
+                                                <code><a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a></code><p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
 
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method___construct" name="method___construct" class="anchor"></a>
-            <article class="method">
-                <h3 class="public ">__construct()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">__construct(\acdhOeaw\fedora\FedoraResource  <span class="argument">$resource</span>) </pre>
-                <p><em>Creates an indexer object for a given Fedora resource.</em></p>
-                
+                        </div>
+                                            <a id="method_createMetadata"></a>
+                        <div class="element clickable method private  method_createMetadata" data-toggle="collapse" data-target=".method_createMetadata .collapse">
+                            <h2>Creates metadata for an indexed file system node</h2>
+                            <pre>createMetadata(string $path, \DirectoryIterator $i) : \EasyRdf_Resource</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
 
-                                    <h4>Parameters</h4>
-                    <table class="table table-condensed table-hover">
-                                                    <tr>
-                                <td><a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a></td>
-                                <td>$resource </td>
-                                <td></td>
-                            </tr>
-                                            </table>
-                
-                                    <h4>Throws</h4>
-                    <dl>
-                                                    <dt>\RuntimeException</dt>
-                            <dd></dd>
-                                                                    </dl>
-                
-                				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
 
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_index" name="method_index" class="anchor"></a>
-            <article class="method">
-                <h3 class="public ">index()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">index(boolean  <span class="argument">$uploadSizeLimit</span>, integer  <span class="argument">$depth = 1000000</span>, boolean  <span class="argument">$includeEmpty = false</span>, boolean  <span class="argument">$verbose = false</span>) </pre>
-                <p><em>Indexes files in the resource directory.</em></p>
-                
+                                    <table class="table">
+                                                                                                                    </table>
 
-                                    <h4>Parameters</h4>
-                    <table class="table table-condensed table-hover">
-                                                    <tr>
-                                <td>boolean</td>
-                                <td>$uploadSizeLimit </td>
-                                <td><p>maximum size of files uploaded to the repo (0 will cause no files upload)</p></td>
-                            </tr>
-                                                    <tr>
-                                <td>integer</td>
-                                <td>$depth </td>
-                                <td><p>maximum insexing depth (0 - only initial Resource dir, 1 - also its direct subdirectories, etc.)</p></td>
-                            </tr>
-                                                    <tr>
-                                <td>boolean</td>
-                                <td>$includeEmpty </td>
-                                <td><p>should resources be created for empty directories</p></td>
-                            </tr>
-                                                    <tr>
-                                <td>boolean</td>
-                                <td>$verbose </td>
-                                <td><p>should be verbose</p></td>
-                            </tr>
-                                            </table>
-                
-                
-                				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$path</h4>
+                                                <code>string</code><p><p>node location base dir relatively to the container</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$i</h4>
+                                                <code>\DirectoryIterator</code><p><p>file system node</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>\EasyRdf_Resource</code><p></p>
+                                                                    </div>
+                            </div>
 
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_getMissingLocations" name="method_getMissingLocations" class="anchor"></a>
-            <article class="method">
-                <h3 class="public ">getMissingLocations()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">getMissingLocations() : array</pre>
-                <p><em>Returns an array of the locations listed in Fedora resources
-location path properties which don&#039;t exist in the filesystem.</em></p>
-                <p>An array of MissingLocation objects is returned.</p>
+                        </div>
+                                            <a id="method_getLocations"></a>
+                        <div class="element clickable method private  method_getLocations" data-toggle="collapse" data-target=".method_getLocations .collapse">
+                            <h2>Fetches all child resource locations.</h2>
+                            <pre>getLocations() : \EasyRdf_Sparql_Result</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\RuntimeException</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                            <h3>Response</h3>
+                                        <code>\EasyRdf_Sparql_Result</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getMissingLocations"></a>
+                        <div class="element clickable method public  method_getMissingLocations" data-toggle="collapse" data-target=".method_getMissingLocations .collapse">
+                            <h2>Returns an array of locations listed in Fedora resources
+location path properties which don&#039;t exist in the filesystem.</h2>
+                            <pre>getMissingLocations() : array</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>An array of MissingLocation objects is returned.</p>
 <p>Only location paths with literal values are taken into account.
 Support for location paths being URIs may be added in the future.</p>
 <p>The location path property is defined by the &quot;fedoraLocProp&quot;
-configuration option (see init()).</p>
+configuration option (see init()).</p></div>
 
-                
-                                    <h4>Throws</h4>
-                    <dl>
-                                                    <dt>\RuntimeException</dt>
-                            <dd></dd>
-                                                                    </dl>
-                
-                                    <h4>Returns</h4>
-                    array
-                                    				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\RuntimeException</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
 
-                                                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_isSkipped" name="method_isSkipped" class="anchor"></a>
-            <article class="method">
-                <h3 class="private ">isSkipped()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">isSkipped(\DirectoryIterator  <span class="argument">$i</span>, integer  <span class="argument">$depth</span>, boolean  <span class="argument">$incEmpty</span>) : boolean</pre>
-                <p><em>Checks if a fiven filesystem node should be skipped during import.</em></p>
-                <p>This happens only if the $empty parameter is TRUE, the node is
-a directory and this directory is empty or the maximum indexing depth
-was reached.</p>
-
-                                    <h4>Parameters</h4>
-                    <table class="table table-condensed table-hover">
-                                                    <tr>
-                                <td>\DirectoryIterator</td>
-                                <td>$i </td>
-                                <td></td>
-                            </tr>
-                                                    <tr>
-                                <td>integer</td>
-                                <td>$depth </td>
-                                <td></td>
-                            </tr>
-                                                    <tr>
-                                <td>boolean</td>
-                                <td>$incEmpty </td>
-                                <td></td>
-                            </tr>
-                                            </table>
-                
-                
-                                    <h4>Returns</h4>
-                    boolean
-                                    				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_createMetadata" name="method_createMetadata" class="anchor"></a>
-            <article class="method">
-                <h3 class="private ">createMetadata()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">createMetadata(\acdhOeaw\storage\string  <span class="argument">$path</span>, \DirectoryIterator  <span class="argument">$i</span>) </pre>
-                <p><em></em></p>
-                
-
-                                    <h4>Parameters</h4>
-                    <table class="table table-condensed table-hover">
-                                                    <tr>
-                                <td>\acdhOeaw\storage\string</td>
-                                <td>$path </td>
-                                <td></td>
-                            </tr>
-                                                    <tr>
-                                <td>\DirectoryIterator</td>
-                                <td>$i </td>
-                                <td></td>
-                            </tr>
-                                            </table>
-                
-                
-                				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_getResource" name="method_getResource" class="anchor"></a>
-            <article class="method">
-                <h3 class="private ">getResource()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">getResource(\acdhOeaw\storage\string  <span class="argument">$path</span>, \DirectoryIterator  <span class="argument">$i</span>) </pre>
-                <p><em></em></p>
-                
-
-                                    <h4>Parameters</h4>
-                    <table class="table table-condensed table-hover">
-                                                    <tr>
-                                <td>\acdhOeaw\storage\string</td>
-                                <td>$path </td>
-                                <td></td>
-                            </tr>
-                                                    <tr>
-                                <td>\DirectoryIterator</td>
-                                <td>$i </td>
-                                <td></td>
-                            </tr>
-                                            </table>
-                
-                
-                				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_getLocations" name="method_getLocations" class="anchor"></a>
-            <article class="method">
-                <h3 class="private ">getLocations()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">getLocations() : \EasyRdf_Sparql_Result</pre>
-                <p><em>Fetches all child resources locations.</em></p>
-                
-
-                
-                                    <h4>Throws</h4>
-                    <dl>
-                                                    <dt>\RuntimeException</dt>
-                            <dd></dd>
-                                                                    </dl>
-                
-                                    <h4>Returns</h4>
-                    \EasyRdf_Sparql_Result
-                                    				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr><td colspan="2"><em>None found</em></td></tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    </div>
-    </section>
-
-    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="source-view-label">Indexer.php</h3>
-        </div>
-        <div class="modal-body">
-            <pre data-src="../files/storage/Indexer.php.txt" class="language-php line-numbers"></pre>
-        </div>
-    </div>
-
-    <footer class="row-fluid">
-        <section class="span10 offset2">
-            <section class="row-fluid">
-                <section class="span10 offset1">
-                    <section class="row-fluid footer-sections">
-                        <section class="span4">
-                                                        <h1><i class="icon-code"></i></h1>
-                            <div>
-                                <ul>
-                                                                            <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
-                                                                    </ul>
+                                    
+                                                                            <h3>Response</h3>
+                                        <code>array</code><p></p>
+                                                                    </div>
                             </div>
-                        </section>
-                        <section class="span4">
-                                                        <h1><i class="icon-bar-chart"></i></h1>
-                            <div>
-                                <ul>
-                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
-                                </ul>
+
+                        </div>
+                                            <a id="method_getResource"></a>
+                        <div class="element clickable method private  method_getResource" data-toggle="collapse" data-target=".method_getResource .collapse">
+                            <h2>Finds Fedora resource corresponding to a given file system entry.</h2>
+                            <pre>getResource(string $path, \DirectoryIterator $i) : \acdhOeaw\fedora\FedoraResource</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>Search is based on matching parent resource and location path property
+values.</p></div>
+
+                                    <table class="table">
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\DomainException</dt>
+                                                        <dd></dd>
+                                                                                                            <dt>\RuntimeException</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$path</h4>
+                                                <code>string</code><p><p>path node location base dir relatively to the container</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$i</h4>
+                                                <code>\DirectoryIterator</code><p><p>file system node</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code><a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a></code><p></p>
+                                                                    </div>
                             </div>
-                        </section>
-                        <section class="span4">
-                                                        <h1><i class="icon-pushpin"></i></h1>
-                            <div>
-                                <ul>
-                                    <li><a href="../reports/errors.html">Errors</a></li>
-                                    <li><a href="../reports/markers.html">Markers</a></li>
-                                </ul>
+
+                        </div>
+                                            <a id="method_index"></a>
+                        <div class="element clickable method public  method_index" data-toggle="collapse" data-target=".method_index .collapse">
+                            <h2>Does the indexing.</h2>
+                            <pre>index(boolean $verbose = false) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$verbose</h4>
+                                                <code>boolean</code><p><p>should be verbose</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
                             </div>
-                        </section>
-                    </section>
-                </section>
-            </section>
-            <section class="row-fluid">
-                <section class="span10 offset1">
-                    <hr />
-                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on November 21st, 2016 at 13:05.
-                </section>
-            </section>
-        </section>
+
+                        </div>
+                                            <a id="method_init"></a>
+                        <div class="element clickable method public  method_init" data-toggle="collapse" data-target=".method_init .collapse">
+                            <h2>Initializes class with configuration settings.</h2>
+                            <pre>init(\zozlak\util\Config $cfg) </pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>Required configuration parameters include:</p>
+<ul>
+<li>fedoraIdProp - URI of the RDF property denoting resource ACDH ID</li>
+<li>fedoraRelProp - URI of the RDF property denoting relation of being a child</li>
+<li>fedoraLocProp - URI of the RDF property denoting resource location</li>
+<li>fedoraSizeProp - URI of the RDF property denoting resource size</li>
+<li>fedoraTitleProp - URI of the RDF property denoting resource title</li>
+<li>containerDir - path to the container root (the &quot;fedoraLocProp&quot; property
+values are relative to this path)</li>
+<li>sparqlUrl - SPARQL endpoint URL</li>
+</ul></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$cfg</h4>
+                                                <code>\zozlak\util\Config</code><p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_isSkipped"></a>
+                        <div class="element clickable method private  method_isSkipped" data-toggle="collapse" data-target=".method_isSkipped .collapse">
+                            <h2>Checks if a given file system node should be skipped during import.</h2>
+                            <pre>isSkipped(\DirectoryIterator $i) : boolean</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$i</h4>
+                                                <code>\DirectoryIterator</code><p><p>file system node</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>boolean</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_setDepth"></a>
+                        <div class="element clickable method public  method_setDepth" data-toggle="collapse" data-target=".method_setDepth .collapse">
+                            <h2>Sets maximum indexing depth.</h2>
+                            <pre>setDepth(integer $depth) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$depth</h4>
+                                                <code>integer</code><p><p>maximum indexing depth (0 - only initial Resource dir, 1 - also its direct subdirectories, etc.)</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_setFilter"></a>
+                        <div class="element clickable method public  method_setFilter" data-toggle="collapse" data-target=".method_setFilter .collapse">
+                            <h2>Sets file name filter for child resources.</h2>
+                            <pre>setFilter(string $filter) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$filter</h4>
+                                                <code>string</code><p><p>regullar expression conformant with preg_replace()</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_setFlatStructure"></a>
+                        <div class="element clickable method public  method_setFlatStructure" data-toggle="collapse" data-target=".method_setFlatStructure .collapse">
+                            <h2>Sets if child resources be directly attached to the indexed FedoraResource
+(`$ifFlat` equals to `true`) or a separate collection Fedora resource
+be created for each subdirectory (`$ifFlat` equals to `false`).</h2>
+                            <pre>setFlatStructure(boolean $ifFlat) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$ifFlat</h4>
+                                                <code>boolean</code><p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_setIncludeEmptyDirs"></a>
+                        <div class="element clickable method public  method_setIncludeEmptyDirs" data-toggle="collapse" data-target=".method_setIncludeEmptyDirs .collapse">
+                            <h2>Sets if Fedora resources should be created for empty directories.</h2>
+                            <pre>setIncludeEmptyDirs(boolean $include) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>Note this setting is skipped when the <code>$flatStructure</code> is set to <code>true</code>.</p></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    see
+                                                </th>
+                                                <td>
+                                                                                                                                                                        
+                                                                                                                                                                            <a href="../classes/acdhOeaw.storage.Indexer.html#method_setFlatStructure">\acdhOeaw\storage\Indexer::setFlatStructure()</a>
+                                                                                                                
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$include</h4>
+                                                <code>boolean</code><p><p>should resources be created for empty directories</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_setPaths"></a>
+                        <div class="element clickable method public  method_setPaths" data-toggle="collapse" data-target=".method_setPaths .collapse">
+                            <h2>Overrides file system paths to look into for child resources.</h2>
+                            <pre>setPaths(array $paths) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$paths</h4>
+                                                <code>array</code><p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_setUploadSizeLimit"></a>
+                        <div class="element clickable method public  method_setUploadSizeLimit" data-toggle="collapse" data-target=".method_setUploadSizeLimit .collapse">
+                            <h2>Sets size treshold for uploading child resources as binary resources.</h2>
+                            <pre>setUploadSizeLimit(boolean $limit) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>For files bigger then this treshold a &quot;pure RDF&quot; Fedora resources will
+be created containing full metadata but no binary content.</p></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$limit</h4>
+                                                <code>boolean</code><p><p>maximum size in bytes (0 will cause no files upload)</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                    
+                    
+                                                                <h3><i class="icon-custom icon-property"></i> Properties</h3>
+                                                    <a id="property_idProp"> </a>
+                            <div class="element clickable property  private property_idProp" data-toggle="collapse" data-target=".property_idProp .collapse">
+                                <h2>URI of the RDF property denoting ACDH ID</h2>
+                                <pre>idProp : string</pre>
+                                <div class="labels">
+                                                                        <span class="label">static</span>                                </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>string</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_relProp"> </a>
+                            <div class="element clickable property  private property_relProp" data-toggle="collapse" data-target=".property_relProp .collapse">
+                                <h2>URI of the RDF property denoting relation of being a child resource</h2>
+                                <pre>relProp : string</pre>
+                                <div class="labels">
+                                                                        <span class="label">static</span>                                </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>string</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_locProp"> </a>
+                            <div class="element clickable property  private property_locProp" data-toggle="collapse" data-target=".property_locProp .collapse">
+                                <h2>URI of the RDF property denoting resource location</h2>
+                                <pre>locProp : string</pre>
+                                <div class="labels">
+                                                                        <span class="label">static</span>                                </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>string</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_sizeProp"> </a>
+                            <div class="element clickable property  private property_sizeProp" data-toggle="collapse" data-target=".property_sizeProp .collapse">
+                                <h2>URI of the RDF property denoting resource size</h2>
+                                <pre>sizeProp : string</pre>
+                                <div class="labels">
+                                                                        <span class="label">static</span>                                </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>string</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_titleProp"> </a>
+                            <div class="element clickable property  private property_titleProp" data-toggle="collapse" data-target=".property_titleProp .collapse">
+                                <h2>URI of the RDF property denoting resource title</h2>
+                                <pre>titleProp : string</pre>
+                                <div class="labels">
+                                                                        <span class="label">static</span>                                </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>string</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_containerDir"> </a>
+                            <div class="element clickable property  private property_containerDir" data-toggle="collapse" data-target=".property_containerDir .collapse">
+                                <h2>Path to the container root</h2>
+                                <pre>containerDir : string</pre>
+                                <div class="labels">
+                                                                        <span class="label">static</span>                                </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>string</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_resourceCache"> </a>
+                            <div class="element clickable property  private property_resourceCache" data-toggle="collapse" data-target=".property_resourceCache .collapse">
+                                <h2>FedoraResource objects cache indexed using their location path</h2>
+                                <pre>resourceCache : \acdhOeaw\storage\type</pre>
+                                <div class="labels">
+                                                                        <span class="label">static</span>                                </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>\acdhOeaw\storage\type</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_sparqlClient"> </a>
+                            <div class="element clickable property  private property_sparqlClient" data-toggle="collapse" data-target=".property_sparqlClient .collapse">
+                                <h2>SPARQL client object</h2>
+                                <pre>sparqlClient : \EasyRdf_Sparql_Client</pre>
+                                <div class="labels">
+                                                                        <span class="label">static</span>                                </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>\EasyRdf_Sparql_Client</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_resource"> </a>
+                            <div class="element clickable property  private property_resource" data-toggle="collapse" data-target=".property_resource .collapse">
+                                <h2>FedoraResource which children are created by the Indexer</h2>
+                                <pre>resource : \acdhOeaw\fedora\FedoraResource</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code><a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a></code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_paths"> </a>
+                            <div class="element clickable property  private property_paths" data-toggle="collapse" data-target=".property_paths .collapse">
+                                <h2>Filesystem paths where resource children are located</h2>
+                                <pre>paths : array</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"><p>It is a concatenation of the container root path coming from the
+class settings (set by calling init()) and the location path
+properties of the FedoraResource.</p>
+<p>They can be also set manually using the <code>setPaths()</code> method</p></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>array</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_filter"> </a>
+                            <div class="element clickable property  private property_filter" data-toggle="collapse" data-target=".property_filter .collapse">
+                                <h2>Regular expression for matching child resource file names.</h2>
+                                <pre>filter : string</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>string</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_flatStructure"> </a>
+                            <div class="element clickable property  private property_flatStructure" data-toggle="collapse" data-target=".property_flatStructure .collapse">
+                                <h2>Should children be directly attached to the FedoraResource or maybe
+each subdirectory should result in a separate collection resource
+containing its children.</h2>
+                                <pre>flatStructure : boolean</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>boolean</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_uploadSizeLimit"> </a>
+                            <div class="element clickable property  private property_uploadSizeLimit" data-toggle="collapse" data-target=".property_uploadSizeLimit .collapse">
+                                <h2>Maximum size of a child resource (in bytes) resulting in the creation
+of binary resources.</h2>
+                                <pre>uploadSizeLimit : integer</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"><p>For child resources bigger then this limit an &quot;RDF only&quot; Fedora resoueces
+will be created.</p></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>integer</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_depth"> </a>
+                            <div class="element clickable property  private property_depth" data-toggle="collapse" data-target=".property_depth .collapse">
+                                <h2>How many subsequent subdirectories should be indexed.</h2>
+                                <pre>depth : \acdhOeaw\storage\type</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>\acdhOeaw\storage\type</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_includeEmpty"> </a>
+                            <div class="element clickable property  private property_includeEmpty" data-toggle="collapse" data-target=".property_includeEmpty .collapse">
+                                <h2>Should resources be created for empty directories.</h2>
+                                <pre>includeEmpty : \acdhOeaw\storage\type</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"><p>Skipped if <code>$flatStructure</code> equals to <code>true</code></p></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>\acdhOeaw\storage\type</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                            </div>
+            </div>
+            <a id="\acdhOeaw\storage\Indexer"></a>
+            <ul class="breadcrumb">
+                <li><a href="../index.html"><i class="icon-custom icon-class"></i></a></li>
+                    
+    
+    <li><span class="divider">\</span><a href="../namespaces/acdhOeaw.storage.html">storage</a></li>
+
+                <li class="active"><span class="divider">\</span><a href="../classes/acdhOeaw.storage.Indexer.html">Indexer</a></li>
+            </ul>
+        </div>
+    </div>
+
+    </div>
+
+        <footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
+            <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
+            generated on Thu, 08 Dec 2016 17:37:49 +0000.<br/>
     </footer>
-</div>
-
-</body>
+    </body>
 </html>

@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
  * Copyright 2016 zozlak.
@@ -29,30 +29,41 @@ namespace acdhOeaw\storage;
 use acdhOeaw\fedora\FedoraResource;
 
 /**
- * Description of MissingLocation
+ * Simple container class for describing 
+ * Fedora resource location in the file system
  *
  * @author zozlak
  */
 class Location {
 
     /**
+     * Absolute path to the file
      * @var string
      */
     public $fullPath;
 
     /**
+     * Relative path to the file
      * @var string
      */
     public $relativePath;
 
     /**
+     * Fedora resource object
      * @var \acdhOeaw\fedora\FedoraResource
      */
     public $resource;
 
-    public function __construct(string $fullPath, string $relPath, string $resUri) {
+    /**
+     * Creates a new instance of the class
+     * 
+     * @param string $fullPath absolute path to the file
+     * @param string $relPath relative path to the file
+     * @param \acdhOeaw\fedora\FedoraResource $res Fedora resource
+     */
+    public function __construct(string $fullPath, string $relPath, FedoraResource $res) {
         $this->fullPath = $fullPath;
         $this->relativePath = $relPath;
-        $this->resource = new FedoraResource($resUri);
+        $this->resource = $res;
     }
 }

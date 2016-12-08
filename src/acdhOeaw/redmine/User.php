@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
  * Copyright 2016 zozlak.
@@ -34,8 +34,21 @@ namespace acdhOeaw\redmine;
  */
 class User extends Redmine {
 
+    /**
+     * Stores all instances of the class identyfing them by their Redmine IDs
+     * @var array
+     * @see getById()
+     */
     static protected $cache = [];
 
+    /**
+     * Fetches an User object from cache based on its Redmine ID.
+     * 
+     * If object does not exist in cache, it will be created and added to the cache.
+     * 
+     * @param int $id Redmine's issue ID
+     * @return \acdhOeaw\redmine\Redmine
+     */
     static public function getById(int $id): Redmine {
 //echo 'get user ' . $id . "\n";
         if (!isset(self::$cache[$id])) {
@@ -46,11 +59,25 @@ class User extends Redmine {
         return self::$cache[$id];
     }
 
+    /**
+     * Returns array of all User objects which can be fetched from the Redmine.
+     * 
+     * See the Redmine::fetchAll() description for details;
+     * 
+     * @param bool $progressBar should progress bar be displayed 
+     *   (makes sense only if the standard output is a console)
+     * @return array
+     * @see Redmine::fetchAll()
+     */
     static public function fetchAll(bool $progressBar): array {
         $param = 'limit=100000&key=' . urlencode(self::$apiKey);
-        return self::redmineFetchLoop($progressBar, 'users', $param, 'acdhOeaw\\redmine\\User');
+        return self::redmineFetchLoop($progressBar, 'users', $param);
     }
 
+    /**
+     * Maps Redmine's User ID to the Redmine's User URI
+     * @return string
+     */
     protected function getIdValue(): string {
         return self::$apiUrl . '/users/' . $this->id;
     }

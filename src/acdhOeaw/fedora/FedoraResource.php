@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
  * Copyright 2016 zozlak.
@@ -39,16 +39,14 @@ use acdhOeaw\util\EasyRdfUtil;
  * Allows manipulations like getting/setting metadata 
  * and updating resource contents.
  * 
- * Static functions allow to manage Fedora session,
- * create new resources and search for existing ones.
- *
  * @author zozlak
  */
 class FedoraResource {
 
     /**
-     * List of metadata properties managed exclusively by the Fedora
+     * List of metadata properties managed exclusively by the Fedora.
      * @var array
+     * @see getSparqlTriples()
      */
     static private $skipProp = array(
         'http://www.loc.gov/premis/rdf/v1#hasSize',
@@ -60,6 +58,7 @@ class FedoraResource {
      * Regular expression for filtering out metadata properties managed
      * exclusively by the Fedora
      * @var string
+     * @see getSparqlTriples()
      */
     static private $skipPropRegExp = '|^http://fedora[.]info/definitions/v4/repository#|';
 
@@ -70,11 +69,10 @@ class FedoraResource {
      * properties Fedora reserves for itself (and rises errors when they are
      * provided from the outside).
      * 
-     * Reserved Fedora properties include all in the http://fedora.info/definitions/v4/repository#
-     * namespace as well as premis:hasSize, premis:hasMessageDigest, iana:describedby.
-     * 
      * @param \EasyRdf_Resource $metadata metadata to serialise
      * @return string
+     * @see $skipProp
+     * @see $skipPropRegExp
      */
     static private function getSparqlTriples(EasyRdf_Resource $metadata): string {
         // make a deep copy of the metadata graph excluding forbidden properties
@@ -106,7 +104,7 @@ class FedoraResource {
     private $metadata;
 
     /**
-     * Resource metadata fetched from the Fedora
+     * Resource metadata lastly fetched from the Fedora
      * enabling us to perform triples update.
      * 
      * @var \EasyRdf_Resource 
@@ -115,23 +113,27 @@ class FedoraResource {
      * @see updateMetadata()
      */
     private $metadataOld;
+
+    /**
+     * Fedora connection object used by this resource
+     * @var \acdhOeaw\fedora\Fedora
+     */
     private $fedora;
+
+    /**
+     * Are object's metadata synchronized with the Fedora
+     * @var bool
+     */
     private $updated = true;
 
     /**
      * Creates new resource based on its Fedora URI.
      * 
-     * URI can be passed in various formats (see the $uri parameter) and will
-     * be internally coverted to the fully qualified form depending on the
-     * $skipTx parameter value (see the sanitizeUri() method).
-     * 
      * Validity of the provided URI is not checked.
      * 
-     * @param string $uri fedora resource URI in a fully qualified form,
-     *   fully qualified form including transaction URI
-     *   or a path within Fedora
-     * @param bool $skipTx should 
-     * @see sanitizeUri()
+     * @param Fedora $fedora Fedora connection object providing context for
+     *   a created resource
+     * @param string $uri resource URI
      */
     public function __construct(Fedora $fedora, string $uri) {
         $this->fedora = $fedora;
@@ -139,7 +141,7 @@ class FedoraResource {
     }
 
     /**
-     * Returns resource Fedora URI
+     * Returns resource's Fedora URI
      * 
      * @return string
      */
@@ -148,9 +150,9 @@ class FedoraResource {
     }
 
     /**
-     * Returns resource id.
+     * Returns resource's ACDH ID.
      * 
-     * If there is no or are many ids, an error is thrown.
+     * If there is no or are many IDs, an error is thrown.
      * 
      * @return string
      * @throws RuntimeException
@@ -165,7 +167,7 @@ class FedoraResource {
     }
 
     /**
-     * Returns an array of resource ids.
+     * Returns an array of resource's ACDH IDs.
      * 
      * If you are sure only one id should be present 
      * (but it's RDF, so think about it twice), 
@@ -183,6 +185,11 @@ class FedoraResource {
         return $ids;
     }
 
+    /**
+     * Returns the Fedora connection used by this object
+     * 
+     * @return \acdhOeaw\fedora\Fedora
+     */
     public function getFedora(): Fedora {
         return $this->fedora;
     }
@@ -206,13 +213,13 @@ class FedoraResource {
      * and then fetches them by calling getMetadata().
      * 
      * Do not be surprised that the metadata read back from the Fedora can 
-     * (and for sure will) differ from the one which were written by you.
+     * (and for sure will) differ from the one written by you.
      * This is because Fedora (and/or doorkeeper) will add/modify some triples
      * (e.g. fedora:lastModified).
      * 
      * Be aware that as Fedora generates errors when you try to set properties
      * Fedora considers its private once, such properties will be ommited in the
-     * update (see getSparqlTriples() method documentation for details).
+     * update (see `getSparqlTriples()` method documentation for details).
      * 
      * @param string $mode chooses the way the update is done:
      *   ADD simply adds current triples. All already existing triples 
@@ -375,6 +382,11 @@ class FedoraResource {
         return self::getSparqlTriples($this->metadata);
     }
 
+    /**
+     * Provides short string representation of the object
+     * 
+     * @return type
+     */
     public function __toString() {
         return $this->getUri();
     }

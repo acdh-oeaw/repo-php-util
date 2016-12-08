@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
  * Copyright 2016 zozlak.
@@ -37,13 +37,21 @@ use zozlak\util\UUID;
 use zozlak\util\Config;
 
 /**
- * Description of Fedora
+ * Represents a Fedora connection.
+ * 
+ * Provides transaction managment and methods for convinient search and creation
+ * of Fedora resources.
  *
  * @author zozlak
  */
 class Fedora {
 
     /**
+     * Attaches binary content to a given Guzzle HTTP request
+     * 
+     * @param \GuzzleHttp\Psr7\Request $request HTTP request
+     * @param string $body binary content to be attached
+     * @return \GuzzleHttp\Psr7\Request
      */
     static public function attachData(Request $request, string $body): Request {
         $headers = $request->getHeaders();
@@ -57,7 +65,7 @@ class Fedora {
 
         return new Request($request->getMethod(), $request->getUri(), $headers, $body);
     }
-    
+
     /**
      * Fedora API base URL
      * 
@@ -90,7 +98,7 @@ class Fedora {
     private $idProp;
 
     /**
-     * The namespace in which resource ids are created
+     * The namespace in which resources' ACDH IDs are created
      * 
      * At the moment ids are created by this class but at some point this will
      * be moved to the doorkeeper. When it's done, this property will be gone.
@@ -104,12 +112,25 @@ class Fedora {
      */
     private $idNamespace;
 
-    private $sparqlClient;
-    
     /**
-     * Initializes all static configuratin options.
+     * Sparql client object
+     * @var \EasyRdf_Sparql_Client
+     */
+    private $sparqlClient;
+
+    /**
+     * Creates Fedora connection object from a given config.
      * 
-     * @param Config $cfg configuration object
+     * Required configuration parameters include:
+     * 
+     * - fedoraApiUrl - base URL of the Fedora REST API
+     * - fedoraIdProp - URI of the RDF property denoting resource ACDH ID
+     * - fedoraIdNamespace - base URL for ACDH ID values
+     * - fedoraUser - login required to connect to the Fedora REST API
+     * - fedoraPswd - password required to connect to the Fedora REST API
+     * - sparqlUrl - SPARQL endpoint URL
+     * 
+     * @param \zozlak\util\Config $cfg configuration object
      */
     public function __construct(Config $cfg) {
         $this->apiUrl = preg_replace('|/$|', '', $cfg->get('fedoraApiUrl'));
@@ -120,10 +141,14 @@ class Fedora {
         $this->sparqlClient = new EasyRdf_Sparql_Client($cfg->get('sparqlUrl'));
     }
 
-    public function getIdProp(){
+    /**
+     * Returns URI of the RDF property denoting ACDH ID as set uppon object creation.
+     * @return string
+     */
+    public function getIdProp(): string {
         return EasyRdfUtil::fixPropName($this->idProp);
     }
-    
+
     /**
      * Creates a resource in the Fedora and returns corresponding Resource object
      * 
@@ -157,15 +182,33 @@ class Fedora {
         return $res;
     }
 
-    public function sendRequest(Request $request): Response{
+    /**
+     * Sends a given HTTP request to the Fedora.
+     * 
+     * @param Request $request request to be send
+     * @return GuzzleHttp\Psr7\Response
+     */
+    public function sendRequest(Request $request): Response {
         return $this->client->send($request);
     }
-    
+
+    /**
+     * Returns a FedoraResource based on a given URI.
+     * 
+     * Request URI is imported into the current connection meaning base
+     * Fedora API URL will and the current transaction URI (if there is 
+     * an active transaction) will replace ones in passed URI.
+     * 
+     * It is not checked if a resource with a given URI exists.
+     * 
+     * @param string $uri
+     * @return \acdhOeaw\fedora\FedoraResource
+     */
     public function getResourceByUri(string $uri): FedoraResource {
         $uri = $this->sanitizeUri($uri);
         return new FedoraResource($this, $uri);
     }
-    
+
     /**
      * Finds Fedora resources with a given id property value
      * (as it is defined by the "fedoraIdProp" configuration option - see the init() method).
@@ -176,7 +219,7 @@ class Fedora {
      * are be searched (see documentation of the begin() method).
      * 
      * @param string $value
-     * @return \acdhOeaw\fedora\Resource
+     * @return \acdhOeaw\fedora\FedoraResource
      * @throws RuntimeException
      * @see getResourcesById()
      */
@@ -276,10 +319,17 @@ class Fedora {
         $this->txUrl = null;
     }
 
+    /**
+     * Overrides the transaction URI to be used by the Fedora connection.
+     * 
+     * Use with care.
+     * 
+     * @param type $txUrl
+     */
     public function setTransactionId($txUrl) {
         $this->txUrl = $txUrl;
     }
-    
+
     /**
      * Commits the current Fedora transaction.
      * 

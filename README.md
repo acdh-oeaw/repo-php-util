@@ -1,4 +1,4 @@
-# repo-php-utils
+# repo-php-util
 
 Set of classes for working with the ACDH repository stack.
 
@@ -34,6 +34,10 @@ $fedora = new acdhOeaw\fedora\Fedora($conf);
 acdhOeaw\redmine\Redmine::init($config, $fedora);
 acdhOeaw\storage\Indexer::init($config);
 ```
+
+# Documentation
+
+You can find detailed API documentation in the `docs` folder.
 
 # Usage
 

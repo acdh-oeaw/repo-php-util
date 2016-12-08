@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
  * Copyright 2016 zozlak.
@@ -39,25 +39,76 @@ use RuntimeException;
 use zozlak\util\Config;
 
 /**
- * Indexes resources in a filesystem
+ * Indexes children of a given FedoraResource in a file system
  *
  * @author zozlak
  */
 class Indexer {
 
+    /**
+     * URI of the RDF property denoting ACDH ID
+     * @var string
+     */
     static private $idProp;
+
+    /**
+     * URI of the RDF property denoting relation of being a child resource
+     * @var string
+     */
     static private $relProp;
+
+    /**
+     * URI of the RDF property denoting resource location 
+     * @var string
+     */
     static private $locProp;
+
+    /**
+     * URI of the RDF property denoting resource size
+     * @var string 
+     */
     static private $sizeProp;
+
+    /**
+     * URI of the RDF property denoting resource title
+     * @var string 
+     */
     static private $titleProp;
+
+    /**
+     * Path to the container root
+     * @var string
+     */
     static private $containerDir;
+
+    /**
+     * FedoraResource objects cache indexed using their location path
+     * @var type 
+     */
     static private $resourceCache = array();
 
     /**
+     * SPARQL client object
      * @var \EasyRdf_Sparql_Client
      */
     static private $sparqlClient;
 
+    /**
+     * Initializes class with configuration settings.
+     * 
+     * Required configuration parameters include:
+     * 
+     * - fedoraIdProp - URI of the RDF property denoting resource ACDH ID
+     * - fedoraRelProp - URI of the RDF property denoting relation of being a child
+     * - fedoraLocProp - URI of the RDF property denoting resource location
+     * - fedoraSizeProp - URI of the RDF property denoting resource size
+     * - fedoraTitleProp - URI of the RDF property denoting resource title
+     * - containerDir - path to the container root (the "fedoraLocProp" property
+     *     values are relative to this path)
+     * - sparqlUrl - SPARQL endpoint URL
+     * 
+     * @param Config $cfg
+     */
     static public function init(Config $cfg) {
         self::$idProp = $cfg->get('fedoraIdProp');
         self::$relProp = $cfg->get('fedoraRelProp');
@@ -69,14 +120,63 @@ class Indexer {
     }
 
     /**
+     * FedoraResource which children are created by the Indexer
      * @var FedoraResource
      */
     private $resource;
+
+    /**
+     * Filesystem paths where resource children are located
+     * 
+     * It is a concatenation of the container root path coming from the
+     * class settings (set by calling init()) and the location path
+     * properties of the FedoraResource.
+     * 
+     * They can be also set manually using the `setPaths()` method
+     * 
+     * @var array
+     */
     private $paths = array();
+
+    /**
+     * Regular expression for matching child resource file names.
+     * @var string 
+     */
     private $filter = '//';
+
+    /**
+     * Should children be directly attached to the FedoraResource or maybe
+     * each subdirectory should result in a separate collection resource
+     * containing its children.
+     * @var bool
+     */
     private $flatStructure = false;
+
+    /**
+     * Maximum size of a child resource (in bytes) resulting in the creation
+     * of binary resources.
+     * 
+     * For child resources bigger then this limit an "RDF only" Fedora resoueces
+     * will be created.
+     * 
+     * @var int
+     */
     private $uploadSizeLimit = 0;
+
+    /**
+     * How many subsequent subdirectories should be indexed.
+     * 
+     * @var type 
+     */
     private $depth = 1000;
+
+    /**
+     * Should resources be created for empty directories.
+     * 
+     * Skipped if `$flatStructure` equals to `true`
+     * 
+     * @var type 
+     */
     private $includeEmpty = false;
 
     /**
@@ -104,44 +204,70 @@ class Indexer {
         }
     }
 
+    /**
+     * Overrides file system paths to look into for child resources.
+     * 
+     * @param array $paths
+     */
     public function setPaths(array $paths) {
         $this->paths = $paths;
     }
 
+    /**
+     * Sets file name filter for child resources.
+     * 
+     * @param string $filter regullar expression conformant with preg_replace()
+     */
     public function setFilter(string $filter) {
         $this->filter = $filter;
     }
 
+    /**
+     * Sets if child resources be directly attached to the indexed FedoraResource
+     * (`$ifFlat` equals to `true`) or a separate collection Fedora resource
+     * be created for each subdirectory (`$ifFlat` equals to `false`).
+     * 
+     * @param bool $ifFlat
+     */
     public function setFlatStructure(bool $ifFlat) {
         $this->flatStructure = $ifFlat;
     }
 
     /**
+     * Sets size treshold for uploading child resources as binary resources.
      * 
-     * @param bool $limit maximum size of files uploaded to the repo (0 will cause no files upload)
+     * For files bigger then this treshold a "pure RDF" Fedora resources will
+     * be created containing full metadata but no binary content.
+     * 
+     * @param bool $limit maximum size in bytes (0 will cause no files upload)
      */
     public function setUploadSizeLimit(int $limit) {
         $this->uploadSizeLimit = $limit;
     }
 
     /**
+     * Sets maximum indexing depth. 
      * 
-     * @param int $depth maximum insexing depth (0 - only initial Resource dir, 1 - also its direct subdirectories, etc.)
+     * @param int $depth maximum indexing depth (0 - only initial Resource dir, 1 - also its direct subdirectories, etc.)
      */
     public function setDepth(int $depth) {
         $this->depth = $depth;
     }
 
     /**
+     * Sets if Fedora resources should be created for empty directories.
+     * 
+     * Note this setting is skipped when the `$flatStructure` is set to `true`.
      * 
      * @param bool $include should resources be created for empty directories
+     * @see setFlatStructure()
      */
     public function setIncludeEmptyDirs(bool $include) {
         $this->includeEmpty = $include;
     }
 
     /**
-     * Indexes files in the resource directory.
+     * Does the indexing.
      * 
      * @param bool $verbose should be verbose
      */
@@ -195,12 +321,9 @@ class Indexer {
     }
 
     /**
-     * Checks if a fiven filesystem node should be skipped during import.
-     * This happens only if the $empty parameter is TRUE, the node is 
-     * a directory and this directory is empty or the maximum indexing depth
-     * was reached.
+     * Checks if a given file system node should be skipped during import.
      * 
-     * @param DirectoryIterator $i
+     * @param DirectoryIterator $i file system node
      * @return bool
      */
     private function isSkipped(DirectoryIterator $i): bool {
@@ -218,6 +341,13 @@ class Indexer {
         return $i->isDir() && $skipDir || !$i->isDir() && $skipFile;
     }
 
+    /**
+     * Creates metadata for an indexed file system node
+     * 
+     * @param string $path node location base dir relatively to the container
+     * @param DirectoryIterator $i file system node
+     * @return EasyRdf_Resource
+     */
     private function createMetadata(string $path, DirectoryIterator $i): EasyRdf_Resource {
         $graph = new EasyRdf_Graph;
         $metadata = $graph->resource('newResource');
@@ -232,6 +362,18 @@ class Indexer {
         return $metadata;
     }
 
+    /**
+     * Finds Fedora resource corresponding to a given file system entry.
+     * 
+     * Search is based on matching parent resource and location path property
+     * values.
+     * 
+     * @param string $path path node location base dir relatively to the container
+     * @param DirectoryIterator $i file system node
+     * @return FedoraResource
+     * @throws DomainException
+     * @throws RuntimeException
+     */
     private function getResource(string $path, DirectoryIterator $i): FedoraResource {
         $path = $path . '/' . $i->getFilename();
         if (!isset(self::$resourceCache[$path])) {
@@ -264,7 +406,7 @@ class Indexer {
     }
 
     /**
-     * Returns an array of the locations listed in Fedora resources
+     * Returns an array of locations listed in Fedora resources
      * location path properties which don't exist in the filesystem.
      * 
      * An array of MissingLocation objects is returned.
@@ -294,7 +436,7 @@ class Indexer {
     }
 
     /**
-     * Fetches all child resources locations.
+     * Fetches all child resource locations.
      * 
      * @return \EasyRdf_Sparql_Result
      * @throws RuntimeException

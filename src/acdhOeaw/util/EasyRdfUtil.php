@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
  * Copyright 2016 zozlak.
@@ -33,31 +33,55 @@ use EasyRdf_Resource;
 use EasyRdf_Serialiser_Ntriples;
 
 /**
- * Class implementing workarounds for the EasyRdf library bugs
+ * Set of helpers and workarounds for the EasyRdf library
  *
  * @author zozlak
  */
 class EasyRdfUtil {
 
     /**
+     * Serializer object
+     * 
      * @var \EasyRdf_Serialiser_Ntriples
      */
     static private $serializer;
 
+    /**
+     * Provides a workaround for EasyRdf buggy handling of fully qualified
+     * property URIs.
+     * 
+     * @param string $property
+     * @return string
+     */
     static public function fixPropName(string $property): string {
         return join(':', EasyRdf_Namespace::splitUri($property, true));
     }
 
+    /**
+     * Escapes a given string as an URI
+     * 
+     * @param string $uri
+     * @return string
+     */
     static public function escapeUri(string $uri): string {
         self::initSerializer();
         return self::$serializer->serialiseValue(new EasyRdf_Resource($uri));
     }
 
+    /**
+     * Escapes a given strin as a literal
+     * 
+     * @param string $literal
+     * @return string
+     */
     static public function escapeLiteral(string $literal): string {
         self::initSerializer();
         return self::$serializer->serialiseValue(new EasyRdf_Literal($literal));
     }
 
+    /**
+     * Initializes serializer used by `escapeLiteral()` and `escapeResource()`
+     */
     static private function initSerializer() {
         if (!self::$serializer) {
             self::$serializer = new EasyRdf_Serialiser_Ntriples();
@@ -92,4 +116,5 @@ class EasyRdfUtil {
 
         return $res;
     }
+
 }

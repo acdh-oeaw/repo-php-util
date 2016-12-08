@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
  * Copyright 2016 zozlak.
@@ -34,8 +34,21 @@ namespace acdhOeaw\redmine;
  */
 class Project extends Redmine {
 
+    /**
+     * Stores all instances of the class identyfing them by their Redmine IDs
+     * @var array
+     * @see getById()
+     */
     static protected $cache = [];
 
+    /**
+     * Fetches a Project object from cache based on its Redmine ID.
+     * 
+     * If object does not exist in cache, it will be created and added to the cache.
+     * 
+     * @param int $id Redmine's project ID
+     * @return \acdhOeaw\redmine\Redmine
+     */
     static public function getById(int $id): Redmine {
 //echo 'get project ' . $id . "\n";
         if (!isset(self::$cache[$id])) {
@@ -46,12 +59,26 @@ class Project extends Redmine {
         return self::$cache[$id];
     }
 
+    /**
+     * Returns array of all Project objects which can be fetched from the Redmine.
+     * 
+     * See the Redmine::fetchAll() description for details;
+     * 
+     * @param bool $progressBar should progress bar be displayed 
+     *   (makes sense only if the standard output is a console)
+     * @return array
+     * @see Redmine::fetchAll()
+     */
     static public function fetchAll(bool $progressBar): array {
         $param = 'limit=100000&key=' . urlencode(self::$apiKey);
         $param .= "&project_id=34";
-        return self::redmineFetchLoop($progressBar, 'projects', $param, 'acdhOeaw\\redmine\\Project');
+        return self::redmineFetchLoop($progressBar, 'projects', $param);
     }
 
+    /**
+     * Maps Redmine's Project ID to the Redmine's Project URI
+     * @return string
+     */
     public function getIdValue(): string {
         return self::$apiUrl . '/projects/' . $this->id;
     }
