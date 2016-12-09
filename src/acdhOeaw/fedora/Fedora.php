@@ -32,6 +32,7 @@ use GuzzleHttp\Psr7\Request;
 use EasyRdf_Resource;
 use EasyRdf_Sparql_Client;
 use RuntimeException;
+use BadMethodCallException;
 use acdhOeaw\util\EasyRdfUtil;
 use zozlak\util\UUID;
 use zozlak\util\Config;
@@ -51,6 +52,8 @@ class Fedora {
      * 
      * @param \GuzzleHttp\Psr7\Request $request HTTP request
      * @param string $body binary content to be attached
+     *   It can be a file name, a string or an URL
+     *   If it is URL, a "redirecting Fedora resource" will be created
      * @return \GuzzleHttp\Psr7\Request
      */
     static public function attachData(Request $request, string $body): Request {
@@ -160,12 +163,18 @@ class Fedora {
      * when be handled by the doorkeeper.
      * 
      * @param EasyRdf_Resource $metadata resource metadata
-     * @param mixed $data optional resource data as a string, file name or an array: ['content-type' => 'foo', 'data' => 'bar']
-     * @param string $path optional Fedora resource path (if empty, resource will be created in the Fedora root)
+     * @param mixed $data optional resource data as a string, 
+     *   file name or an array: ['content-type' => 'foo', 'data' => 'bar']
+     * @param string $path optional Fedora resource path (see also the `$method`
+     *   parameter)
+     * @param string $method creation method to use - POST or PUT, by default POST
      * @return \acdhOeaw\rms\FedoraResource
+     * @throws \BadMethodCallException
      */
-    public function createResource(EasyRdf_Resource $metadata, $data = '', string $path = ''): FedoraResource {
-        $method = $path ? 'PUT' : 'POST';
+    public function createResource(EasyRdf_Resource $metadata, $data = '', string $path = '', string $method = 'POST'): FedoraResource {
+        if (!in_array($method, array('POST', 'PUT'))) {
+            throw new BadMethodCallException('method must be PUT or POST');
+        }
         $path = $path ? $this->txUrl . '/' . preg_replace('|^/|', '', $path) : $this->txUrl;
         $request = new Request($method, $path);
         $request = self::attachData($request, $data);
