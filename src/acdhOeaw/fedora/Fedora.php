@@ -34,7 +34,6 @@ use EasyRdf_Sparql_Client;
 use RuntimeException;
 use BadMethodCallException;
 use acdhOeaw\util\EasyRdfUtil;
-use zozlak\util\UUID;
 use zozlak\util\Config;
 
 /**
@@ -64,8 +63,10 @@ class Fedora {
         } elseif (is_array($body) && isset($body['contentType']) && isset($body['data'])) {
             $headers['Content-Type'] = $body['contentType'];
             $body = file_exists($body['data']) ? fopen($body, 'rb') : $body['data'];
+        } elseif (preg_match('|^[a-z0-9]+://|i', $body)) {
+            $headers['Content-Type'] = 'message/external-body; access-type=URL; URL="' . $body . '"';
+            $body = null;
         }
-
         return new Request($request->getMethod(), $request->getUri(), $headers, $body);
     }
 
@@ -101,21 +102,6 @@ class Fedora {
     private $idProp;
 
     /**
-     * The namespace in which resources' ACDH IDs are created
-     * 
-     * At the moment ids are created by this class but at some point this will
-     * be moved to the doorkeeper. When it's done, this property will be gone.
-     * 
-     * Ids are v4 UUIDs.
-     * 
-     * @var string
-     * @see getId()
-     * @see getIds()
-     * @see updateContent()
-     */
-    private $idNamespace;
-
-    /**
      * Sparql client object
      * @var \EasyRdf_Sparql_Client
      */
@@ -128,7 +114,6 @@ class Fedora {
      * 
      * - fedoraApiUrl - base URL of the Fedora REST API
      * - fedoraIdProp - URI of the RDF property denoting resource ACDH ID
-     * - fedoraIdNamespace - base URL for ACDH ID values
      * - fedoraUser - login required to connect to the Fedora REST API
      * - fedoraPswd - password required to connect to the Fedora REST API
      * - sparqlUrl - SPARQL endpoint URL
@@ -138,7 +123,6 @@ class Fedora {
     public function __construct(Config $cfg) {
         $this->apiUrl = preg_replace('|/$|', '', $cfg->get('fedoraApiUrl'));
         $this->idProp = $cfg->get('fedoraIdProp');
-        $this->idNamespace = $cfg->get('fedoraIdNamespace');
         $authHeader = 'Basic ' . base64_encode($cfg->get('fedoraUser') . ':' . $cfg->get('fedoraPswd'));
         $this->client = new Client(['headers' => ['Authorization' => $authHeader]]);
         $this->sparqlClient = new EasyRdf_Sparql_Client($cfg->get('sparqlUrl'));
@@ -154,13 +138,6 @@ class Fedora {
 
     /**
      * Creates a resource in the Fedora and returns corresponding Resource object
-     * 
-     * If the object's metadata does not contain the id property 
-     * (as defined by the "fedoraIdProp" configuration option - see init()),
-     * a new ID will be assigned (a v4 UUID appended to the namespace defined
-     * by the "fedoraIdNamespace" configuration option).
-     * This feature is to be removed in the future, when the ids generation
-     * when be handled by the doorkeeper.
      * 
      * @param EasyRdf_Resource $metadata resource metadata
      * @param mixed $data optional resource data as a string, 
@@ -181,9 +158,6 @@ class Fedora {
         $resp = $this->sendRequest($request);
         $uri = $resp->getHeader('Location')[0];
 
-        if (!$metadata->hasProperty(EasyRdfUtil::fixPropName($this->idProp))) {
-            $metadata->addResource($this->idProp, $this->idNamespace . UUID::v4());
-        }
         $res = new FedoraResource($this, $uri);
         $res->setMetadata($metadata);
         $res->updateMetadata();
