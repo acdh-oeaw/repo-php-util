@@ -314,6 +314,10 @@ class FedoraResource {
             $graph->parse($resp->getBody());
             $this->metadata = $graph->resource($this->uri);
 
+            if (count($this->metadata->propertyUris()) === 0) {
+                throw new RuntimeException('No resource metadata. Please check a value of the fedoraApiUrl configuration property.');
+            }
+
             $this->metadataOld = EasyRdfUtil::cloneResource($this->metadata);
         }
     }
