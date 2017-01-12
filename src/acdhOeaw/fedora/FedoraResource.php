@@ -266,7 +266,7 @@ class FedoraResource {
             }
             $insert = self::getSparqlTriples($this->metadata);
             $body = sprintf('DELETE {%s} INSERT {%s} WHERE {%s}', $delete, $insert, $where);
-
+            
             $headers = array('Content-Type' => 'application/sparql-update');
             $request = new Request('PATCH', $this->uri . '/fcr:metadata', $headers, $body);
             $this->fedora->sendRequest($request);

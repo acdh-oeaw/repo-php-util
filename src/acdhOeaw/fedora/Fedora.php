@@ -157,9 +157,25 @@ class Fedora {
         $request = self::attachData($request, $data);
         $resp = $this->sendRequest($request);
         $uri = $resp->getHeader('Location')[0];
-
         $res = new FedoraResource($this, $uri);
-        $res->setMetadata($metadata);
+
+        // merge the metadata created by Fedora (and Doorkeeper) upon resource creation
+        // with the ones provided by user
+        $curMetadata = $res->getMetadata();
+        foreach ($metadata->propertyUris() as $prop) {
+            $prop = EasyRdfUtil::fixPropName($prop);
+            if ($curMetadata->hasProperty($prop)) {
+                $curMetadata->delete($prop);
+            }
+            foreach ($metadata->allLiterals($prop) as $i) {
+                $curMetadata->addLiteral($prop, $i->getValue());
+            }
+            foreach ($metadata->allResources($prop) as $i) {
+                $curMetadata->addResource($prop, $i->getUri());
+            }
+        }
+
+        $res->setMetadata($curMetadata);
         $res->updateMetadata();
 
         return $res;
