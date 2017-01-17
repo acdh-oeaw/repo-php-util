@@ -281,7 +281,6 @@ of Fedora resources.</p>
 <ul>
 <li>fedoraApiUrl - base URL of the Fedora REST API</li>
 <li>fedoraIdProp - URI of the RDF property denoting resource ACDH ID</li>
-<li>fedoraIdNamespace - base URL for ACDH ID values</li>
 <li>fedoraUser - login required to connect to the Fedora REST API</li>
 <li>fedoraPswd - password required to connect to the Fedora REST API</li>
 <li>sparqlUrl - SPARQL endpoint URL</li>
@@ -329,7 +328,9 @@ of Fedora resources.</p>
                                             </div>
                                                                                     <div class="subelement argument">
                                                 <h4>$body</h4>
-                                                <code>string</code><p><p>binary content to be attached</p></p>
+                                                <code>string</code><p><p>binary content to be attached
+It can be a file name, a string or an URL
+If it is URL, a &quot;redirecting Fedora resource&quot; will be created</p></p>
                                             </div>
                                                                             
                                                                             <h3>Response</h3>
@@ -440,22 +441,26 @@ will be finally uvailable in the triplestore associated with the Fedora.</p></di
                                             <a id="method_createResource"></a>
                         <div class="element clickable method public  method_createResource" data-toggle="collapse" data-target=".method_createResource .collapse">
                             <h2>Creates a resource in the Fedora and returns corresponding Resource object</h2>
-                            <pre>createResource(\EasyRdf_Resource $metadata, mixed $data = &#039;&#039;, string $path = &#039;&#039;) : \acdhOeaw\rms\FedoraResource</pre>
+                            <pre>createResource(\EasyRdf_Resource $metadata, mixed $data = &#039;&#039;, string $path = &#039;&#039;, string $method = &#039;POST&#039;) : \acdhOeaw\rms\FedoraResource</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
                             
                             <div class="row collapse">
                                 <div class="detail-description">
-                                    <div class="long_description"><p>If the object's metadata does not contain the id property
-(as defined by the &quot;fedoraIdProp&quot; configuration option - see init()),
-a new ID will be assigned (a v4 UUID appended to the namespace defined
-by the &quot;fedoraIdNamespace&quot; configuration option).
-This feature is to be removed in the future, when the ids generation
-when be handled by the doorkeeper.</p></div>
+                                    <div class="long_description"></div>
 
                                     <table class="table">
-                                                                                                                    </table>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\BadMethodCallException</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
 
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
@@ -464,11 +469,17 @@ when be handled by the doorkeeper.</p></div>
                                             </div>
                                                                                     <div class="subelement argument">
                                                 <h4>$data</h4>
-                                                <code>mixed</code><p><p>optional resource data as a string, file name or an array: ['content-type' =&gt; 'foo', 'data' =&gt; 'bar']</p></p>
+                                                <code>mixed</code><p><p>optional resource data as a string,
+file name or an array: ['content-type' =&gt; 'foo', 'data' =&gt; 'bar']</p></p>
                                             </div>
                                                                                     <div class="subelement argument">
                                                 <h4>$path</h4>
-                                                <code>string</code><p><p>optional Fedora resource path (if empty, resource will be created in the Fedora root)</p></p>
+                                                <code>string</code><p><p>optional Fedora resource path (see also the <code>$method</code>
+parameter)</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$method</h4>
+                                                <code>string</code><p><p>creation method to use - POST or PUT, by default POST</p></p>
                                             </div>
                                                                             
                                                                             <h3>Response</h3>
@@ -950,44 +961,6 @@ URL and the transaction id.</h2>
                                                                             </div>
                                 </div>
                             </div>
-                                                    <a id="property_idNamespace"> </a>
-                            <div class="element clickable property  private property_idNamespace" data-toggle="collapse" data-target=".property_idNamespace .collapse">
-                                <h2>The namespace in which resources&#039; ACDH IDs are created</h2>
-                                <pre>idNamespace : string</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"><p>At the moment ids are created by this class but at some point this will
-be moved to the doorkeeper. When it's done, this property will be gone.</p>
-<p>Ids are v4 UUIDs.</p></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    
-                                                                                                            </td>
-                                                </tr>
-                                                                                            <tr>
-                                                    <th>
-                                                        see
-                                                    </th>
-                                                    <td>
-                                                                                                                    
-                                                                                                                    
-                                                                                                                    
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>string</code>
-                                                                            </div>
-                                </div>
-                            </div>
                                                     <a id="property_sparqlClient"> </a>
                             <div class="element clickable property  private property_sparqlClient" data-toggle="collapse" data-target=".property_sparqlClient .collapse">
                                 <h2>Sparql client object</h2>
@@ -1034,7 +1007,7 @@ be moved to the doorkeeper. When it's done, this property will be gone.</p>
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Thu, 08 Dec 2016 17:37:49 +0000.<br/>
+            generated on Tue, 17 Jan 2017 11:06:19 +0000.<br/>
     </footer>
     </body>
 </html>

@@ -26,6 +26,9 @@
 
 namespace acdhOeaw\redmine;
 
+use EasyRdf_Resource;
+use acdhOeaw\util\EasyRdfUtil;
+
 /**
  * Represents a Redmine user
  * and provides mapping to ACDH repository resource representing a person.
@@ -82,4 +85,26 @@ class User extends Redmine {
         return self::$apiUrl . '/users/' . $this->id;
     }
 
+    /**
+     * Maps Redmine's object properties to and RDF graph.
+     * 
+     * Extends mapping provided by the base Redmine class with mappings
+     * specific to the Redmine users.
+     * 
+     * @param array $data associative array with Redmine's resource properties
+     *   fetched from the Redmine REST API
+     * @return \EasyRdf_Resource
+     * @see \acdhOeaw\redmine\Redmine::mapProperties()
+     */
+    protected function mapProperties(array $data): EasyRdf_Resource {
+        $res = parent::mapProperties($data);
+        
+        $given = $res->getLiteral(EasyRdfUtil::fixPropName('http://xmlns.com/foaf/0.1/givenName'));
+        $family = $res->getLiteral(EasyRdfUtil::fixPropName('http://xmlns.com/foaf/0.1/familyName'));
+        
+        $res->delete(EasyRdfUtil::fixPropName('http://xmlns.com/foaf/0.1/name'));
+        $res->addLiteral('http://xmlns.com/foaf/0.1/name', trim($given . ' ' . $family));
+        
+        return $res;
+    }
 }

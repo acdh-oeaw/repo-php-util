@@ -131,7 +131,7 @@
         </a>
     </li>
 
-                                                                                                        </ul>
+                                                                                                                                                                </ul>
         </li>
         <li class="nav-header protected">» Protected
             <ul>
@@ -140,11 +140,16 @@
                                 <span class="description">Maps Redmine&#039;s User ID to the Redmine&#039;s User URI</span><pre>getIdValue</pre>
                             </a>
                         </li>
+                                                                                <li class="method protected">
+                            <a href="#method_mapProperties" title="mapProperties :: Maps Redmine&#039;s object properties to and RDF graph.">
+                                <span class="description">Maps Redmine&#039;s object properties to and RDF graph.</span><pre>mapProperties</pre>
+                            </a>
+                        </li>
                                                 </ul>
         </li>
         <li class="nav-header private">» Private
             <ul>
-                                                                                                                                                        </ul>
+                                                                                                                                                                                            </ul>
         </li>
         <li class="nav-header">
             <i class="icon-custom icon-constant"></i> Constants
@@ -284,6 +289,45 @@ and provides mapping to ACDH repository resource representing a person.</p>
                             </div>
 
                         </div>
+                                            <a id="method_mapProperties"></a>
+                        <div class="element clickable method protected  method_mapProperties" data-toggle="collapse" data-target=".method_mapProperties .collapse">
+                            <h2>Maps Redmine&#039;s object properties to and RDF graph.</h2>
+                            <pre>mapProperties(array $data) : \EasyRdf_Resource</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>Extends mapping provided by the base Redmine class with mappings
+specific to the Redmine users.</p></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    see
+                                                </th>
+                                                <td>
+                                                                                                                                                                        
+                                                                                                                                                                            \acdhOeaw\redmine\Redmine::mapProperties()
+                                                                                                                
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$data</h4>
+                                                <code>array</code><p><p>associative array with Redmine's resource properties
+fetched from the Redmine REST API</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>\EasyRdf_Resource</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
                     
                     
                                                                 <h3><i class="icon-custom icon-property"></i> Properties</h3>
@@ -341,7 +385,7 @@ and provides mapping to ACDH repository resource representing a person.</p>
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Thu, 08 Dec 2016 17:37:49 +0000.<br/>
+            generated on Tue, 17 Jan 2017 11:06:19 +0000.<br/>
     </footer>
     </body>
 </html>

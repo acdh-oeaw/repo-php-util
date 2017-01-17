@@ -280,7 +280,7 @@ abstract class Redmine {
      *   fetched from the Redmine REST API
      * @return \EasyRdf_Resource
      */
-    private function mapProperties(array $data): EasyRdf_Resource {
+    protected function mapProperties(array $data): EasyRdf_Resource {
         $this->getRmsUri(false); // to load metadata if resource already exists
 
         if ($this->fedoraRes) {
