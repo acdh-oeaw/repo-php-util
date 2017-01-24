@@ -276,6 +276,36 @@ class Fedora {
     }
 
     /**
+     * Finds all Fedora resources with a given RDF property matching given regular expression.
+     * 
+     * Be aware that all property values introduced during the transaction
+     * are not taken into account (see documentation of the begin() method)
+     * 
+     * @param string $property fully quallified property URI
+     * @param string $regEx regular expression to match against
+     * @param string $flags regular expression flags (by default "i" - case insensitive)
+     * @return array
+     * @see begin()
+     */
+    public function getResourcesByPropertyRegEx(string $property, string $regEx, string $flags = 'i'): array {
+        $query = "
+            SELECT ?uri ?val 
+            WHERE { 
+                ?uri %s ?val 
+                FILTER regex(str(?val), '%s', 'i')
+            } 
+            ORDER BY ( ?val )
+        ";
+        $query = sprintf($query, EasyRdfUtil::escapeUri($property), $regEx);
+        $res = $this->sparqlClient->query($query);
+        $resources = array();
+        foreach ($res as $i) {
+            $resources[] = new FedoraResource($this, $i->uri);
+        }
+        return $resources;
+    }
+    
+    /**
      * Adjusts URI to the current object state by setting up the proper base
      * URL and the transaction id.
      * 

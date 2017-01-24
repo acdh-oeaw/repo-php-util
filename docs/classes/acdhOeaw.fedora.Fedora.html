@@ -184,6 +184,12 @@
     </li>
 
                                                                                                         <li class="method public">
+        <a href="#method_getResourcesByPropertyRegEx" title="getResourcesByPropertyRegEx :: Finds all Fedora resources with a given RDF property matching given regular expression.">
+            <span class="description">Finds all Fedora resources with a given RDF property matching given regular expression.</span><pre>getResourcesByPropertyRegEx</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
         <a href="#method_inTransaction" title="inTransaction :: Retruns true if a Fedora transaction is opened and false otherwise.">
             <span class="description">Retruns true if a Fedora transaction is opened and false otherwise.</span><pre>inTransaction</pre>
         </a>
@@ -211,11 +217,11 @@
         </li>
         <li class="nav-header protected">» Protected
             <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </ul>
         </li>
         <li class="nav-header private">» Private
             <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li class="method private">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <li class="method private">
                             <a href="#method_sanitizeUri" title="sanitizeUri :: Adjusts URI to the current object state by setting up the proper base
 URL and the transaction id.">
                                 <span class="description">Adjusts URI to the current object state by setting up the proper base
@@ -681,6 +687,52 @@ are not taken into account (see documentation of the begin() method)</p></div>
                             </div>
 
                         </div>
+                                            <a id="method_getResourcesByPropertyRegEx"></a>
+                        <div class="element clickable method public  method_getResourcesByPropertyRegEx" data-toggle="collapse" data-target=".method_getResourcesByPropertyRegEx .collapse">
+                            <h2>Finds all Fedora resources with a given RDF property matching given regular expression.</h2>
+                            <pre>getResourcesByPropertyRegEx(string $property, string $regEx, string $flags = &#039;i&#039;) : array</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>Be aware that all property values introduced during the transaction
+are not taken into account (see documentation of the begin() method)</p></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    see
+                                                </th>
+                                                <td>
+                                                                                                                                                                        
+                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin">\acdhOeaw\fedora\Fedora::begin()</a>
+                                                                                                                
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$property</h4>
+                                                <code>string</code><p><p>fully quallified property URI</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$regEx</h4>
+                                                <code>string</code><p><p>regular expression to match against</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$flags</h4>
+                                                <code>string</code><p><p>regular expression flags (by default &quot;i&quot; - case insensitive)</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>array</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
                                             <a id="method_inTransaction"></a>
                         <div class="element clickable method public  method_inTransaction" data-toggle="collapse" data-target=".method_inTransaction .collapse">
                             <h2>Retruns true if a Fedora transaction is opened and false otherwise.</h2>
@@ -1007,7 +1059,7 @@ URL and the transaction id.</h2>
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Tue, 17 Jan 2017 11:06:19 +0000.<br/>
+            generated on Tue, 24 Jan 2017 11:41:20 +0000.<br/>
     </footer>
     </body>
 </html>
