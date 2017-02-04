@@ -32,6 +32,11 @@ use EasyRdf_Resource;
 use InvalidArgumentException;
 use RuntimeException;
 use acdhOeaw\util\EasyRdfUtil;
+use acdhOeaw\fedora\metadataQuery\Query;
+use acdhOeaw\fedora\metadataQuery\QueryParameter;
+use acdhOeaw\fedora\metadataQuery\HasProperty;
+use acdhOeaw\fedora\metadataQuery\HasValue;
+use acdhOeaw\fedora\metadataQuery\MatchesRegEx;
 
 /**
  * Represents an already existing Fedora resource.
@@ -63,13 +68,13 @@ class FedoraResource {
     static private $skipPropRegExp = '|^http://fedora[.]info/definitions/v4/repository#|';
 
     /**
-     * Serialises metadata to a form suitable for Fedora's SPARQL-update query.
+     * Serializes metadata to a form suitable for Fedora's SPARQL-update query.
      * 
      * This means the "ntriples" format with blank subject URIs and excluding
      * properties Fedora reserves for itself (and rises errors when they are
      * provided from the outside).
      * 
-     * @param \EasyRdf_Resource $metadata metadata to serialise
+     * @param \EasyRdf_Resource $metadata metadata to serialize
      * @return string
      * @see $skipProp
      * @see $skipPropRegExp
@@ -266,7 +271,7 @@ class FedoraResource {
             }
             $insert = self::getSparqlTriples($this->metadata);
             $body = sprintf('DELETE {%s} INSERT {%s} WHERE {%s}', $delete, $insert, $where);
-            
+
             $headers = array('Content-Type' => 'application/sparql-update');
             $request = new Request('PATCH', $this->uri . '/fcr:metadata', $headers, $body);
             $this->fedora->sendRequest($request);
@@ -374,6 +379,37 @@ class FedoraResource {
             }
         }
         return false;
+    }
+
+    public function getChildrenQuery(): Query {
+        $query = new Query();
+        $query->addParameter($this->getChildrenQueryParameter());
+        return $query;
+    }
+    
+    public function getChildrenQueryParameter(): QueryParameter {
+        return new HasValue($this->fedora->getRelProp(), $this->getId());
+    }
+    
+    public function getChildren(): array {
+        return $this->fedora->getResourcesByQuery($this->getChildrenQuery());
+    }
+
+    public function getChildrenByProperty(string $property, string $value = ''): array {
+        $query = $this->getChildrenQuery();
+        if($value != ''){
+            $param = new HasValue($property, $value);
+        }else{
+            $param = new HasProperty($property);
+        }
+        $query->addParameter($param);
+        return $this->fedora->getResourcesByQuery($query);
+    }
+
+    public function getChildrenByPropertyRegEx(string $property, string $regEx, string $flags = 'i'): array {
+        $query = $this->getChildrenQuery();
+        $query->addParameter(new MatchesRegEx($property, $regEx, $flags));
+        return $this->fedora->getResourcesByQuery($query);
     }
 
     /**

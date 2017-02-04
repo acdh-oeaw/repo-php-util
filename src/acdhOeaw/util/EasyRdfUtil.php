@@ -80,6 +80,42 @@ class EasyRdfUtil {
     }
 
     /**
+     * Checks it a given string is a valid SPARQL variable name
+     * (see https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#rVARNAME)
+     * 
+     * Current implementation is more restrictive that the SPARQL standard
+     * as Unicode ranges #x00B7, #x0300-#x036F, #x203F-#x2040, #x00C0-#x00D6,
+     * #x00D8-#x00F6, #x00F8-#x02FF, #x0370-#x037D, #x037F-#x1FFF, 
+     * #x200C-#x200D, #x2070-#x218F, #x2C00-#x2FEF, #x3001-#xD7FF,
+     * #xF900-#xFDCF, #xFDF0-#xFFFD and #x10000-#xEFFFF are NOT allowed.
+     * 
+     * @param string $variable SPARQL variable name to match
+     */
+    static public function isVariable(string $variable): bool {
+        return preg_match('|^[?$][a-zA-Z0-9_]+|', $variable);
+    }
+    
+    static public function isPathOp(string $op): bool {
+        return in_array($op, array('!', '^', '|', '/', '*', '+', '?', '!^', '(', ')'));
+    }
+    
+    static public function isPathOpLeft(string $op): bool {
+        return in_array($op, array('!', '^', '!^'));
+    }
+
+    static public function isPathOpRight(string $op): bool {
+        return in_array($op, array('*', '+', '?'));
+    }
+
+    static public function isPathOpTwoSided(string $op): bool {
+        return in_array($op, array('/', '|'));
+    }
+    
+    static public function isUri(string $string): bool{
+        return preg_match('#[a-z0-9+.-]+://#', $string); 
+    }
+    
+    /**
      * Initializes serializer used by `escapeLiteral()` and `escapeResource()`
      */
     static private function initSerializer() {

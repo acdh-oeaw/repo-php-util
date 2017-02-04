@@ -35,7 +35,7 @@ namespace acdhOeaw\redmine;
 class Issue extends Redmine {
 
     /**
-     * Stores all instances of the class identyfing them by their Redmine IDs
+     * Stores all instances of the class identifying them by their Redmine IDs
      * @var array
      * @see getById()
      */

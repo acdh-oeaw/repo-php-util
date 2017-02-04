@@ -34,6 +34,10 @@ use EasyRdf_Sparql_Client;
 use RuntimeException;
 use BadMethodCallException;
 use acdhOeaw\util\EasyRdfUtil;
+use acdhOeaw\fedora\metadataQuery\Query;
+use acdhOeaw\fedora\metadataQuery\HasProperty;
+use acdhOeaw\fedora\metadataQuery\HasValue;
+use acdhOeaw\fedora\metadataQuery\MatchesRegEx;
 use zozlak\util\Config;
 
 /**
@@ -106,6 +110,15 @@ class Fedora {
      * @var \EasyRdf_Sparql_Client
      */
     private $sparqlClient;
+    private $relProp;
+
+    public function getRelProp() {
+        return $this->relProp;
+    }
+
+    public function query($query) {
+        return $this->sparqlClient->query($query);
+    }
 
     /**
      * Creates Fedora connection object from a given config.
@@ -123,13 +136,14 @@ class Fedora {
     public function __construct(Config $cfg) {
         $this->apiUrl = preg_replace('|/$|', '', $cfg->get('fedoraApiUrl'));
         $this->idProp = $cfg->get('fedoraIdProp');
+        $this->relProp = $cfg->get('fedoraRelProp');
         $authHeader = 'Basic ' . base64_encode($cfg->get('fedoraUser') . ':' . $cfg->get('fedoraPswd'));
         $this->client = new Client(['headers' => ['Authorization' => $authHeader]]);
         $this->sparqlClient = new EasyRdf_Sparql_Client($cfg->get('sparqlUrl'));
     }
 
     /**
-     * Returns URI of the RDF property denoting ACDH ID as set uppon object creation.
+     * Returns URI of the RDF property denoting ACDH ID as set upon object creation.
      * @return string
      */
     public function getIdProp(): string {
@@ -257,22 +271,20 @@ class Fedora {
      * Be aware that all property values introduced during the transaction
      * are not taken into account (see documentation of the begin() method)
      * 
-     * @param string $property fully quallified property URI
+     * @param string $property fully qualified property URI
      * @param string $value optional property value
      * @return array
      * @see begin()
      */
     public function getResourcesByProperty(string $property, string $value = ''): array {
-        $query = sprintf('SELECT ?uri ?val WHERE { ?uri %s ?val } ORDER BY ( ?val )', EasyRdfUtil::escapeUri($property));
-        $res = $this->sparqlClient->query($query);
-        $resources = array();
-        foreach ($res as $i) {
-            if ($value === '' || (string) $i->val === $value) {
-                $uri = $this->sanitizeUri($i->uri);
-                $resources[] = new FedoraResource($this, $uri);
-            }
+        $query = new Query();
+        if ($value != '') {
+            $param = new HasValue($property, $value);
+        } else {
+            $param = new HasProperty($property);
         }
-        return $resources;
+        $query->addParameter($param);
+        return $this->getResourcesByQuery($query);
     }
 
     /**
@@ -281,30 +293,32 @@ class Fedora {
      * Be aware that all property values introduced during the transaction
      * are not taken into account (see documentation of the begin() method)
      * 
-     * @param string $property fully quallified property URI
+     * @param string $property fully qualified property URI
      * @param string $regEx regular expression to match against
      * @param string $flags regular expression flags (by default "i" - case insensitive)
      * @return array
      * @see begin()
      */
     public function getResourcesByPropertyRegEx(string $property, string $regEx, string $flags = 'i'): array {
-        $query = "
-            SELECT ?uri ?val 
-            WHERE { 
-                ?uri %s ?val 
-                FILTER regex(str(?val), '%s', 'i')
-            } 
-            ORDER BY ( ?val )
-        ";
-        $query = sprintf($query, EasyRdfUtil::escapeUri($property), $regEx);
-        $res = $this->sparqlClient->query($query);
+        $query = new Query();
+        $query->addParameter(new MatchesRegEx($property, $regEx, $flags));
+        return $this->getResourcesByQuery($query);
+    }
+
+    public function getResourcesByQuery(Query $query, string $resVar = '?res') {
+        $resVar = preg_replace('|^[?]|', '', $resVar);
+        $query = $query->getQuery();
+//echo "\n".$query;
+        $results = $this->sparqlClient->query($query);
         $resources = array();
-        foreach ($res as $i) {
-            $resources[] = new FedoraResource($this, $i->uri);
+        foreach ($results as $i) {
+            $uri = $i->$resVar;
+            $uri = $this->sanitizeUri($uri);
+            $resources[] = new FedoraResource($this, $uri);
         }
         return $resources;
     }
-    
+
     /**
      * Adjusts URI to the current object state by setting up the proper base
      * URL and the transaction id.
@@ -312,7 +326,7 @@ class Fedora {
      * @param string $uri resource URI
      * @return string 
      */
-    private function sanitizeUri(string $uri) {
+    public function sanitizeUri(string $uri) {
         $baseUrl = !$this->txUrl ? $this->apiUrl : $this->txUrl;
         $uri = preg_replace('|^https?://[^/]+/rest/(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
         $uri = $baseUrl . '/' . $uri;
