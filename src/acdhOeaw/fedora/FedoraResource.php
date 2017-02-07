@@ -200,6 +200,14 @@ class FedoraResource {
     }
 
     /**
+     * Removes the resource from the Fedora
+     */
+    public function delete() {
+        $request = new Request('DELETE', $this->getUri());
+        $this->fedora->sendRequest($request);
+    }
+    
+    /**
      * Replaces resource metadata with a given RDF graph.
      * 
      * New metadata are not automatically written back to the Fedora.

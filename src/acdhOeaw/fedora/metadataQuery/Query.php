@@ -77,7 +77,8 @@ class Query {
     public function getQuery() {
         $query = '';
 
-        $query .= 'SELECT ' . implode(' ', $this->getSubVars()) . "\n";
+        $query .= 'SELECT ' . ($this->distinct ? 'DISTINCT ' : '');
+        $query .= implode(' ', $this->getSubVars()) . "\n";
 
         $where = $this->getWhere();
         $filter = $this->getFilter();

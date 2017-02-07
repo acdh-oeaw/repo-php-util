@@ -199,12 +199,12 @@ class Fedora {
      * Sends a given HTTP request to the Fedora.
      * 
      * @param Request $request request to be send
-     * @return GuzzleHttp\Psr7\Response
+     * @return \GuzzleHttp\Psr7\Response
      */
     public function sendRequest(Request $request): Response {
         return $this->client->send($request);
     }
-
+    
     /**
      * Returns a FedoraResource based on a given URI.
      * 
