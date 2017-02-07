@@ -76,8 +76,8 @@ class EasyRdfUtil {
      */
     static public function escapeLiteral(string $literal): string {
         self::initSerializer();
-        $value = str_replace('\\', '\\\\', $value);
-        $value = self::$serializer->serialiseValue(new EasyRdf_Literal($literal));
+        $value = str_replace('\\', '\\\\', $literal); // EasyRdf does not escape backslashes!
+        $value = self::$serializer->serialiseValue(new EasyRdf_Literal($value));
         return $value;
     }
 
