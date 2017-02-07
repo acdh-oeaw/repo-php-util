@@ -77,7 +77,7 @@ class EasyRdfUtil {
     static public function escapeLiteral(string $literal): string {
         self::initSerializer();
         $value = str_replace('\\', '\\\\', $literal); // EasyRdf does not escape backslashes!
-        $value = self::$serializer->serialiseValue(new EasyRdf_Literal($value));    
+        $value = self::$serializer->serialiseValue(new EasyRdf_Literal($value));
         return $value;
     }
 
@@ -96,11 +96,11 @@ class EasyRdfUtil {
     static public function isVariable(string $variable): bool {
         return preg_match('|^[?$][a-zA-Z0-9_]+|', $variable);
     }
-    
+
     static public function isPathOp(string $op): bool {
         return in_array($op, array('!', '^', '|', '/', '*', '+', '?', '!^', '(', ')'));
     }
-    
+
     static public function isPathOpLeft(string $op): bool {
         return in_array($op, array('!', '^', '!^'));
     }
@@ -112,11 +112,11 @@ class EasyRdfUtil {
     static public function isPathOpTwoSided(string $op): bool {
         return in_array($op, array('/', '|'));
     }
-    
-    static public function isUri(string $string): bool{
-        return preg_match('#[a-z0-9+.-]+://#', $string); 
+
+    static public function isUri(string $string): bool {
+        return preg_match('#[a-z0-9+.-]+://#', $string);
     }
-    
+
     /**
      * Initializes serializer used by `escapeLiteral()` and `escapeResource()`
      */
@@ -153,6 +153,21 @@ class EasyRdfUtil {
         }
 
         return $res;
+    }
+
+    static public function serialiseResource(EasyRdf_Resource $resource) {
+        $rdf = '';
+        foreach ($resource->propertyUris() as $prop) {
+            $fProp = self::fixPropName($prop);
+            $eProp = self::escapeUri($prop);
+            foreach ($resource->allLiterals($fProp) as $i) {
+                $rdf .= '<> ' . $eProp . ' ' . self::escapeLiteral($i) . " .\n";
+            }
+            foreach ($resource->allResources($fProp) as $i) {
+                $rdf .= '<> ' . $eProp . ' ' . self::escapeUri($i->getUri()) . " .\n";
+            }
+        }
+        return $rdf;
     }
 
 }

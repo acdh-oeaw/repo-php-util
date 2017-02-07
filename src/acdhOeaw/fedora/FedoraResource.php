@@ -83,11 +83,7 @@ class FedoraResource {
         // make a deep copy of the metadata graph excluding forbidden properties
         $res = EasyRdfUtil::cloneResource($metadata, self::$skipProp, self::$skipPropRegExp);
 
-        // serialize graph to ntriples format and convert all subjects to <>
-        $rdf = "\n" . $res->getGraph()->serialise('ntriples') . "\n";
-        $pattern = '|\n' . EasyRdfUtil::escapeUri($metadata->getUri()) . '|';
-        $rdf = preg_replace($pattern, "\n<>", $rdf);
-
+        $rdf = EasyRdfUtil::serialiseResource($res);
         return $rdf;
     }
 
