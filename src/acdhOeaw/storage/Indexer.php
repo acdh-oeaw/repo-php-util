@@ -76,6 +76,12 @@ class Indexer {
     static private $titleProp;
 
     /**
+     * URI of the default RDF class assigned to indexed resources
+     * @var string
+     */
+    static private $defaultClass;
+    
+    /**
      * Path to the container root
      * @var string
      */
@@ -103,6 +109,8 @@ class Indexer {
      * - fedoraLocProp - URI of the RDF property denoting resource location
      * - fedoraSizeProp - URI of the RDF property denoting resource size
      * - fedoraTitleProp - URI of the RDF property denoting resource title
+     * - indexerDefaultClass - URI of the default class to be assigned to each 
+     *     indexed resource (can be empty)
      * - containerDir - path to the container root (the "fedoraLocProp" property
      *     values are relative to this path)
      * - sparqlUrl - SPARQL endpoint URL
@@ -115,6 +123,7 @@ class Indexer {
         self::$locProp = $cfg->get('fedoraLocProp');
         self::$sizeProp = $cfg->get('fedoraSizeProp');
         self::$titleProp = $cfg->get('fedoraTitleProp');
+        self::$defaultClass = $cfg->get('indexerDefaultClass');
         self::$containerDir = preg_replace('|/$|', '', $cfg->get('containerDir')) . '/';
         self::$sparqlClient = new EasyRdf_Sparql_Client($cfg->get('sparqlUrl'));
     }
@@ -270,8 +279,11 @@ class Indexer {
      * Does the indexing.
      * 
      * @param bool $verbose should be verbose
+     * @return array a list FedoraResource objects representing indexed resources
      */
-    public function index(bool $verbose = false) {
+    public function index(bool $verbose = false): array {
+        $indexedRes = array();
+        
         foreach ($this->paths as $path) {
             foreach (new DirectoryIterator(self::$containerDir . $path) as $i) {
                 if ($i->isDot()) {
@@ -294,10 +306,13 @@ class Indexer {
                         echo $verbose ? "+ upload " : "";
                         $res->updateContent($i->getPathname(), true);
                     }
+                    
+                    $indexedRes[] = $res;
                 } catch (DomainException $e) {
                     // resource does not exist and must be created
                     if (!$skip) {
                         $res = $this->resource->getFedora()->createResource($metadata, $upload ? $i->getPathname() : '');
+                        $indexedRes[] = $res;
                         echo $verbose ? "create " : "";
                     } else {
                         echo $verbose ? "skip " : "";
@@ -313,11 +328,14 @@ class Indexer {
                     $ind = clone($this);
                     $ind->setDepth($this->depth - 1);
                     $ind->setPaths(array(substr($i->getPathname(), strlen(self::$containerDir))));
-                    $ind->index($verbose);
+                    $recRes = $ind->index($verbose);
+                    $indexedRes = array_merge($indexedRes, $recRes);
                     echo $verbose ? "returning " . $path . "\n" : "";
                 }
             }
         }
+        
+        return $indexedRes;
     }
 
     /**
@@ -351,6 +369,9 @@ class Indexer {
     private function createMetadata(string $path, DirectoryIterator $i): EasyRdf_Resource {
         $graph = new EasyRdf_Graph;
         $metadata = $graph->resource('newResource');
+        if (self::$defaultClass != '') {
+            $metadata->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', self::$defaultClass);
+        }
         $metadata->addLiteral(self::$locProp, $path . '/' . $i->getFilename());
         $metadata->addLiteral(self::$titleProp, $i->getFilename());
         $metadata->addLiteral('ebucore:filename', $i->getFilename());
