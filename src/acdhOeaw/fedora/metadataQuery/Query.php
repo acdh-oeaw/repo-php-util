@@ -39,35 +39,52 @@ class Query {
      */
     private $param = array();
     private $distinct;
+    private $select = array('*');
     private $orderBy = array();
+    private $groupBy = array();
     private $joinClause = '';
 
     public function __construct() {
         
     }
 
-    public function addParameter(QueryParameter $p) {
+    public function addParameter(QueryParameter $p): Query {
         $this->param[] = $p;
+        return $this;
     }
 
-    public function addSubquery(Query $q) {
+    public function addSubquery(Query $q): Query {
         $this->param[] = $q;
+        return $this;
     }
 
-    public function setDistinct(bool $distinct) {
+    public function setDistinct(bool $distinct): Query {
         $this->distinct = $distinct;
+        return $this;
     }
 
-    public function setOrderBy(array $orderBy) {
+    public function setSelect(array $select): Query {
+        $this->select = $select;
+        return $this;
+    }
+    
+    public function setOrderBy(array $orderBy): Query {
         $this->orderBy = $orderBy;
+        return $this;
     }
 
-    public function setJoinClause(string $joinClause) {
+    public function setGroupBy(array $groupBy): Query {
+        $this->groupBy = $groupBy;
+        return $this;
+    }
+    
+    public function setJoinClause(string $joinClause): Query {
         $clauses = array('optional', 'minus', 'filter exists', 'filter not exists');
         if (!in_array(strtolower($joinClause), $clauses)) {
             throw new \BadMethodCallException('wrong join clause');
         }
         $this->joinClause = $joinClause;
+        return $this;
     }
 
     public function getJoinClause(): string {
@@ -77,13 +94,13 @@ class Query {
     public function getQuery() {
         $query = '';
 
-        $query .= 'SELECT ' . ($this->distinct ? 'DISTINCT ' : '');
-        $query .= implode(' ', $this->getSubVars()) . "\n";
+        $query .= 'SELECT ' . $this->getSelect() . "\n";
 
         $where = $this->getWhere();
         $filter = $this->getFilter();
         $query .= "WHERE {\n" . $where . $filter . "}\n";
 
+        $query .= $this->getGroupBy();
         $query .= $this->getOrderBy();
 
         return $query;
@@ -92,7 +109,11 @@ class Query {
     private function getSubVars() {
         $subVars = array();
         foreach ($this->param as $p) {
-            $subVars[] .= $p->getSubVar();
+            if (method_exists($p, 'getSubVar')) {
+                $subVars[] .= $p->getSubVar();
+            } else {
+                $subVars = array_merge($subVars, $p->getSubVars());
+            }
         }
         return array_unique($subVars);
     }
@@ -100,10 +121,10 @@ class Query {
     private function getWhere() {
         $where = array();
         foreach ($this->param as $p) {
-            if (method_exists($p, 'getWhere')) {
-                $where[] = $p->getWhere() . "\n";
-            } else {
+            if (method_exists($p, 'getQuery')) {
                 $where[] = $p->getJoinClause() . '{ ' . $p->getQuery() . " }\n";
+            } else {
+                $where[] = $p->getWhere() . "\n";
             }
         }
         return implode('', $where);
@@ -129,7 +150,17 @@ class Query {
         if (count($this->orderBy) == 0) {
             return '';
         }
-        return 'ORDER BY ' . implode($this->orderBy) . "\n";
+        return 'ORDER BY ' . implode(' ', $this->orderBy) . "\n";
     }
 
+    private function getGroupBy() {
+        if (count($this->groupBy) == 0) {
+            return '';
+        }
+        return 'GROUP BY ' . implode(' ', $this->groupBy) . "\n";
+    }
+    
+    private function getSelect() {
+        return ' ' . ($this->distinct ? 'DISTINCT ' : '') . implode(' ', $this->select) . ' ';
+    }
 }

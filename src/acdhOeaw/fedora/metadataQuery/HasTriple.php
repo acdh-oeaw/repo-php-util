@@ -26,37 +26,25 @@
 
 namespace acdhOeaw\fedora\metadataQuery;
 
-use BadMethodCallException;
 use acdhOeaw\util\EasyRdfUtil;
+use BadMethodCallException;
 
 /**
- * Description of hasParameter
+ * Description of HasTriple
  *
  * @author zozlak
  */
-class HasProperty extends QueryParameter {
+class HasTriple extends HasProperty {
 
     protected $property = '';
 
-    public function __construct($property) {
-        parent::__construct();
-        if (!is_array($property)) {
-            if (EasyRdfUtil::isVariable($property)) {
-                $this->property = $property;
-            } else {
-                $this->property = EasyRdfUtil::escapeUri($property);
-            }
-        } else {
-            foreach ($property as &$i) {
-                if (EasyRdfUtil::isUri($i)) {
-                    $i = EasyRdfUtil::escapeUri($i);
-                } elseif (!EasyRdfUtil::isPathOp($i)) {
-                    throw new BadMethodCallException('property does not describe a valid sparql property path');
-                }
-            }
-            unset($i);
-            $this->property = implode(' ', $property);
+    public function __construct(string $sub, $prop, string $obj) {
+        parent::__construct($prop);
+        if (!EasyRdfUtil::isVariable($sub) || !EasyRdfUtil::isVariable($obj)) {
+            throw new BadMethodCallException('all parameters must be a valid SPARQL variable names');
         }
+        $this->subVar = $sub;
+        $this->objVar = $obj;
     }
 
     public function getWhere(): string {

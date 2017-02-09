@@ -43,16 +43,19 @@ abstract class QueryParameter {
         $this->objVar = self::$objVarPrefix . self::$counter;
     }
 
-    public function setSubVar(string $subVar) {
+    public function setSubVar(string $subVar): QueryParameter {
         $this->subVar = $subVar;
+        return $this;
     }
 
-    public function setObjVar(string $objVar) {
+    public function setObjVar(string $objVar): QueryParameter {
         $this->objVar = $objVar;
+        return $this;
     }
 
-    public function setOptional(bool $optional) {
+    public function setOptional(bool $optional): QueryParameter {
         $this->optional = $optional;
+        return $this;
     }
 
     public function getSubVar(): string {
