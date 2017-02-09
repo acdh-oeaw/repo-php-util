@@ -135,7 +135,7 @@ class Indexer {
     private $resource;
 
     /**
-     * Filesystem paths where resource children are located
+     * File system paths where resource children are located
      * 
      * It is a concatenation of the container root path coming from the
      * class settings (set by calling init()) and the location path
@@ -165,7 +165,7 @@ class Indexer {
      * Maximum size of a child resource (in bytes) resulting in the creation
      * of binary resources.
      * 
-     * For child resources bigger then this limit an "RDF only" Fedora resoueces
+     * For child resources bigger then this limit an "RDF only" Fedora resources
      * will be created.
      * 
      * @var int
@@ -225,7 +225,7 @@ class Indexer {
     /**
      * Sets file name filter for child resources.
      * 
-     * @param string $filter regullar expression conformant with preg_replace()
+     * @param string $filter regular expression conformant with preg_replace()
      */
     public function setFilter(string $filter) {
         $this->filter = $filter;
@@ -300,6 +300,7 @@ class Indexer {
                     $res = $this->getResource($path, $i);
                     echo $verbose ? "update " : "";
 
+                    $metadata = EasyRdfUtil::mergeMetadata($res->getMetadata(), $metadata);
                     $res->setMetadata($metadata);
                     $res->updateMetadata();
                     if ($upload) {
@@ -362,7 +363,7 @@ class Indexer {
     /**
      * Creates metadata for an indexed file system node
      * 
-     * @param string $path node location base dir relatively to the container
+     * @param string $path node location base directory relatively to the container
      * @param DirectoryIterator $i file system node
      * @return EasyRdf_Resource
      */
@@ -372,7 +373,8 @@ class Indexer {
         if (self::$defaultClass != '') {
             $metadata->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', self::$defaultClass);
         }
-        $metadata->addLiteral(self::$locProp, $path . '/' . $i->getFilename());
+        $path = str_replace('\\', '/', $path . '/' . $i->getFilename());
+        $metadata->addLiteral(self::$locProp, $path);
         $metadata->addLiteral(self::$titleProp, $i->getFilename());
         $metadata->addLiteral('ebucore:filename', $i->getFilename());
         $metadata->addLiteral('ebucore:hasMimeType', mime_content_type($i->getPathname()));
