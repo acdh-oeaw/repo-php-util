@@ -120,7 +120,7 @@ class ServiceParameter {
         
         $redPropertyProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraServiceParamRdfPropertyProp'));
         $meta->delete($redPropertyProp);
-        $meta->addLiteral($redPropertyProp, $this->rdfProperty);
+        $meta->addResource($redPropertyProp, $this->rdfProperty);
 
         $fedoraRes->setMetadata($meta);
         $fedoraRes->updateMetadata();
