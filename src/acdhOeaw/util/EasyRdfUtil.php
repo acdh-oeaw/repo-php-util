@@ -143,7 +143,7 @@ class EasyRdfUtil {
             if (in_array($prop, $skipProp) || preg_match($skipRegExp, $prop)) {
                 continue;
             }
-            $prop = EasyRdfUtil::fixPropName($prop);
+            $prop = self::fixPropName($prop);
             foreach ($resource->allLiterals($prop) as $i) {
                 $res->addLiteral($prop, $i->getValue());
             }
@@ -168,6 +168,21 @@ class EasyRdfUtil {
             }
         }
         return $rdf;
+    }
+
+    static public function mergeMetadata(EasyRdf_Resource $cur, EasyRdf_Resource $new): EasyRdf_Resource {
+        $cur = self::cloneResource($cur, $new->propertyUris());
+        
+        foreach ($new->propertyUris() as $prop) {
+            $prop = self::fixPropName($prop);
+            foreach ($new->allLiterals($prop) as $i) {
+                $cur->addLiteral($prop, $i->getValue());
+            }
+            foreach ($new->allResources($prop) as $i) {
+                $cur->addResource($prop, $i->getUri());
+            }
+        }
+        return $cur;
     }
 
 }
