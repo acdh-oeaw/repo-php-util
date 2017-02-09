@@ -79,7 +79,7 @@ class Query {
     }
     
     public function setJoinClause(string $joinClause): Query {
-        $clauses = array('optional', 'minus', 'filter exists', 'filter not exists');
+        $clauses = array('optional', 'minus', 'filter exists', 'filter not exists', 'union');
         if (!in_array(strtolower($joinClause), $clauses)) {
             throw new \BadMethodCallException('wrong join clause');
         }
