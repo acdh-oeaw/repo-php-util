@@ -56,7 +56,8 @@ class FedoraResource {
     static private $skipProp = array(
         'http://www.loc.gov/premis/rdf/v1#hasSize',
         'http://www.loc.gov/premis/rdf/v1#hasMessageDigest',
-        'http://www.iana.org/assignments/relation/describedby'
+        'http://www.iana.org/assignments/relation/describedby',
+        'http://purl.org/dc/terms/extent'
     );
 
     /**
