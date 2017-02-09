@@ -31,6 +31,7 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request;
 use EasyRdf_Resource;
 use EasyRdf_Sparql_Client;
+use EasyRdf_Sparql_Result;
 use RuntimeException;
 use BadMethodCallException;
 use acdhOeaw\util\EasyRdfUtil;
@@ -121,7 +122,7 @@ class Fedora {
     }
 
     /**
-     * Creates Fedora connection object from a given config.
+     * Creates Fedora connection object from a given configuration.
      * 
      * Required configuration parameters include:
      * 
@@ -204,7 +205,7 @@ class Fedora {
     public function sendRequest(Request $request): Response {
         return $this->client->send($request);
     }
-    
+
     /**
      * Returns a FedoraResource based on a given URI.
      * 
@@ -307,9 +308,7 @@ class Fedora {
 
     public function getResourcesByQuery(Query $query, string $resVar = '?res') {
         $resVar = preg_replace('|^[?]|', '', $resVar);
-        $query = $query->getQuery();
-//echo "\n".$query;
-        $results = $this->sparqlClient->query($query);
+        $results = $this->runQuery($query);
         $resources = array();
         foreach ($results as $i) {
             $uri = $i->$resVar;
@@ -317,6 +316,14 @@ class Fedora {
             $resources[] = new FedoraResource($this, $uri);
         }
         return $resources;
+    }
+
+    public function runQuery(Query $query, bool $debug = false): EasyRdf_Sparql_Result {
+        $query = $query->getQuery();
+        if ($debug) {
+            echo $query . "\n";
+        }
+        return $this->sparqlClient->query($query);
     }
 
     /**
@@ -337,11 +344,11 @@ class Fedora {
      * Starts new Fedora transaction.
      * 
      * Only one transaction can be opened at the same time, 
-     * so make sure you commited previous transactions before starting a new one.
+     * so make sure you committed previous transactions before starting a new one.
      * 
-     * Be aware that all metadata modyfied during the transaction will be not
+     * Be aware that all metadata modified during the transaction will be not
      * visible in the triplestore coupled with the Fedora until the transaction
-     * is commited.
+     * is committed.
      * 
      * @see rollback()
      * @see commit()
@@ -377,7 +384,7 @@ class Fedora {
      * Commits the current Fedora transaction.
      * 
      * After the commit all the metadata modified during the transaction 
-     * will be finally uvailable in the triplestore associated with the Fedora.
+     * will be finally available in the triplestore associated with the Fedora.
      * 
      * @see begin()
      * @see rollback()
@@ -388,7 +395,7 @@ class Fedora {
     }
 
     /**
-     * Retruns true if a Fedora transaction is opened and false otherwise.
+     * Returns true if a Fedora transaction is opened and false otherwise.
      * 
      * @return bool
      */
