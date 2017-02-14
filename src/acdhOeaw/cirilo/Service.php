@@ -30,6 +30,7 @@ use zozlak\util\Config;
 use SimpleXMLElement;
 use EasyRdf_Graph;
 use RuntimeException;
+use Exception;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\util\EasyRdfUtil;
@@ -121,7 +122,11 @@ class Service {
 
         $services = array();
         foreach ($dom->xpath('//fmm:Method') as $s) {
-            $services[] = new Service($s, $dom);
+            try {
+                $services[] = new Service($s, $dom);
+            } catch (Exception $e) {
+                echo "\t" . $e . "\n";
+            }
         }
         return $services;
     }

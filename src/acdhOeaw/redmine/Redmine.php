@@ -374,6 +374,7 @@ abstract class Redmine {
         if (!$this->fedoraRes) {
             $this->getRmsUri(true);
         }
+        $this->metadata = EasyRdfUtil::mergeMetadata($this->fedoraRes->getMetadata(), $this->metadata);
         $this->fedoraRes->setMetadata($this->metadata);
         try {
             $this->fedoraRes->updateMetadata();
