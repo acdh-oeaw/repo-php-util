@@ -327,6 +327,9 @@ class Indexer {
                 if ($i->isDir() && (!$skip || $this->flatStructure && $this->depth > 0)) {
                     echo $verbose ? "entering " . $i->getPathname() . "\n" : "";
                     $ind = clone($this);
+                    if(!$this->flatStructure) {
+                        $ind->resource = $res;
+                    }
                     $ind->setDepth($this->depth - 1);
                     $ind->setPaths(array(substr($i->getPathname(), strlen(self::$containerDir))));
                     $recRes = $ind->index($verbose);
