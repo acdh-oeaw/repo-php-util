@@ -167,7 +167,8 @@ class Fedora {
         if (!in_array($method, array('POST', 'PUT'))) {
             throw new BadMethodCallException('method must be PUT or POST');
         }
-        $path = $path ? $this->txUrl . '/' . preg_replace('|^/|', '', $path) : $this->txUrl;
+        $baseUrl = $this->txUrl ? $this->txUrl : $this->apiUrl;
+        $path = $path ? $baseUrl . '/' . preg_replace('|^/|', '', $path) : $baseUrl;
         $request = new Request($method, $path);
         $request = self::attachData($request, $data);
         $resp = $this->sendRequest($request);
@@ -333,13 +334,19 @@ class Fedora {
      * @param string $uri resource URI
      * @return string 
      */
-    public function sanitizeUri(string $uri) {
+    public function sanitizeUri(string $uri): string {
         $baseUrl = !$this->txUrl ? $this->apiUrl : $this->txUrl;
         $uri = preg_replace('|^https?://[^/]+/rest/(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
         $uri = $baseUrl . '/' . $uri;
         return $uri;
     }
 
+    public function standardizeUri(string $uri): string {
+        $uri = preg_replace('|^https?://[^/]+/rest/(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
+        $uri = $this->apiUrl . '/' . $uri;
+        return $uri;
+    }
+    
     /**
      * Starts new Fedora transaction.
      * 

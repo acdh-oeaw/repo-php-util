@@ -35,7 +35,44 @@ use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\util\EasyRdfUtil;
 
 /**
- * Description of Service
+ * Transforms Fedora 3 service deployment resource
+ * (see http://fedorarepository.org/sites/fedorarepository.org/files/documentation/3.2.1/Creating%20a%20Service%20Deployment.html)
+ * into an ACDH repository dissemination service description (being a set of
+ * Fedora resources).
+ * 
+ * ACDH dessimination service is modeled as a Fedora resource described by
+ * RDF properties:
+ * 
+ * - cfg:fedoraTitleProp - a service name
+ * - cfg:fedoraServiceLocProp - a service location containing parameter bindings
+ *   (copy of the Fedora 3 wsdl:binding/wsdl:operation/http:operation/@location)
+ * - cfg:fedoraServiceRetMimeProp - a MIME type provided by this service
+ * - cfg:fedoraServiceSupportsProp - a class supported by this service
+ *   (use ldp:Container to support all resources in the repository)
+ * - cfg:ciriloIdProp - a Fedora 3 service ID used to match a resource in 
+ *   Fedora 4 with a corresponding service deployment method of Fedora 3
+ * 
+ * Dissemination service parameters are modeled as its child resources
+ * (cfg:fedoraRelProp). Each parameter is described by RDF properties:
+ * 
+ * - cfg:fedoraServiceParamRdfPropertyProp - an RDF property used in Fedora
+ *   resources to denote given parameter value
+ * - cfg:fedoraServiceParamDefaultValueProp - a default parameter value
+ * - cfg:fedoraServiceParamRequiredProp - if the parameter is required
+ *   (it is not really used by ACDH dissemination services)
+ * - cfg:fedoraServiceParamByValueProp - if the parameter value should be
+ *   treated as an URI to fetch data from (when "true") or be passed as it is
+ *   (when "false").
+ *   While it was an important property for Fedora 3, for ACDH dissemination
+ *   services only the combination of default value equal to "." and pass by
+ *   value equal to "false" is used (as it denotes the current Fedora 4 resource
+ *   URI should be used as a parameter value).
+ * 
+ * There is a special case when a parameter is not passed by value and its
+ * default value is ".". In such a case a current resource's URI is taken as the
+ * parameter value.
+ * This is needed because of the differences between Fedora 3 and Fedora 4 data
+ * models.
  *
  * @author zozlak
  */
@@ -62,6 +99,7 @@ class Service {
                 self::$cache[$s->pid] = $candidates[0];
             } elseif (count($candidates) === 0) {
                 $metadata = (new EasyRdf_Graph())->resource('.');
+                $metadata->addLiteral(EasyRdfUtil::fixPropName(self::$config->get('fedoraTitleProp')), $s->title);
                 self::$cache[$s->pid] = self::$fedora->createResource($metadata);
             } else {
                 throw new RuntimeException('Many resources with matching given fedora 3 pid');
@@ -105,8 +143,8 @@ class Service {
 
         $this->pid = $sdep->xpath('//dc:identifier')[0] . '/' . $service['operationName'];
         $this->title = (string) $service['operationName'];
-        $this->location = (string) $sdep->xpath('//wsdl:binding/wsdl:operation[@name="' . $service['operationName'] . '"]/http:operation')[0];
-        $this->location = preg_replace('#http[s]://[^/]+/#i', self::$config->get('ciriloLocationBase'), $this->location);
+        $this->location = (string) $sdep->xpath('//wsdl:binding/wsdl:operation[@name="' . $service['operationName'] . '"]/http:operation')[0]['location'];
+        $this->location = preg_replace('#https?://[^/]+/#i', self::$config->get('ciriloLocationBase'), $this->location);
         $this->retMime = (string) $service->xpath('./fmm:MethodReturnType')[0]['wsdlMsgTOMIME'];
 
         foreach ($sdep->xpath('//fedora-model:isContractorOf/@rdf:resource') as $i) {
@@ -126,6 +164,7 @@ class Service {
     }
 
     public function updateRms() {
+        
         $fedoraRes = self::getFedoraResource($this);
         $meta = $fedoraRes->getMetadata();
 
@@ -151,6 +190,13 @@ class Service {
             $meta->addLiteral($supProp, $i);
         }
 
+/*
+        if($this->retMime == 'text/html'){
+            $meta->addResource($supProp, 'https://vocabs.acdh.oeaw.ac.at/#DigitalResource');
+            $meta->addResource($supProp, 'http://www.w3.org/ns/ldp#Container');
+        }
+*/
+ 
         $fedoraRes->setMetadata($meta);
         $fedoraRes->updateMetadata();
 

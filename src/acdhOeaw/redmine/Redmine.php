@@ -31,6 +31,7 @@ use RuntimeException;
 use BadMethodCallException;
 use EasyRdf_Graph;
 use EasyRdf_Resource;
+use GuzzleHttp\Exception\ClientException;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\util\EasyRdfUtil;
 use zozlak\util\Config;
@@ -355,7 +356,12 @@ abstract class Redmine {
             } elseif (count($resources) == 1) {
                 $this->fedoraRes = $resources[0];
             } else if ($create) {
-                $this->fedoraRes = self::$fedora->createResource($this->metadata);
+                try {
+                    $this->fedoraRes = self::$fedora->createResource($this->metadata);
+                } catch (ClientException $e) {
+                    echo $this->metadata->getGraph()->serialise('ntriples') . "\n";
+                    throw $e;
+                }
             }
         }
         return $this->fedoraRes ? $this->fedoraRes->getUri() : '';
@@ -369,7 +375,12 @@ abstract class Redmine {
             $this->getRmsUri(true);
         }
         $this->fedoraRes->setMetadata($this->metadata);
-        $this->fedoraRes->updateMetadata();
+        try {
+            $this->fedoraRes->updateMetadata();
+        } catch (ClientException $e) {
+            echo $this->metadata->getGraph()->serialise('ntriples') . "\n";
+            throw $e;
+        }
     }
 
     /**

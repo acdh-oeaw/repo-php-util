@@ -40,10 +40,15 @@ class HasTriple extends HasProperty {
 
     public function __construct(string $sub, $prop, string $obj) {
         parent::__construct($prop);
-        if (!EasyRdfUtil::isVariable($sub) || !EasyRdfUtil::isVariable($obj)) {
-            throw new BadMethodCallException('all parameters must be a valid SPARQL variable names');
+
+        if (!EasyRdfUtil::isVariable($sub) && !EasyRdfUtil::isUri($sub)) {
+            throw new BadMethodCallException('$sub parameter must be a valid SPARQL variable name or an URI');
         }
-        $this->subVar = $sub;
+        $this->subVar = EasyRdfUtil::isVariable($sub) ? $sub : EasyRdfUtil::escapeUri($sub);
+
+        if (!EasyRdfUtil::isVariable($obj)) {
+            $obj = EasyRdfUtil::isUri($obj) ? EasyRdfUtil::escapeUri($sub) : EasyRdfUtil::escapeLiteral($sub);
+        }
         $this->objVar = $obj;
     }
 

@@ -65,6 +65,7 @@ class ServiceParameter {
 //echo ' found ' . "\n";
             } elseif (count($candidates) === 0) {
                 $metadata = (new EasyRdf_Graph())->resource('.');
+                $metadata->addLiteral(EasyRdfUtil::fixPropName(self::$config->get('fedoraTitleProp')), $p->title);
                 self::$cache[$id] = self::$fedora->createResource($metadata);
 //echo ' not found ' . self::$cache[$id]->getUri() . "\n";
             } else {

@@ -101,9 +101,12 @@ class User extends Redmine {
         
         $given = $res->getLiteral(EasyRdfUtil::fixPropName('http://xmlns.com/foaf/0.1/givenName'));
         $family = $res->getLiteral(EasyRdfUtil::fixPropName('http://xmlns.com/foaf/0.1/familyName'));
+        $title = trim($given . ' ' . $family);
         
         $res->delete(EasyRdfUtil::fixPropName('http://xmlns.com/foaf/0.1/name'));
-        $res->addLiteral('http://xmlns.com/foaf/0.1/name', trim($given . ' ' . $family));
+        $res->addLiteral('http://xmlns.com/foaf/0.1/name', $title);
+        $res->delete(EasyRdfUtil::fixPropName('http://purl.org/dc/elements/1.1/title'));
+        $res->addLiteral('http://purl.org/dc/elements/1.1/title', $title);
         
         return $res;
     }
