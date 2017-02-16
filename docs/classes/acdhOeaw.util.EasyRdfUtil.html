@@ -147,11 +147,61 @@ property URIs.</span><pre>fixPropName</pre>
         </a>
     </li>
 
-                                                                                                        </ul>
+                                                                                                                                                                <li class="method public">
+        <a href="#method_isPathOp" title="isPathOp :: Checks if a given string is a valid SPARQL path operator">
+            <span class="description">Checks if a given string is a valid SPARQL path operator</span><pre>isPathOp</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_isPathOpLeft" title="isPathOpLeft :: Checks if a given string is a valid left-side SPARQL path operator">
+            <span class="description">Checks if a given string is a valid left-side SPARQL path operator</span><pre>isPathOpLeft</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_isPathOpRight" title="isPathOpRight :: Checks if a given string is a valid right-side SPARQL path operator">
+            <span class="description">Checks if a given string is a valid right-side SPARQL path operator</span><pre>isPathOpRight</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_isPathOpTwoSided" title="isPathOpTwoSided :: Checks if a given string is a valid both-sides SPARQL path operator">
+            <span class="description">Checks if a given string is a valid both-sides SPARQL path operator</span><pre>isPathOpTwoSided</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_isUri" title="isUri :: Checks if a given string is an URI">
+            <span class="description">Checks if a given string is an URI</span><pre>isUri</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_isVariable" title="isVariable :: Checks it a given string is a valid SPARQL variable name
+(see https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#rVARNAME)">
+            <span class="description">Checks it a given string is a valid SPARQL variable name
+(see https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#rVARNAME)</span><pre>isVariable</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_mergeMetadata" title="mergeMetadata :: Merges two metadata sets.">
+            <span class="description">Merges two metadata sets.</span><pre>mergeMetadata</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_serialiseResource" title="serialiseResource :: Serializes given resource to ntriples taking care of escaping.">
+            <span class="description">Serializes given resource to ntriples taking care of escaping.</span><pre>serialiseResource</pre>
+        </a>
+    </li>
+
+                                                </ul>
         </li>
         <li class="nav-header protected">» Protected
             <ul>
-                                                                                                                                                                                                                                </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ul>
         </li>
         <li class="nav-header private">» Private
             <ul>
@@ -160,7 +210,7 @@ property URIs.</span><pre>fixPropName</pre>
                                 <span class="description">Initializes serializer used by `escapeLiteral()` and `escapeResource()`</span><pre>initSerializer</pre>
                             </a>
                         </li>
-                                                </ul>
+                                                                                                                                                                                                                                                                                                                                                </ul>
         </li>
         <li class="nav-header">
             <i class="icon-custom icon-constant"></i> Constants
@@ -356,6 +406,241 @@ property URIs.</h2>
                             </div>
 
                         </div>
+                                            <a id="method_isPathOp"></a>
+                        <div class="element clickable method public  method_isPathOp" data-toggle="collapse" data-target=".method_isPathOp .collapse">
+                            <h2>Checks if a given string is a valid SPARQL path operator</h2>
+                            <pre>isPathOp(string $op) : boolean</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$op</h4>
+                                                <code>string</code><p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>boolean</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_isPathOpLeft"></a>
+                        <div class="element clickable method public  method_isPathOpLeft" data-toggle="collapse" data-target=".method_isPathOpLeft .collapse">
+                            <h2>Checks if a given string is a valid left-side SPARQL path operator</h2>
+                            <pre>isPathOpLeft(string $op) : boolean</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$op</h4>
+                                                <code>string</code><p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>boolean</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_isPathOpRight"></a>
+                        <div class="element clickable method public  method_isPathOpRight" data-toggle="collapse" data-target=".method_isPathOpRight .collapse">
+                            <h2>Checks if a given string is a valid right-side SPARQL path operator</h2>
+                            <pre>isPathOpRight(string $op) : boolean</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$op</h4>
+                                                <code>string</code><p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>boolean</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_isPathOpTwoSided"></a>
+                        <div class="element clickable method public  method_isPathOpTwoSided" data-toggle="collapse" data-target=".method_isPathOpTwoSided .collapse">
+                            <h2>Checks if a given string is a valid both-sides SPARQL path operator</h2>
+                            <pre>isPathOpTwoSided(string $op) : boolean</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$op</h4>
+                                                <code>string</code><p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>boolean</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_isUri"></a>
+                        <div class="element clickable method public  method_isUri" data-toggle="collapse" data-target=".method_isUri .collapse">
+                            <h2>Checks if a given string is an URI</h2>
+                            <pre>isUri(string $string) : boolean</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$string</h4>
+                                                <code>string</code><p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>boolean</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_isVariable"></a>
+                        <div class="element clickable method public  method_isVariable" data-toggle="collapse" data-target=".method_isVariable .collapse">
+                            <h2>Checks it a given string is a valid SPARQL variable name
+(see https://www.w3.org/TR/2013/REC-sparql11-query-20130321/#rVARNAME)</h2>
+                            <pre>isVariable(string $variable) </pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>Current implementation is more restrictive that the SPARQL standard
+as Unicode ranges #x00B7, #x0300-#x036F, #x203F-#x2040, #x00C0-#x00D6,</p>
+<h1>x00D8-#x00F6, #x00F8-#x02FF, #x0370-#x037D, #x037F-#x1FFF,</h1>
+<h1>x200C-#x200D, #x2070-#x218F, #x2C00-#x2FEF, #x3001-#xD7FF,</h1>
+<h1>xF900-#xFDCF, #xFDF0-#xFFFD and #x10000-#xEFFFF are NOT allowed.</h1></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$variable</h4>
+                                                <code>string</code><p><p>SPARQL variable name to match</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_mergeMetadata"></a>
+                        <div class="element clickable method public  method_mergeMetadata" data-toggle="collapse" data-target=".method_mergeMetadata .collapse">
+                            <h2>Merges two metadata sets.</h2>
+                            <pre>mergeMetadata(\EasyRdf_Resource $cur, \EasyRdf_Resource $new) : \EasyRdf_Resource</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>The final metadata contains:</p>
+<ul>
+<li>All properties existing in <code>new</code>.</li>
+<li>Those properties from <code>cur</code> which do not exist in <code>new</code>.</li>
+</ul></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$cur</h4>
+                                                <code>\EasyRdf_Resource</code><p><p>current metadata</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$new</h4>
+                                                <code>\EasyRdf_Resource</code><p><p>metadata to be merged with current metadata</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>\EasyRdf_Resource</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_serialiseResource"></a>
+                        <div class="element clickable method public  method_serialiseResource" data-toggle="collapse" data-target=".method_serialiseResource .collapse">
+                            <h2>Serializes given resource to ntriples taking care of escaping.</h2>
+                            <pre>serialiseResource(\EasyRdf_Resource $resource) : string</pre>
+                            <div class="labels">
+                                                                <span class="label">static</span>                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>Replaces EasyRdf ntriples serializer which does not escape special values
+in literal strings.</p></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$resource</h4>
+                                                <code>\EasyRdf_Resource</code><p><p>resource to serialize</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
                     
                     
                                                                 <h3><i class="icon-custom icon-property"></i> Properties</h3>
@@ -405,7 +690,7 @@ property URIs.</h2>
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Tue, 24 Jan 2017 11:41:20 +0000.<br/>
+            generated on Thu, 16 Feb 2017 14:52:38 +0000.<br/>
     </footer>
     </body>
 </html>

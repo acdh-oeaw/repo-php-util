@@ -386,20 +386,44 @@ class FedoraResource {
         return false;
     }
 
+    /**
+     * Returns the SPARQL query object returning resource's children
+     * 
+     * @return Query
+     */
     public function getChildrenQuery(): Query {
         $query = new Query();
         $query->addParameter($this->getChildrenQueryParameter());
         return $query;
     }
     
+    /**
+     * Return the SPARQL query triple object denoting relation of being
+     * this resource's child
+     * 
+     * @return QueryParameter
+     */
     public function getChildrenQueryParameter(): QueryParameter {
         return new HasValue($this->fedora->getRelProp(), $this->getId());
     }
     
+    /**
+     * Returns all resource's children
+     * 
+     * @return array
+     */
     public function getChildren(): array {
         return $this->fedora->getResourcesByQuery($this->getChildrenQuery());
     }
 
+    /**
+     * Returns all resource's children having a given property or a given value
+     * of a given property.
+     * 
+     * @param string $property fully qualified URI of the property
+     * @param string $value property value (optional)
+     * @return array
+     */
     public function getChildrenByProperty(string $property, string $value = ''): array {
         $query = $this->getChildrenQuery();
         if($value != ''){
@@ -411,6 +435,15 @@ class FedoraResource {
         return $this->fedora->getResourcesByQuery($query);
     }
 
+    /**
+     * Returns all resource's children with a given property matching a given
+     * regular expression
+     * 
+     * @param string $property fully qualified URI of the property
+     * @param string $regEx regular expression to match
+     * @param string $flags regular expression flags
+     * @return array
+     */
     public function getChildrenByPropertyRegEx(string $property, string $regEx, string $flags = 'i'): array {
         $query = $this->getChildrenQuery();
         $query->addParameter(new MatchesRegEx($property, $regEx, $flags));

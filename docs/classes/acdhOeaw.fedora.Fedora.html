@@ -120,8 +120,8 @@
             <i class="icon-custom icon-method"></i> Methods
             <ul>
                                                                                                     <li class="method public">
-        <a href="#method___construct" title="__construct :: Creates Fedora connection object from a given config.">
-            <span class="description">Creates Fedora connection object from a given config.</span><pre>__construct</pre>
+        <a href="#method___construct" title="__construct :: Creates Fedora connection object from a given configuration.">
+            <span class="description">Creates Fedora connection object from a given configuration.</span><pre>__construct</pre>
         </a>
     </li>
 
@@ -150,8 +150,14 @@
     </li>
 
                                                                                                         <li class="method public">
-        <a href="#method_getIdProp" title="getIdProp :: Returns URI of the RDF property denoting ACDH ID as set uppon object creation.">
-            <span class="description">Returns URI of the RDF property denoting ACDH ID as set uppon object creation.</span><pre>getIdProp</pre>
+        <a href="#method_getIdProp" title="getIdProp :: Returns URI of the RDF property denoting ACDH ID as set upon object creation.">
+            <span class="description">Returns URI of the RDF property denoting ACDH ID as set upon object creation.</span><pre>getIdProp</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_getRelProp" title="getRelProp :: Returns URI of the RDF property denoting relation of being a collection part.">
+            <span class="description">Returns URI of the RDF property denoting relation of being a collection part.</span><pre>getRelProp</pre>
         </a>
     </li>
 
@@ -190,8 +196,14 @@
     </li>
 
                                                                                                         <li class="method public">
-        <a href="#method_inTransaction" title="inTransaction :: Retruns true if a Fedora transaction is opened and false otherwise.">
-            <span class="description">Retruns true if a Fedora transaction is opened and false otherwise.</span><pre>inTransaction</pre>
+        <a href="#method_getResourcesByQuery" title="getResourcesByQuery :: Finds all Fedora resources satisfying a given SPARQL query.">
+            <span class="description">Finds all Fedora resources satisfying a given SPARQL query.</span><pre>getResourcesByQuery</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_inTransaction" title="inTransaction :: Returns true if a Fedora transaction is opened and false otherwise.">
+            <span class="description">Returns true if a Fedora transaction is opened and false otherwise.</span><pre>inTransaction</pre>
         </a>
     </li>
 
@@ -201,7 +213,29 @@
         </a>
     </li>
 
-                                                                                                                                                                <li class="method public">
+                                                                                                        <li class="method public">
+        <a href="#method_runQuery" title="runQuery :: Runs a SPARQL query defined by a Query object against repository
+triplestore.">
+            <span class="description">Runs a SPARQL query defined by a Query object against repository
+triplestore.</span><pre>runQuery</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_runSparql" title="runSparql :: Runs a SPARQL against repository triplestore.">
+            <span class="description">Runs a SPARQL against repository triplestore.</span><pre>runSparql</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_sanitizeUri" title="sanitizeUri :: Adjusts URI to the current object state by setting up the proper base
+URL and the transaction id.">
+            <span class="description">Adjusts URI to the current object state by setting up the proper base
+URL and the transaction id.</span><pre>sanitizeUri</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
         <a href="#method_sendRequest" title="sendRequest :: Sends a given HTTP request to the Fedora.">
             <span class="description">Sends a given HTTP request to the Fedora.</span><pre>sendRequest</pre>
         </a>
@@ -213,22 +247,23 @@
         </a>
     </li>
 
+                                                                                                        <li class="method public">
+        <a href="#method_standardizeUri" title="standardizeUri :: Transforms an URI into &quot;a canonical form&quot; used in the triplestore to
+denote triples subject.">
+            <span class="description">Transforms an URI into &quot;a canonical form&quot; used in the triplestore to
+denote triples subject.</span><pre>standardizeUri</pre>
+        </a>
+    </li>
+
                                                 </ul>
         </li>
         <li class="nav-header protected">» Protected
             <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ul>
         </li>
         <li class="nav-header private">» Private
             <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <li class="method private">
-                            <a href="#method_sanitizeUri" title="sanitizeUri :: Adjusts URI to the current object state by setting up the proper base
-URL and the transaction id.">
-                                <span class="description">Adjusts URI to the current object state by setting up the proper base
-URL and the transaction id.</span><pre>sanitizeUri</pre>
-                            </a>
-                        </li>
-                                                                                                                        </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ul>
         </li>
         <li class="nav-header">
             <i class="icon-custom icon-constant"></i> Constants
@@ -275,7 +310,7 @@ of Fedora resources.</p>
                     <h3><i class="icon-custom icon-method"></i> Methods</h3>
                                                                 <a id="method___construct"></a>
                         <div class="element clickable method public  method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
-                            <h2>Creates Fedora connection object from a given config.</h2>
+                            <h2>Creates Fedora connection object from a given configuration.</h2>
                             <pre>__construct(\zozlak\util\Config $cfg) </pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
@@ -356,10 +391,10 @@ If it is URL, a &quot;redirecting Fedora resource&quot; will be created</p></p>
                             <div class="row collapse">
                                 <div class="detail-description">
                                     <div class="long_description"><p>Only one transaction can be opened at the same time,
-so make sure you commited previous transactions before starting a new one.</p>
-<p>Be aware that all metadata modyfied during the transaction will be not
+so make sure you committed previous transactions before starting a new one.</p>
+<p>Be aware that all metadata modified during the transaction will be not
 visible in the triplestore coupled with the Fedora until the transaction
-is commited.</p></div>
+is committed.</p></div>
 
                                     <table class="table">
                                                                                     <tr>
@@ -407,7 +442,7 @@ is commited.</p></div>
                             <div class="row collapse">
                                 <div class="detail-description">
                                     <div class="long_description"><p>After the commit all the metadata modified during the transaction
-will be finally uvailable in the triplestore associated with the Fedora.</p></div>
+will be finally available in the triplestore associated with the Fedora.</p></div>
 
                                     <table class="table">
                                                                                     <tr>
@@ -496,8 +531,37 @@ parameter)</p></p>
                         </div>
                                             <a id="method_getIdProp"></a>
                         <div class="element clickable method public  method_getIdProp" data-toggle="collapse" data-target=".method_getIdProp .collapse">
-                            <h2>Returns URI of the RDF property denoting ACDH ID as set uppon object creation.</h2>
+                            <h2>Returns URI of the RDF property denoting ACDH ID as set upon object creation.</h2>
                             <pre>getIdProp() : string</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                    
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getRelProp"></a>
+                        <div class="element clickable method public  method_getRelProp" data-toggle="collapse" data-target=".method_getRelProp .collapse">
+                            <h2>Returns URI of the RDF property denoting relation of being a collection part.</h2>
+                            <pre>getRelProp() : string</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -674,7 +738,7 @@ are not taken into account (see documentation of the begin() method)</p></div>
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
                                                 <h4>$property</h4>
-                                                <code>string</code><p><p>fully quallified property URI</p></p>
+                                                <code>string</code><p><p>fully qualified property URI</p></p>
                                             </div>
                                                                                     <div class="subelement argument">
                                                 <h4>$value</h4>
@@ -716,7 +780,7 @@ are not taken into account (see documentation of the begin() method)</p></div>
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
                                                 <h4>$property</h4>
-                                                <code>string</code><p><p>fully quallified property URI</p></p>
+                                                <code>string</code><p><p>fully qualified property URI</p></p>
                                             </div>
                                                                                     <div class="subelement argument">
                                                 <h4>$regEx</h4>
@@ -733,9 +797,52 @@ are not taken into account (see documentation of the begin() method)</p></div>
                             </div>
 
                         </div>
+                                            <a id="method_getResourcesByQuery"></a>
+                        <div class="element clickable method public  method_getResourcesByQuery" data-toggle="collapse" data-target=".method_getResourcesByQuery .collapse">
+                            <h2>Finds all Fedora resources satisfying a given SPARQL query.</h2>
+                            <pre>getResourcesByQuery(\acdhOeaw\fedora\metadataQuery\Query $query, string $resVar = &#039;?res&#039;) : array</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>Be aware that the triplestore state is not affected by all actions
+performed during the active transaction.</p></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    see
+                                                </th>
+                                                <td>
+                                                                                                                                                                        
+                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin">\acdhOeaw\fedora\Fedora::begin()</a>
+                                                                                                                
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$query</h4>
+                                                <code><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">\acdhOeaw\fedora\metadataQuery\Query</a></code><p><p>SPARQL query fetching resources from the triplestore</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$resVar</h4>
+                                                <code>string</code><p><p>name of the SPARQL variable containing resource
+URIs</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>array</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
                                             <a id="method_inTransaction"></a>
                         <div class="element clickable method public  method_inTransaction" data-toggle="collapse" data-target=".method_inTransaction .collapse">
-                            <h2>Retruns true if a Fedora transaction is opened and false otherwise.</h2>
+                            <h2>Returns true if a Fedora transaction is opened and false otherwise.</h2>
                             <pre>inTransaction() : boolean</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
@@ -809,8 +916,67 @@ are not taken into account (see documentation of the begin() method)</p></div>
                             </div>
 
                         </div>
+                                            <a id="method_runQuery"></a>
+                        <div class="element clickable method public  method_runQuery" data-toggle="collapse" data-target=".method_runQuery .collapse">
+                            <h2>Runs a SPARQL query defined by a Query object against repository
+triplestore.</h2>
+                            <pre>runQuery(\acdhOeaw\fedora\metadataQuery\Query $query, boolean $debug = false) : \EasyRdf_Sparql_Result</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$query</h4>
+                                                <code><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">\acdhOeaw\fedora\metadataQuery\Query</a></code><p><p>query to run</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$debug</h4>
+                                                <code>boolean</code><p><p>should the underlying SPARQL query be displayed</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>\EasyRdf_Sparql_Result</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_runSparql"></a>
+                        <div class="element clickable method public  method_runSparql" data-toggle="collapse" data-target=".method_runSparql .collapse">
+                            <h2>Runs a SPARQL against repository triplestore.</h2>
+                            <pre>runSparql(string $query) : \EasyRdf_Sparql_Result</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$query</h4>
+                                                <code>string</code><p><p>SPARQL query to run</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>\EasyRdf_Sparql_Result</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
                                             <a id="method_sanitizeUri"></a>
-                        <div class="element clickable method private  method_sanitizeUri" data-toggle="collapse" data-target=".method_sanitizeUri .collapse">
+                        <div class="element clickable method public  method_sanitizeUri" data-toggle="collapse" data-target=".method_sanitizeUri .collapse">
                             <h2>Adjusts URI to the current object state by setting up the proper base
 URL and the transaction id.</h2>
                             <pre>sanitizeUri(string $uri) : string</pre>
@@ -840,7 +1006,7 @@ URL and the transaction id.</h2>
                                             <a id="method_sendRequest"></a>
                         <div class="element clickable method public  method_sendRequest" data-toggle="collapse" data-target=".method_sendRequest .collapse">
                             <h2>Sends a given HTTP request to the Fedora.</h2>
-                            <pre>sendRequest(\GuzzleHttp\Psr7\Request $request) : \acdhOeaw\fedora\GuzzleHttp\Psr7\Response</pre>
+                            <pre>sendRequest(\GuzzleHttp\Psr7\Request $request) : \GuzzleHttp\Psr7\Response</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -859,7 +1025,7 @@ URL and the transaction id.</h2>
                                             </div>
                                                                             
                                                                             <h3>Response</h3>
-                                        <code>\acdhOeaw\fedora\GuzzleHttp\Psr7\Response</code><p></p>
+                                        <code>\GuzzleHttp\Psr7\Response</code><p></p>
                                                                     </div>
                             </div>
 
@@ -892,6 +1058,34 @@ URL and the transaction id.</h2>
                                                 <code>\acdhOeaw\fedora\type</code><p></p>
                                             </div>
                                                                             
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_standardizeUri"></a>
+                        <div class="element clickable method public  method_standardizeUri" data-toggle="collapse" data-target=".method_standardizeUri .collapse">
+                            <h2>Transforms an URI into &quot;a canonical form&quot; used in the triplestore to
+denote triples subject.</h2>
+                            <pre>standardizeUri(string $uri) : string</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$uri</h4>
+                                                <code>string</code><p><p>URI to transform</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>string</code><p></p>
                                                                     </div>
                             </div>
 
@@ -1015,8 +1209,8 @@ URL and the transaction id.</h2>
                             </div>
                                                     <a id="property_sparqlClient"> </a>
                             <div class="element clickable property  private property_sparqlClient" data-toggle="collapse" data-target=".property_sparqlClient .collapse">
-                                <h2>Sparql client object</h2>
-                                <pre>sparqlClient : \EasyRdf_Sparql_Client</pre>
+                                <h2>SPARQL client object</h2>
+                                <pre>sparqlClient : \acdhOeaw\fedora\SparqlClient</pre>
                                 <div class="labels">
                                                                                                         </div>
                                 <div class="row collapse">
@@ -1035,7 +1229,34 @@ URL and the transaction id.</h2>
                                                                                     </table>
 
                                                                                     <h3>Type(s)</h3>
-                                            <code>\EasyRdf_Sparql_Client</code>
+                                            <code><a href="../classes/acdhOeaw.fedora.SparqlClient.html">\acdhOeaw\fedora\SparqlClient</a></code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_relProp"> </a>
+                            <div class="element clickable property  private property_relProp" data-toggle="collapse" data-target=".property_relProp .collapse">
+                                <h2>Fully qualified URI of the RDF property used to denote relation of being
+a collection part</h2>
+                                <pre>relProp : string</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>string</code>
                                                                             </div>
                                 </div>
                             </div>
@@ -1059,7 +1280,7 @@ URL and the transaction id.</h2>
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Tue, 24 Jan 2017 11:41:20 +0000.<br/>
+            generated on Thu, 16 Feb 2017 14:52:37 +0000.<br/>
     </footer>
     </body>
 </html>

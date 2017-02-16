@@ -260,7 +260,7 @@ be created for each subdirectory (`$ifFlat` equals to `false`).</span><pre>setFl
                                                                 <a id="method___construct"></a>
                         <div class="element clickable method public  method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
                             <h2>Creates an indexer object for a given Fedora resource.</h2>
-                            <pre>__construct(\acdhOeaw\fedora\FedoraResource $resource) </pre>
+                            <pre>__construct(\acdhOeaw\fedora\FedoraResource $resource, string $encoding = null) </pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -293,6 +293,11 @@ be created for each subdirectory (`$ifFlat` equals to `false`).</span><pre>setFl
                                                 <h4>$resource</h4>
                                                 <code><a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a></code><p></p>
                                             </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$encoding</h4>
+                                                <code>string</code><p><p>character encoding used by the operation system
+(will be autodetected if not provided)</p></p>
+                                            </div>
                                                                             
                                                                     </div>
                             </div>
@@ -316,7 +321,7 @@ be created for each subdirectory (`$ifFlat` equals to `false`).</span><pre>setFl
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
                                                 <h4>$path</h4>
-                                                <code>string</code><p><p>node location base dir relatively to the container</p></p>
+                                                <code>string</code><p><p>node location base directory relatively to the container</p></p>
                                             </div>
                                                                                     <div class="subelement argument">
                                                 <h4>$i</h4>
@@ -456,7 +461,7 @@ values.</p></div>
                                             <a id="method_index"></a>
                         <div class="element clickable method public  method_index" data-toggle="collapse" data-target=".method_index .collapse">
                             <h2>Does the indexing.</h2>
-                            <pre>index(boolean $verbose = false) </pre>
+                            <pre>index(boolean $verbose = false) : array</pre>
                             <div class="labels">
                                                                                                                                                                                             </div>
 
@@ -466,13 +471,6 @@ values.</p></div>
                                     <div class="long_description"></div>
 
                                     <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
                                                                                                                     </table>
 
                                                                             <h3>Arguments</h3>
@@ -481,6 +479,8 @@ values.</p></div>
                                                 <code>boolean</code><p><p>should be verbose</p></p>
                                             </div>
                                                                             
+                                                                            <h3>Response</h3>
+                                        <code>array</code><p><p>a list FedoraResource objects representing indexed resources</p></p>
                                                                     </div>
                             </div>
 
@@ -502,9 +502,10 @@ values.</p></div>
 <li>fedoraLocProp - URI of the RDF property denoting resource location</li>
 <li>fedoraSizeProp - URI of the RDF property denoting resource size</li>
 <li>fedoraTitleProp - URI of the RDF property denoting resource title</li>
+<li>indexerDefaultClass - URI of the default class to be assigned to each
+indexed resource (can be empty)</li>
 <li>containerDir - path to the container root (the &quot;fedoraLocProp&quot; property
 values are relative to this path)</li>
-<li>sparqlUrl - SPARQL endpoint URL</li>
 </ul></div>
 
                                     <table class="table">
@@ -611,7 +612,7 @@ values are relative to this path)</li>
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
                                                 <h4>$filter</h4>
-                                                <code>string</code><p><p>regullar expression conformant with preg_replace()</p></p>
+                                                <code>string</code><p><p>regular expression conformant with preg_replace()</p></p>
                                             </div>
                                                                             
                                                                     </div>
@@ -892,6 +893,32 @@ be created containing full metadata but no binary content.</p></div>
                                                                             </div>
                                 </div>
                             </div>
+                                                    <a id="property_defaultClass"> </a>
+                            <div class="element clickable property  private property_defaultClass" data-toggle="collapse" data-target=".property_defaultClass .collapse">
+                                <h2>URI of the default RDF class assigned to indexed resources</h2>
+                                <pre>defaultClass : string</pre>
+                                <div class="labels">
+                                                                        <span class="label">static</span>                                </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>string</code>
+                                                                            </div>
+                                </div>
+                            </div>
                                                     <a id="property_containerDir"> </a>
                             <div class="element clickable property  private property_containerDir" data-toggle="collapse" data-target=".property_containerDir .collapse">
                                 <h2>Path to the container root</h2>
@@ -944,32 +971,6 @@ be created containing full metadata but no binary content.</p></div>
                                                                             </div>
                                 </div>
                             </div>
-                                                    <a id="property_sparqlClient"> </a>
-                            <div class="element clickable property  private property_sparqlClient" data-toggle="collapse" data-target=".property_sparqlClient .collapse">
-                                <h2>SPARQL client object</h2>
-                                <pre>sparqlClient : \EasyRdf_Sparql_Client</pre>
-                                <div class="labels">
-                                                                        <span class="label">static</span>                                </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>\EasyRdf_Sparql_Client</code>
-                                                                            </div>
-                                </div>
-                            </div>
                                                     <a id="property_resource"> </a>
                             <div class="element clickable property  private property_resource" data-toggle="collapse" data-target=".property_resource .collapse">
                                 <h2>FedoraResource which children are created by the Indexer</h2>
@@ -998,7 +999,7 @@ be created containing full metadata but no binary content.</p></div>
                             </div>
                                                     <a id="property_paths"> </a>
                             <div class="element clickable property  private property_paths" data-toggle="collapse" data-target=".property_paths .collapse">
-                                <h2>Filesystem paths where resource children are located</h2>
+                                <h2>File system paths where resource children are located</h2>
                                 <pre>paths : array</pre>
                                 <div class="labels">
                                                                                                         </div>
@@ -1088,7 +1089,7 @@ of binary resources.</h2>
                                                                                                         </div>
                                 <div class="row collapse">
                                     <div class="detail-description">
-                                        <div class="long_description"><p>For child resources bigger then this limit an &quot;RDF only&quot; Fedora resoueces
+                                        <div class="long_description"><p>For child resources bigger then this limit an &quot;RDF only&quot; Fedora resources
 will be created.</p></div>
 
                                         <table class="table">
@@ -1110,7 +1111,7 @@ will be created.</p></div>
                                                     <a id="property_depth"> </a>
                             <div class="element clickable property  private property_depth" data-toggle="collapse" data-target=".property_depth .collapse">
                                 <h2>How many subsequent subdirectories should be indexed.</h2>
-                                <pre>depth : \acdhOeaw\storage\type</pre>
+                                <pre>depth : integer</pre>
                                 <div class="labels">
                                                                                                         </div>
                                 <div class="row collapse">
@@ -1129,14 +1130,14 @@ will be created.</p></div>
                                                                                     </table>
 
                                                                                     <h3>Type(s)</h3>
-                                            <code>\acdhOeaw\storage\type</code>
+                                            <code>integer</code>
                                                                             </div>
                                 </div>
                             </div>
                                                     <a id="property_includeEmpty"> </a>
                             <div class="element clickable property  private property_includeEmpty" data-toggle="collapse" data-target=".property_includeEmpty .collapse">
                                 <h2>Should resources be created for empty directories.</h2>
-                                <pre>includeEmpty : \acdhOeaw\storage\type</pre>
+                                <pre>includeEmpty : boolean</pre>
                                 <div class="labels">
                                                                                                         </div>
                                 <div class="row collapse">
@@ -1155,7 +1156,41 @@ will be created.</p></div>
                                                                                     </table>
 
                                                                                     <h3>Type(s)</h3>
-                                            <code>\acdhOeaw\storage\type</code>
+                                            <code>boolean</code>
+                                                                            </div>
+                                </div>
+                            </div>
+                                                    <a id="property_pathEncoding"> </a>
+                            <div class="element clickable property  private property_pathEncoding" data-toggle="collapse" data-target=".property_pathEncoding .collapse">
+                                <h2>Encoding used by file system paths.</h2>
+                                <pre>pathEncoding : string</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description"><p>By default it is guessed from current locale.</p></div>
+
+                                        <table class="table">
+                                                                                            <tr>
+                                                    <th>
+                                                        var
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                            <tr>
+                                                    <th>
+                                                        see
+                                                    </th>
+                                                    <td>
+                                                                                                                    
+                                                                                                            </td>
+                                                </tr>
+                                                                                    </table>
+
+                                                                                    <h3>Type(s)</h3>
+                                            <code>string</code>
                                                                             </div>
                                 </div>
                             </div>
@@ -1179,7 +1214,7 @@ will be created.</p></div>
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Tue, 24 Jan 2017 11:41:20 +0000.<br/>
+            generated on Thu, 16 Feb 2017 14:52:38 +0000.<br/>
     </footer>
     </body>
 </html>

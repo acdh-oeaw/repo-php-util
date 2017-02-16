@@ -110,15 +110,14 @@ class Fedora {
      * @var SparqlClient
      */
     private $sparqlClient;
+    
+    /**
+     * Fully qualified URI of the RDF property used to denote relation of being
+     * a collection part
+     * 
+     * @var string
+     */
     private $relProp;
-
-    public function getRelProp() {
-        return $this->relProp;
-    }
-
-    public function query($query) {
-        return $this->sparqlClient->query($query);
-    }
 
     /**
      * Creates Fedora connection object from a given configuration.
@@ -148,6 +147,14 @@ class Fedora {
      */
     public function getIdProp(): string {
         return EasyRdfUtil::fixPropName($this->idProp);
+    }
+
+    /**
+     * Returns URI of the RDF property denoting relation of being a collection part.
+     * @return string
+     */
+    public function getRelProp(): string {
+        return $this->relProp;
     }
 
     /**
@@ -306,7 +313,19 @@ class Fedora {
         return $this->getResourcesByQuery($query);
     }
 
-    public function getResourcesByQuery(Query $query, string $resVar = '?res') {
+    /**
+     * Finds all Fedora resources satisfying a given SPARQL query.
+     * 
+     * Be aware that the triplestore state is not affected by all actions
+     * performed during the active transaction.
+     * 
+     * @param Query $query SPARQL query fetching resources from the triplestore
+     * @param string $resVar name of the SPARQL variable containing resource 
+     *   URIs
+     * @return array
+     * @see begin()
+     */
+    public function getResourcesByQuery(Query $query, string $resVar = '?res'): array {
         $resVar = preg_replace('|^[?]|', '', $resVar);
         $results = $this->runQuery($query);
         $resources = array();
@@ -318,6 +337,14 @@ class Fedora {
         return $resources;
     }
 
+    /**
+     * Runs a SPARQL query defined by a Query object against repository
+     * triplestore.
+     * 
+     * @param Query $query query to run
+     * @param bool $debug should the underlying SPARQL query be displayed
+     * @return EasyRdf_Sparql_Result
+     */
     public function runQuery(Query $query, bool $debug = false): EasyRdf_Sparql_Result {
         $query = $query->getQuery();
         if ($debug) {
@@ -326,6 +353,12 @@ class Fedora {
         return $this->runSparql($query);
     }
 
+    /**
+     * Runs a SPARQL against repository triplestore.
+     * 
+     * @param string $query SPARQL query to run
+     * @return EasyRdf_Sparql_Result
+     */
     public function runSparql(string $query): EasyRdf_Sparql_Result {
         return $this->sparqlClient->query($query);
     }
@@ -344,6 +377,13 @@ class Fedora {
         return $uri;
     }
 
+    /**
+     * Transforms an URI into "a canonical form" used in the triplestore to
+     * denote triples subject.
+     * 
+     * @param string $uri URI to transform
+     * @return string
+     */
     public function standardizeUri(string $uri): string {
         $uri = preg_replace('|^https?://[^/]+/rest/(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
         $uri = $this->apiUrl . '/' . $uri;

@@ -184,6 +184,27 @@ and updating resource contents.</div>
         <a href="../classes/acdhOeaw.fedora.FedoraResource.html" class="more">« More »</a>
     </div>
 
+                                        <div id="HasProperty" class="element ajax clickable class">
+        <h1>HasProperty<a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html">¶</a></h1>
+        <p class="short_description">Description of hasParameter</p>
+        <div class="details collapse"></div>
+        <a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html" class="more">« More »</a>
+    </div>
+
+                                        <div id="HasTriple" class="element ajax clickable class">
+        <h1>HasTriple<a href="../classes/acdhOeaw.fedora.metadataQuery.HasTriple.html">¶</a></h1>
+        <p class="short_description">Description of HasTriple</p>
+        <div class="details collapse"></div>
+        <a href="../classes/acdhOeaw.fedora.metadataQuery.HasTriple.html" class="more">« More »</a>
+    </div>
+
+                                        <div id="HasValue" class="element ajax clickable class">
+        <h1>HasValue<a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html">¶</a></h1>
+        <p class="short_description">Description of HasValue</p>
+        <div class="details collapse"></div>
+        <a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html" class="more">« More »</a>
+    </div>
+
                                         <div id="Indexer" class="element ajax clickable class">
         <h1>Indexer<a href="../classes/acdhOeaw.storage.Indexer.html">¶</a></h1>
         <p class="short_description">Indexes children of a given FedoraResource in a file system</p>
@@ -207,12 +228,89 @@ Fedora resource location in the file system</p>
         <a href="../classes/acdhOeaw.storage.Location.html" class="more">« More »</a>
     </div>
 
+                                        <div id="MatchesRegEx" class="element ajax clickable class">
+        <h1>MatchesRegEx<a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html">¶</a></h1>
+        <p class="short_description">Description of MatchesRegEx</p>
+        <div class="details collapse"></div>
+        <a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html" class="more">« More »</a>
+    </div>
+
                                         <div id="Project" class="element ajax clickable class">
         <h1>Project<a href="../classes/acdhOeaw.redmine.Project.html">¶</a></h1>
         <p class="short_description">Represents a Redmine project
 and provides mapping to ACDH repository resource representing a project.</p>
         <div class="details collapse"></div>
         <a href="../classes/acdhOeaw.redmine.Project.html" class="more">« More »</a>
+    </div>
+
+                                        <div id="Query" class="element ajax clickable class">
+        <h1>Query<a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">¶</a></h1>
+        <p class="short_description">Description of Query</p>
+        <div class="details collapse"></div>
+        <a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html" class="more">« More »</a>
+    </div>
+
+                                        <div id="QueryParameter" class="element ajax clickable class">
+        <h1>QueryParameter<a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html">¶</a></h1>
+        <p class="short_description"></p>
+        <div class="details collapse"></div>
+        <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html" class="more">« More »</a>
+    </div>
+
+                                        <div id="Service" class="element ajax clickable class">
+        <h1>Service<a href="../classes/acdhOeaw.cirilo.Service.html">¶</a></h1>
+        <p class="short_description">Transforms Fedora 3 service deployment resource
+(see http://fedorarepository.org/sites/fedorarepository.org/files/documentation/3.2.1/Creating%20a%20Service%20Deployment.html)
+into an ACDH repository dissemination service description (being a set of
+Fedora resources).</p>
+        <div class="details collapse">ACDH dessimination service is modeled as a Fedora resource described by
+RDF properties:
+
+- cfg:fedoraTitleProp - a service name
+- cfg:fedoraServiceLocProp - a service location containing parameter bindings
+  (copy of the Fedora 3 wsdl:binding/wsdl:operation/http:operation/@location)
+- cfg:fedoraServiceRetMimeProp - a MIME type provided by this service
+- cfg:fedoraServiceSupportsProp - a class supported by this service
+  (use ldp:Container to support all resources in the repository)
+- cfg:ciriloIdProp - a Fedora 3 service ID used to match a resource in
+  Fedora 4 with a corresponding service deployment method of Fedora 3
+
+Dissemination service parameters are modeled as its child resources
+(cfg:fedoraRelProp). Each parameter is described by RDF properties:
+
+- cfg:fedoraServiceParamRdfPropertyProp - an RDF property used in Fedora
+  resources to denote given parameter value
+- cfg:fedoraServiceParamDefaultValueProp - a default parameter value
+- cfg:fedoraServiceParamRequiredProp - if the parameter is required
+  (it is not really used by ACDH dissemination services)
+- cfg:fedoraServiceParamByValueProp - if the parameter value should be
+  treated as an URI to fetch data from (when &quot;true&quot;) or be passed as it is
+  (when &quot;false&quot;).
+  While it was an important property for Fedora 3, for ACDH dissemination
+  services only the combination of default value equal to &quot;.&quot; and pass by
+  value equal to &quot;false&quot; is used (as it denotes the current Fedora 4 resource
+  URI should be used as a parameter value).
+
+There is a special case when a parameter is not passed by value and its
+default value is &quot;.&quot;. In such a case a current resource&#039;s URI is taken as the
+parameter value.
+This is needed because of the differences between Fedora 3 and Fedora 4 data
+models.</div>
+        <a href="../classes/acdhOeaw.cirilo.Service.html" class="more">« More »</a>
+    </div>
+
+                                        <div id="ServiceParameter" class="element ajax clickable class">
+        <h1>ServiceParameter<a href="../classes/acdhOeaw.cirilo.ServiceParameter.html">¶</a></h1>
+        <p class="short_description">Description of ServiceParameter</p>
+        <div class="details collapse"></div>
+        <a href="../classes/acdhOeaw.cirilo.ServiceParameter.html" class="more">« More »</a>
+    </div>
+
+                                        <div id="SparqlClient" class="element ajax clickable class">
+        <h1>SparqlClient<a href="../classes/acdhOeaw.fedora.SparqlClient.html">¶</a></h1>
+        <p class="short_description">Simple SPARQL client with HTTP basic authentication support.</p>
+        <div class="details collapse">There is no support for UPDATE queries.</div>
+        <a href="../classes/acdhOeaw.fedora.SparqlClient.html" class="more">« More »</a>
     </div>
 
                                         <div id="User" class="element ajax clickable class">
@@ -235,7 +333,7 @@ and provides mapping to ACDH repository resource representing a person.</p>
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Tue, 24 Jan 2017 11:41:20 +0000.<br/>
+            generated on Thu, 16 Feb 2017 14:52:37 +0000.<br/>
     </footer>
     </body>
 </html>

@@ -97,22 +97,52 @@ class EasyRdfUtil {
         return preg_match('|^[?$][a-zA-Z0-9_]+|', $variable);
     }
 
+    /**
+     * Checks if a given string is a valid SPARQL path operator
+     * 
+     * @param string $op
+     * @return bool
+     */
     static public function isPathOp(string $op): bool {
         return in_array($op, array('!', '^', '|', '/', '*', '+', '?', '!^', '(', ')'));
     }
 
+    /**
+     * Checks if a given string is a valid left-side SPARQL path operator
+     * 
+     * @param string $op
+     * @return bool
+     */
     static public function isPathOpLeft(string $op): bool {
         return in_array($op, array('!', '^', '!^'));
     }
 
+    /**
+     * Checks if a given string is a valid right-side SPARQL path operator
+     * 
+     * @param string $op
+     * @return bool
+     */
     static public function isPathOpRight(string $op): bool {
         return in_array($op, array('*', '+', '?'));
     }
 
+    /**
+     * Checks if a given string is a valid both-sides SPARQL path operator
+     * 
+     * @param string $op
+     * @return bool
+     */
     static public function isPathOpTwoSided(string $op): bool {
         return in_array($op, array('/', '|'));
     }
 
+    /**
+     * Checks if a given string is an URI
+     * 
+     * @param string $string
+     * @return bool
+     */
     static public function isUri(string $string): bool {
         return preg_match('#[a-z0-9+.-]+://#', $string);
     }
@@ -155,6 +185,15 @@ class EasyRdfUtil {
         return $res;
     }
 
+    /**
+     * Serializes given resource to ntriples taking care of escaping.
+     * 
+     * Replaces EasyRdf ntriples serializer which does not escape special values
+     * in literal strings.
+     * 
+     * @param EasyRdf_Resource $resource resource to serialize
+     * @return string
+     */
     static public function serialiseResource(EasyRdf_Resource $resource) {
         $rdf = '';
         foreach ($resource->propertyUris() as $prop) {
@@ -170,6 +209,18 @@ class EasyRdfUtil {
         return $rdf;
     }
 
+    /**
+     * Merges two metadata sets.
+     * 
+     * The final metadata contains:
+     * 
+     * - All properties existing in `new`.
+     * - Those properties from `cur` which do not exist in `new`.
+     * 
+     * @param EasyRdf_Resource $cur current metadata
+     * @param EasyRdf_Resource $new metadata to be merged with current metadata
+     * @return EasyRdf_Resource
+     */
     static public function mergeMetadata(EasyRdf_Resource $cur, EasyRdf_Resource $new): EasyRdf_Resource {
         $cur = self::cloneResource($cur, $new->propertyUris());
         

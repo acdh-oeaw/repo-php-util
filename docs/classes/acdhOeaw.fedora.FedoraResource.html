@@ -140,6 +140,48 @@ in a console-friendly way</span><pre>__getSparqlTriples</pre>
     </li>
 
                                                                                                         <li class="method public">
+        <a href="#method_delete" title="delete :: Removes the resource from the Fedora">
+            <span class="description">Removes the resource from the Fedora</span><pre>delete</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_getChildren" title="getChildren :: Returns all resource&#039;s children">
+            <span class="description">Returns all resource&#039;s children</span><pre>getChildren</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_getChildrenByProperty" title="getChildrenByProperty :: Returns all resource&#039;s children having a given property or a given value
+of a given property.">
+            <span class="description">Returns all resource&#039;s children having a given property or a given value
+of a given property.</span><pre>getChildrenByProperty</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_getChildrenByPropertyRegEx" title="getChildrenByPropertyRegEx :: Returns all resource&#039;s children with a given property matching a given
+regular expression">
+            <span class="description">Returns all resource&#039;s children with a given property matching a given
+regular expression</span><pre>getChildrenByPropertyRegEx</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_getChildrenQuery" title="getChildrenQuery :: Returns the SPARQL query object returning resource&#039;s children">
+            <span class="description">Returns the SPARQL query object returning resource&#039;s children</span><pre>getChildrenQuery</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_getChildrenQueryParameter" title="getChildrenQueryParameter :: Return the SPARQL query triple object denoting relation of being
+this resource&#039;s child">
+            <span class="description">Return the SPARQL query triple object denoting relation of being
+this resource&#039;s child</span><pre>getChildrenQueryParameter</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
         <a href="#method_getFedora" title="getFedora :: Returns the Fedora connection used by this object">
             <span class="description">Returns the Fedora connection used by this object</span><pre>getFedora</pre>
         </a>
@@ -199,13 +241,13 @@ and then fetches them by calling getMetadata().</span><pre>updateMetadata</pre>
         </li>
         <li class="nav-header protected">» Protected
             <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </ul>
         </li>
         <li class="nav-header private">» Private
             <ul>
-                                                                                                                                                                                                                                                                                                                                        <li class="method private">
-                            <a href="#method_getSparqlTriples" title="getSparqlTriples :: Serialises metadata to a form suitable for Fedora&#039;s SPARQL-update query.">
-                                <span class="description">Serialises metadata to a form suitable for Fedora&#039;s SPARQL-update query.</span><pre>getSparqlTriples</pre>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <li class="method private">
+                            <a href="#method_getSparqlTriples" title="getSparqlTriples :: Serializes metadata to a form suitable for Fedora&#039;s SPARQL-update query.">
+                                <span class="description">Serializes metadata to a form suitable for Fedora&#039;s SPARQL-update query.</span><pre>getSparqlTriples</pre>
                             </a>
                         </li>
                                                                                                                                                         <li class="method private">
@@ -350,6 +392,196 @@ in a console-friendly way</h2>
                                     
                                                                             <h3>Response</h3>
                                         <code>\acdhOeaw\fedora\type</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_delete"></a>
+                        <div class="element clickable method public  method_delete" data-toggle="collapse" data-target=".method_delete .collapse">
+                            <h2>Removes the resource from the Fedora</h2>
+                            <pre>delete() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                    
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getChildren"></a>
+                        <div class="element clickable method public  method_getChildren" data-toggle="collapse" data-target=".method_getChildren .collapse">
+                            <h2>Returns all resource&#039;s children</h2>
+                            <pre>getChildren() : array</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                    
+                                                                            <h3>Response</h3>
+                                        <code>array</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getChildrenByProperty"></a>
+                        <div class="element clickable method public  method_getChildrenByProperty" data-toggle="collapse" data-target=".method_getChildrenByProperty .collapse">
+                            <h2>Returns all resource&#039;s children having a given property or a given value
+of a given property.</h2>
+                            <pre>getChildrenByProperty(string $property, string $value = &#039;&#039;) : array</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$property</h4>
+                                                <code>string</code><p><p>fully qualified URI of the property</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$value</h4>
+                                                <code>string</code><p><p>property value (optional)</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>array</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getChildrenByPropertyRegEx"></a>
+                        <div class="element clickable method public  method_getChildrenByPropertyRegEx" data-toggle="collapse" data-target=".method_getChildrenByPropertyRegEx .collapse">
+                            <h2>Returns all resource&#039;s children with a given property matching a given
+regular expression</h2>
+                            <pre>getChildrenByPropertyRegEx(string $property, string $regEx, string $flags = &#039;i&#039;) : array</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                                                    </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$property</h4>
+                                                <code>string</code><p><p>fully qualified URI of the property</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$regEx</h4>
+                                                <code>string</code><p><p>regular expression to match</p></p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$flags</h4>
+                                                <code>string</code><p><p>regular expression flags</p></p>
+                                            </div>
+                                                                            
+                                                                            <h3>Response</h3>
+                                        <code>array</code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getChildrenQuery"></a>
+                        <div class="element clickable method public  method_getChildrenQuery" data-toggle="collapse" data-target=".method_getChildrenQuery .collapse">
+                            <h2>Returns the SPARQL query object returning resource&#039;s children</h2>
+                            <pre>getChildrenQuery() : \acdhOeaw\fedora\metadataQuery\Query</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                    
+                                                                            <h3>Response</h3>
+                                        <code><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">\acdhOeaw\fedora\metadataQuery\Query</a></code><p></p>
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getChildrenQueryParameter"></a>
+                        <div class="element clickable method public  method_getChildrenQueryParameter" data-toggle="collapse" data-target=".method_getChildrenQueryParameter .collapse">
+                            <h2>Return the SPARQL query triple object denoting relation of being
+this resource&#039;s child</h2>
+                            <pre>getChildrenQueryParameter() : \acdhOeaw\fedora\metadataQuery\QueryParameter</pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                    </table>
+
+                                    
+                                                                            <h3>Response</h3>
+                                        <code><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html">\acdhOeaw\fedora\metadataQuery\QueryParameter</a></code><p></p>
                                                                     </div>
                             </div>
 
@@ -519,7 +751,7 @@ or e.g. reset them back to their current state in Fedora)</p></p>
                         </div>
                                             <a id="method_getSparqlTriples"></a>
                         <div class="element clickable method private  method_getSparqlTriples" data-toggle="collapse" data-target=".method_getSparqlTriples .collapse">
-                            <h2>Serialises metadata to a form suitable for Fedora&#039;s SPARQL-update query.</h2>
+                            <h2>Serializes metadata to a form suitable for Fedora&#039;s SPARQL-update query.</h2>
                             <pre>getSparqlTriples(\EasyRdf_Resource $metadata) : string</pre>
                             <div class="labels">
                                                                 <span class="label">static</span>                                                                                                                            </div>
@@ -550,7 +782,7 @@ provided from the outside).</p></div>
                                                                             <h3>Arguments</h3>
                                                                                     <div class="subelement argument">
                                                 <h4>$metadata</h4>
-                                                <code>\EasyRdf_Resource</code><p><p>metadata to serialise</p></p>
+                                                <code>\EasyRdf_Resource</code><p><p>metadata to serialize</p></p>
                                             </div>
                                                                             
                                                                             <h3>Response</h3>
@@ -1061,7 +1293,7 @@ enabling us to perform triples update.</h2>
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Tue, 24 Jan 2017 11:41:20 +0000.<br/>
+            generated on Thu, 16 Feb 2017 14:52:37 +0000.<br/>
     </footer>
     </body>
 </html>
