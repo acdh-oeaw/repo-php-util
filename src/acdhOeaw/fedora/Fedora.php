@@ -30,7 +30,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request;
 use EasyRdf_Resource;
-use EasyRdf_Sparql_Client;
 use EasyRdf_Sparql_Result;
 use RuntimeException;
 use BadMethodCallException;
@@ -107,8 +106,8 @@ class Fedora {
     private $idProp;
 
     /**
-     * Sparql client object
-     * @var \EasyRdf_Sparql_Client
+     * SPARQL client object
+     * @var SparqlClient
      */
     private $sparqlClient;
     private $relProp;
@@ -140,7 +139,7 @@ class Fedora {
         $this->relProp = $cfg->get('fedoraRelProp');
         $authHeader = 'Basic ' . base64_encode($cfg->get('fedoraUser') . ':' . $cfg->get('fedoraPswd'));
         $this->client = new Client(['headers' => ['Authorization' => $authHeader]]);
-        $this->sparqlClient = new EasyRdf_Sparql_Client($cfg->get('sparqlUrl'));
+        $this->sparqlClient = new SparqlClient($cfg->get('sparqlUrl'), $cfg->get('fedoraUser'), $cfg->get('fedoraPswd'));
     }
 
     /**
@@ -324,9 +323,13 @@ class Fedora {
         if ($debug) {
             echo $query . "\n";
         }
-        return $this->sparqlClient->query($query);
+        return $this->runSparql($query);
     }
 
+    public function runSparql(string $query): EasyRdf_Sparql_Result {
+        return $this->sparqlClient->query($query);
+    }
+    
     /**
      * Adjusts URI to the current object state by setting up the proper base
      * URL and the transaction id.

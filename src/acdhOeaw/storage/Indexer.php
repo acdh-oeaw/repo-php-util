@@ -34,7 +34,6 @@ use DomainException;
 use EasyRdf_Graph;
 use EasyRdf_Resource;
 use EasyRdf_Sparql_Result;
-use EasyRdf_Sparql_Client;
 use RuntimeException;
 use zozlak\util\Config;
 
@@ -94,12 +93,6 @@ class Indexer {
     static private $resourceCache = array();
 
     /**
-     * SPARQL client object
-     * @var \EasyRdf_Sparql_Client
-     */
-    static private $sparqlClient;
-
-    /**
      * Initializes class with configuration settings.
      * 
      * Required configuration parameters include:
@@ -113,7 +106,6 @@ class Indexer {
      *     indexed resource (can be empty)
      * - containerDir - path to the container root (the "fedoraLocProp" property
      *     values are relative to this path)
-     * - sparqlUrl - SPARQL endpoint URL
      * 
      * @param Config $cfg
      */
@@ -125,7 +117,6 @@ class Indexer {
         self::$titleProp = $cfg->get('fedoraTitleProp');
         self::$defaultClass = $cfg->get('indexerDefaultClass');
         self::$containerDir = preg_replace('|/$|', '', $cfg->get('containerDir')) . '/';
-        self::$sparqlClient = new EasyRdf_Sparql_Client($cfg->get('sparqlUrl'));
     }
 
     /**
@@ -418,7 +409,7 @@ class Indexer {
             $resPath = EasyRdfUtil::escapeLiteral($path);
             $query = sprintf($query, $relProp, $resId, $idProp, $locProp, $resPath);
 
-            $res = self::$sparqlClient->query($query);
+            $res = $this->resource->getFedora()->runSparql($query);
 
             if ($res->numRows() === 0) {
                 throw new DomainException('No such resource');
