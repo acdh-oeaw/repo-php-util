@@ -27,6 +27,9 @@
 namespace acdhOeaw\storage;
 
 use acdhOeaw\fedora\FedoraResource;
+use acdhOeaw\fedora\metadataQuery\Query;
+use acdhOeaw\fedora\metadataQuery\HasValue;
+use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\util\EasyRdfUtil;
 use acdhOeaw\util\SparqlEndpoint;
 use DirectoryIterator;
@@ -79,7 +82,7 @@ class Indexer {
      * @var string
      */
     static private $defaultClass;
-    
+
     /**
      * Path to the container root
      * @var string
@@ -166,7 +169,7 @@ class Indexer {
     /**
      * How many subsequent subdirectories should be indexed.
      * 
-     * @var type 
+     * @var int 
      */
     private $depth = 1000;
 
@@ -175,17 +178,29 @@ class Indexer {
      * 
      * Skipped if `$flatStructure` equals to `true`
      * 
-     * @var type 
+     * @var bool 
      */
     private $includeEmpty = false;
+
+    /**
+     * Encoding used by file system paths.
+     * 
+     * By default it is guessed from current locale.
+     * 
+     * @var string
+     * @see setPathEncoding()
+     */
+    private $pathEncoding = 'UTF-8';
 
     /**
      * Creates an indexer object for a given Fedora resource.
      * 
      * @param FedoraResource $resource
+     * @param string $encoding character encoding used by the operation system
+     *   (will be autodetected if not provided)
      * @throws RuntimeException
      */
-    public function __construct(FedoraResource $resource) {
+    public function __construct(FedoraResource $resource, string $encoding = null) {
         $this->resource = $resource;
 
         $metadata = $this->resource->getMetadata();
@@ -201,6 +216,25 @@ class Indexer {
             if (is_dir($loc)) {
                 $this->paths[] = $i->getValue();
             }
+        }
+
+        // detect path encoding
+        if (empty($encoding)) {
+            foreach (explode(';', setlocale(LC_ALL, 0)) as $i) {
+                $i = explode('=', $i);
+                if ($i[0] === 'LC_CTYPE') {
+                    $tmp = preg_replace('|^.*[.]|', '', $i[1]);
+                    if (is_numeric($tmp)) {
+                        $this->pathEncoding = 'windows-' . $tmp;
+                    } else if (preg_match('|utf-?8|i', $tmp)) {
+                        $this->pathEncoding = 'utf-8';
+                    } else {
+                        throw new RuntimeException('Operation system encoding can not be determined');
+                    }
+                }
+            }
+        } else {
+            $this->pathEncoding = $encoding;
         }
     }
 
@@ -274,7 +308,7 @@ class Indexer {
      */
     public function index(bool $verbose = false): array {
         $indexedRes = array();
-        
+
         foreach ($this->paths as $path) {
             foreach (new DirectoryIterator(self::$containerDir . $path) as $i) {
                 if ($i->isDot()) {
@@ -298,7 +332,7 @@ class Indexer {
                         echo $verbose ? "+ upload " : "";
                         $res->updateContent($i->getPathname(), true);
                     }
-                    
+
                     $indexedRes[] = $res;
                 } catch (DomainException $e) {
                     // resource does not exist and must be created
@@ -318,7 +352,7 @@ class Indexer {
                 if ($i->isDir() && (!$skip || $this->flatStructure && $this->depth > 0)) {
                     echo $verbose ? "entering " . $i->getPathname() . "\n" : "";
                     $ind = clone($this);
-                    if(!$this->flatStructure) {
+                    if (!$this->flatStructure) {
                         $ind->resource = $res;
                     }
                     $ind->setDepth($this->depth - 1);
@@ -329,7 +363,7 @@ class Indexer {
                 }
             }
         }
-        
+
         return $indexedRes;
     }
 
@@ -394,22 +428,20 @@ class Indexer {
     private function getResource(string $path, DirectoryIterator $i): FedoraResource {
         $path = $path . '/' . $i->getFilename();
         if (!isset(self::$resourceCache[$path])) {
-            $query = '
-                SELECT ?child
-                WHERE {
-                    ?child %s %s .
-                    ?child %s ?id .
-                    ?child %s %s^^xsd:string .
-                }
-            ';
-            $relProp = EasyRdfUtil::escapeUri(self::$relProp);
-            $resId = EasyRdfUtil::escapeUri($this->resource->getId());
-            $idProp = EasyRdfUtil::escapeUri(self::$idProp);
-            $locProp = EasyRdfUtil::escapeUri(self::$locProp);
-            $resPath = EasyRdfUtil::escapeLiteral($path);
-            $query = sprintf($query, $relProp, $resId, $idProp, $locProp, $resPath);
+            $path = iconv($this->pathEncoding, 'utf-8', $path);
+            /*
+             *  SELECT ?child
+             *  WHERE {
+             *      ?child $relProp $parentResId .
+             *      ?child $idProp ?id .
+             *      ?child $locProp $path .
+             */
+            $query = new Query();
+            $query->addParameter((new HasValue(self::$relProp, $this->resource->getId()))->setSubVar('?child'));
+            $query->addParameter((new HasProperty(self::$idProp))->setSubVar('?child'));
+            $query->addParameter((new HasValue(self::$locProp, $path))->setSubVar('?child'));
 
-            $res = $this->resource->getFedora()->runSparql($query);
+            $res = $this->resource->getFedora()->runQuery($query);
 
             if ($res->numRows() === 0) {
                 throw new DomainException('No such resource');
