@@ -68,7 +68,7 @@ class SparqlClient {
             $authHeader = 'Basic ' . base64_encode($user . ':' . $password);
             $headers['Authorization'] = $authHeader;
         }
-        $this->client = new Client(['headers' => $headers]);
+        $this->client = new Client(['headers' => $headers, 'verify' => false]);
     }
 
     /**

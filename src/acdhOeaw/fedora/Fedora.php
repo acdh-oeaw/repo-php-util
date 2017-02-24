@@ -137,7 +137,7 @@ class Fedora {
         $this->idProp = $cfg->get('fedoraIdProp');
         $this->relProp = $cfg->get('fedoraRelProp');
         $authHeader = 'Basic ' . base64_encode($cfg->get('fedoraUser') . ':' . $cfg->get('fedoraPswd'));
-        $this->client = new Client(['headers' => ['Authorization' => $authHeader]]);
+        $this->client = new Client(['verify' => false, 'headers' => ['Authorization' => $authHeader]]);
         $this->sparqlClient = new SparqlClient($cfg->get('sparqlUrl'), $cfg->get('fedoraUser'), $cfg->get('fedoraPswd'));
     }
 
