@@ -29,8 +29,8 @@ namespace acdhOeaw\redmine;
 use stdClass;
 use RuntimeException;
 use BadMethodCallException;
-use EasyRdf_Graph;
-use EasyRdf_Resource;
+use EasyRdf\Graph;
+use EasyRdf\Resource;
 use GuzzleHttp\Exception\ClientException;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\util\EasyRdfUtil;
@@ -196,7 +196,7 @@ abstract class Redmine {
     /**
      * Redmine's object metadata
      * 
-     * @var \EasyRdf_Resource
+     * @var \EasyRdf\Resource
      */
     protected $metadata;
 
@@ -231,12 +231,12 @@ abstract class Redmine {
     /**
      * Adds RDF property to the metadata according to mapping rules.
      * 
-     * @param EasyRdf_Resource $res metadata
+     * @param EasyRdf\Resource $res metadata
      * @param stdClass $prop property mapping object
      * @param string $value Redmine property value
      * @throws RuntimeException
      */
-    private function addValue(EasyRdf_Resource $res, stdClass $prop, string $value) {
+    private function addValue(EasyRdf\Resource $res, stdClass $prop, string $value) {
         if (!$value) {
             return;
         }
@@ -279,15 +279,15 @@ abstract class Redmine {
      * 
      * @param array $data associative array with Redmine's resource properties
      *   fetched from the Redmine REST API
-     * @return \EasyRdf_Resource
+     * @return \EasyRdf\Resource
      */
-    protected function mapProperties(array $data): EasyRdf_Resource {
+    protected function mapProperties(array $data): EasyRdf\Resource {
         $this->getRmsUri(false); // to load metadata if resource already exists
 
         if ($this->fedoraRes) {
             $res = $this->fedoraRes->getMetadata();
         } else {
-            $graph = new EasyRdf_Graph();
+            $graph = new EasyRdf\Graph();
             $res = $graph->resource('.');
         }
 

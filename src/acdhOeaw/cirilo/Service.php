@@ -28,7 +28,7 @@ namespace acdhOeaw\cirilo;
 
 use zozlak\util\Config;
 use SimpleXMLElement;
-use EasyRdf_Graph;
+use EasyRdf\Graph;
 use RuntimeException;
 use Exception;
 use acdhOeaw\fedora\Fedora;
@@ -99,7 +99,7 @@ class Service {
             if (count($candidates) === 1) {
                 self::$cache[$s->pid] = $candidates[0];
             } elseif (count($candidates) === 0) {
-                $metadata = (new EasyRdf_Graph())->resource('.');
+                $metadata = (new EasyRdf\Graph())->resource('.');
                 $metadata->addLiteral(self::$config->get('fedoraTitleProp'), $s->title);
                 self::$cache[$s->pid] = self::$fedora->createResource($metadata);
             } else {

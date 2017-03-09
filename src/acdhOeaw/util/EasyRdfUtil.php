@@ -26,11 +26,11 @@
 
 namespace acdhOeaw\util;
 
-use EasyRdf_Namespace;
-use EasyRdf_Literal;
-use EasyRdf_Graph;
-use EasyRdf_Resource;
-use EasyRdf_Serialiser_Ntriples;
+use EasyRdf\RdfNamespace;
+use EasyRdf\Literal;
+use EasyRdf\Graph;
+use EasyRdf\Resource;
+use EasyRdf\Serialiser\Ntriples;
 
 /**
  * Set of helpers and workarounds for the EasyRdf library
@@ -42,7 +42,7 @@ class EasyRdfUtil {
     /**
      * Serializer object
      * 
-     * @var \EasyRdf_Serialiser_Ntriples
+     * @var \EasyRdf\Serialiser\Ntriples
      */
     static private $serializer;
 
@@ -54,7 +54,7 @@ class EasyRdfUtil {
      * @return string
      */
     static public function fixPropName(string $property): string {
-        return join(':', EasyRdf_Namespace::splitUri($property, true));
+        return join(':', RdfNamespace::splitUri($property, true));
     }
 
     /**
@@ -65,7 +65,7 @@ class EasyRdfUtil {
      */
     static public function  escapeUri(string $uri): string {
         self::initSerializer();
-        return self::$serializer->serialiseValue(new EasyRdf_Resource($uri));
+        return self::$serializer->serialiseValue(new Resource($uri));
     }
 
     /**
@@ -76,7 +76,7 @@ class EasyRdfUtil {
      */
     static public function escapeLiteral(string $literal): string {
         self::initSerializer();
-        $value = self::$serializer->serialiseValue(new EasyRdf_Literal($value));
+        $value = self::$serializer->serialiseValue(new Literal($literal));
         return $value;
     }
 
@@ -151,21 +151,21 @@ class EasyRdfUtil {
      */
     static private function initSerializer() {
         if (!self::$serializer) {
-            self::$serializer = new EasyRdf_Serialiser_Ntriples();
+            self::$serializer = new EasyRdf\Serialiser\Ntriples();
         }
     }
 
     /**
-     * Returns a deep copy of the given EasyRdf_Resouerce 
+     * Returns a deep copy of the given EasyRdf\Resource 
      * optionally excluding given properties.
      * 
-     * @param \EasyRdf_Resource $resource metadata to clone
+     * @param \EasyRdf\Resource $resource metadata to clone
      * @param array $skipProp a list of fully qualified property URIs to skip
-     * @param string $skipRegExp regular expression matchin fully qualified property URIs to skip
-     * @return \EasyRdf_Resource
+     * @param string $skipRegExp regular expression matching fully qualified property URIs to skip
+     * @return \EasyRdf\Resource
      */
-    static public function cloneResource(EasyRdf_Resource $resource, array $skipProp = array(), string $skipRegExp = '/^$/'): EasyRdf_Resource {
-        $graph = new EasyRdf_Graph();
+    static public function cloneResource(Resource $resource, array $skipProp = array(), string $skipRegExp = '/^$/'): Resource {
+        $graph = new Graph();
         $res = $graph->resource($resource->getUri());
 
         foreach ($resource->propertyUris() as $prop) {
@@ -190,10 +190,10 @@ class EasyRdfUtil {
      * Replaces EasyRdf ntriples serializer which does not escape special values
      * in literal strings.
      * 
-     * @param EasyRdf_Resource $resource resource to serialize
+     * @param EasyRdf\Resource $resource resource to serialize
      * @return string
      */
-    static public function serialiseResource(EasyRdf_Resource $resource) {
+    static public function serialiseResource(EasyRdf\Resource $resource) {
         return $resource->getGraph()->serialise('ntriples');
     }
 
@@ -205,11 +205,11 @@ class EasyRdfUtil {
      * - All properties existing in `new`.
      * - Those properties from `cur` which do not exist in `new`.
      * 
-     * @param EasyRdf_Resource $cur current metadata
-     * @param EasyRdf_Resource $new metadata to be merged with current metadata
-     * @return EasyRdf_Resource
+     * @param EasyRdf\Resource $cur current metadata
+     * @param EasyRdf\Resource $new metadata to be merged with current metadata
+     * @return EasyRdf\Resource
      */
-    static public function mergeMetadata(EasyRdf_Resource $cur, EasyRdf_Resource $new): EasyRdf_Resource {
+    static public function mergeMetadata(EasyRdf\Resource $cur, EasyRdf\Resource $new): EasyRdf\Resource {
         $cur = self::cloneResource($cur, $new->propertyUris());
         
         foreach ($new->propertyUris() as $prop) {

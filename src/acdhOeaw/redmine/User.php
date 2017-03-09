@@ -26,7 +26,7 @@
 
 namespace acdhOeaw\redmine;
 
-use EasyRdf_Resource;
+use EasyRdf\Resource;
 use acdhOeaw\util\EasyRdfUtil;
 
 /**
@@ -93,10 +93,10 @@ class User extends Redmine {
      * 
      * @param array $data associative array with Redmine's resource properties
      *   fetched from the Redmine REST API
-     * @return \EasyRdf_Resource
+     * @return \EasyRdf\Resource
      * @see \acdhOeaw\redmine\Redmine::mapProperties()
      */
-    protected function mapProperties(array $data): EasyRdf_Resource {
+    protected function mapProperties(array $data): EasyRdf\Resource {
         $res = parent::mapProperties($data);
         
         $given = $res->getLiteral('http://xmlns.com/foaf/0.1/givenName');

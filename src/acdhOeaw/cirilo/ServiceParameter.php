@@ -27,7 +27,7 @@
 namespace acdhOeaw\cirilo;
 
 use SimpleXMLElement;
-use EasyRdf_Graph;
+use EasyRdf\Graph;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\util\EasyRdfUtil;
@@ -64,7 +64,7 @@ class ServiceParameter {
                 self::$cache[$id] = $candidates[0];
 //echo ' found ' . "\n";
             } elseif (count($candidates) === 0) {
-                $metadata = (new EasyRdf_Graph())->resource('.');
+                $metadata = (new EasyRdf\Graph())->resource('.');
                 $metadata->addLiteral(self::$config->get('fedoraTitleProp'), $p->title);
                 self::$cache[$id] = self::$fedora->createResource($metadata);
 //echo ' not found ' . self::$cache[$id]->getUri() . "\n";

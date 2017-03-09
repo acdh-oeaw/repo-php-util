@@ -34,9 +34,10 @@ use acdhOeaw\util\EasyRdfUtil;
 use acdhOeaw\util\SparqlEndpoint;
 use DirectoryIterator;
 use DomainException;
-use EasyRdf_Graph;
-use EasyRdf_Resource;
-use EasyRdf_Sparql_Result;
+use EasyRdf\Graph;
+use EasyRdf\Resource;
+use EasyRdf\Sparql\Result;
+use EasyRdf\Literal;
 use RuntimeException;
 use zozlak\util\Config;
 
@@ -206,7 +207,7 @@ class Indexer {
         $metadata = $this->resource->getMetadata();
         $locations = $metadata->allLiterals(self::$locProp);
         if (count($locations) === 0) {
-            throw new RuntimeException('Resouce lacks locationpath property');
+            throw new RuntimeException('Resource lacks locationpath property');
         }
         foreach ($locations as $i) {
             $loc = preg_replace('|/$|', '', self::$containerDir . $i->getValue());
@@ -393,10 +394,10 @@ class Indexer {
      * 
      * @param string $path node location base directory relatively to the container
      * @param DirectoryIterator $i file system node
-     * @return EasyRdf_Resource
+     * @return EasyRdf\Resource
      */
-    private function createMetadata(string $path, DirectoryIterator $i): EasyRdf_Resource {
-        $graph = new EasyRdf_Graph;
+    private function createMetadata(string $path, DirectoryIterator $i): EasyRdf\Resource {
+        $graph = new EasyRdf\Graph;
         $metadata = $graph->resource('newResource');
         if (self::$defaultClass != '') {
             $metadata->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', self::$defaultClass);
@@ -472,7 +473,7 @@ class Indexer {
     public function getMissingLocations(): array {
         $missing = array();
         foreach ($this->getLocations() as $i) {
-            if (!get_class($i->path) === 'EasyRdf_Literal') {
+            if (!$i->path instanceof Literal) {
                 continue; // skip locations being URIs
             }
 
@@ -487,10 +488,10 @@ class Indexer {
     /**
      * Fetches all child resource locations.
      * 
-     * @return \EasyRdf_Sparql_Result
-     * @throws RuntimeException
+     * @return \EasyRdf\Sparql\Result
+     * @throws \RuntimeException
      */
-    private function getLocations(): EasyRdf_Sparql_Result {
+    private function getLocations(): Result {
         if (FedoraResource::inTransaction()) {
             throw new RuntimeException('Fedora transaction is active');
         }

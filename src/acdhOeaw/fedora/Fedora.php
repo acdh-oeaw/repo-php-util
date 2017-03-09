@@ -29,8 +29,8 @@ namespace acdhOeaw\fedora;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request;
-use EasyRdf_Resource;
-use EasyRdf_Sparql_Result;
+use EasyRdf\Resource;
+use EasyRdf\Sparql\Result;
 use RuntimeException;
 use BadMethodCallException;
 use acdhOeaw\util\EasyRdfUtil;
@@ -160,7 +160,7 @@ class Fedora {
     /**
      * Creates a resource in the Fedora and returns corresponding Resource object
      * 
-     * @param EasyRdf_Resource $metadata resource metadata
+     * @param EasyRdf\Resource $metadata resource metadata
      * @param mixed $data optional resource data as a string, 
      *   file name or an array: ['content-type' => 'foo', 'data' => 'bar']
      * @param string $path optional Fedora resource path (see also the `$method`
@@ -169,7 +169,7 @@ class Fedora {
      * @return \acdhOeaw\rms\FedoraResource
      * @throws \BadMethodCallException
      */
-    public function createResource(EasyRdf_Resource $metadata, $data = '', string $path = '', string $method = 'POST'): FedoraResource {
+    public function createResource(EasyRdf\Resource $metadata, $data = '', string $path = '', string $method = 'POST'): FedoraResource {
         if (!in_array($method, array('POST', 'PUT'))) {
             throw new BadMethodCallException('method must be PUT or POST');
         }
@@ -343,9 +343,9 @@ class Fedora {
      * 
      * @param Query $query query to run
      * @param bool $debug should the underlying SPARQL query be displayed
-     * @return EasyRdf_Sparql_Result
+     * @return \EasyRdf\Sparql\Result
      */
-    public function runQuery(Query $query, bool $debug = false): EasyRdf_Sparql_Result {
+    public function runQuery(Query $query, bool $debug = false): Result {
         $query = $query->getQuery();
         if ($debug) {
             echo $query . "\n";
@@ -357,9 +357,9 @@ class Fedora {
      * Runs a SPARQL against repository triplestore.
      * 
      * @param string $query SPARQL query to run
-     * @return EasyRdf_Sparql_Result
+     * @return \EasyRdf\Sparql\Result
      */
-    public function runSparql(string $query): EasyRdf_Sparql_Result {
+    public function runSparql(string $query): Result {
         return $this->sparqlClient->query($query);
     }
     

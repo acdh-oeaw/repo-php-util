@@ -28,7 +28,7 @@ namespace acdhOeaw\fedora;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
-use EasyRdf_Sparql_Result;
+use EasyRdf\Sparql\Result;
 
 /**
  * Simple SPARQL client with HTTP basic authentication support.
@@ -77,13 +77,13 @@ class SparqlClient {
      * There is no support for UPDATE queries.
      * 
      * @param string $query SPARQL query to be run
-     * @return EasyRdf_Sparql_Result
+     * @return \EasyRdf\Sparql\Result
      */
-    public function query(string $query): EasyRdf_Sparql_Result {
+    public function query(string $query): Result {
         $request = new Request('GET', $this->url . '?query=' . rawurlencode($query));
         $response = $this->client->send($request);
         $body = $response->getBody();
-        $result = new EasyRdf_Sparql_Result($body, 'application/sparql-results+json');
+        $result = new Result($body, 'application/sparql-results+json');
         return $result;
     }
 

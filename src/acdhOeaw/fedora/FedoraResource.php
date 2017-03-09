@@ -27,8 +27,8 @@
 namespace acdhOeaw\fedora;
 
 use GuzzleHttp\Psr7\Request;
-use EasyRdf_Graph;
-use EasyRdf_Resource;
+use EasyRdf\Graph;
+use EasyRdf\Resource;
 use InvalidArgumentException;
 use RuntimeException;
 use acdhOeaw\util\EasyRdfUtil;
@@ -75,12 +75,12 @@ class FedoraResource {
      * properties Fedora reserves for itself (and rises errors when they are
      * provided from the outside).
      * 
-     * @param \EasyRdf_Resource $metadata metadata to serialize
+     * @param \EasyRdf\Resource $metadata metadata to serialize
      * @return string
      * @see $skipProp
      * @see $skipPropRegExp
      */
-    static private function getSparqlTriples(EasyRdf_Resource $metadata): string {
+    static private function getSparqlTriples(EasyRdf\Resource $metadata): string {
         // make a deep copy of the metadata graph excluding forbidden properties
         $res = EasyRdfUtil::cloneResource($metadata, self::$skipProp, self::$skipPropRegExp);
 
@@ -98,7 +98,7 @@ class FedoraResource {
     /**
      * Resource metadata (local copy)
      * 
-     * @var \EasyRdf_Resource 
+     * @var \EasyRdf\Resource 
      * @see getMetadata()
      * @see setMetadata()
      * @see updateMetadata()
@@ -109,7 +109,7 @@ class FedoraResource {
      * Resource metadata lastly fetched from the Fedora
      * enabling us to perform triples update.
      * 
-     * @var \EasyRdf_Resource 
+     * @var \EasyRdf\Resource 
      * @see getMetadata()
      * @see setMetadata()
      * @see updateMetadata()
@@ -210,10 +210,10 @@ class FedoraResource {
      * New metadata are not automatically written back to the Fedora.
      * Use the updateMetadata() method to write them back.
      * 
-     * @param EasyRdf_Resource $metadata
+     * @param EasyRdf\Resource $metadata
      * @see updateMetadata()
      */
-    public function setMetadata(EasyRdf_Resource $metadata) {
+    public function setMetadata(EasyRdf\Resource $metadata) {
         $this->metadata = $metadata;
         $this->updated = false;
     }
@@ -299,11 +299,11 @@ class FedoraResource {
      * @param bool $force enforce fetch from Fedora 
      *   (when you want to make sure metadata are in line with ones in the Fedora 
      *   or e.g. reset them back to their current state in Fedora)
-     * @return \EasyRdf_Resource
+     * @return \EasyRdf\Resource
      * @see updateMetadata()
      * @see setMetadata()
      */
-    public function getMetadata(bool $force = false): EasyRdf_Resource {
+    public function getMetadata(bool $force = false): EasyRdf\Resource {
         $this->loadMetadata($force);
         return EasyRdfUtil::cloneResource($this->metadata);
     }
@@ -320,7 +320,7 @@ class FedoraResource {
             $request = new Request('GET', $this->uri . '/fcr:metadata');
             $resp = $this->fedora->sendRequest($request);
 
-            $graph = new EasyRdf_Graph();
+            $graph = new EasyRdf\Graph();
             $graph->parse($resp->getBody());
             $this->metadata = $graph->resource($this->uri);
 
