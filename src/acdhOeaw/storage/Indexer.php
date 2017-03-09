@@ -396,8 +396,8 @@ class Indexer {
      * @param DirectoryIterator $i file system node
      * @return EasyRdf\Resource
      */
-    private function createMetadata(string $path, DirectoryIterator $i): EasyRdf\Resource {
-        $graph = new EasyRdf\Graph;
+    private function createMetadata(string $path, DirectoryIterator $i): Resource {
+        $graph = new Graph;
         $metadata = $graph->resource('newResource');
         if (self::$defaultClass != '') {
             $metadata->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', self::$defaultClass);

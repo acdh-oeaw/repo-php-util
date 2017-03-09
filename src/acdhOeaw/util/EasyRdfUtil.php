@@ -151,7 +151,7 @@ class EasyRdfUtil {
      */
     static private function initSerializer() {
         if (!self::$serializer) {
-            self::$serializer = new EasyRdf\Serialiser\Ntriples();
+            self::$serializer = new Ntriples();
         }
     }
 
@@ -193,7 +193,7 @@ class EasyRdfUtil {
      * @param EasyRdf\Resource $resource resource to serialize
      * @return string
      */
-    static public function serialiseResource(EasyRdf\Resource $resource) {
+    static public function serialiseResource(Resource $resource) {
         return $resource->getGraph()->serialise('ntriples');
     }
 
@@ -209,7 +209,7 @@ class EasyRdfUtil {
      * @param EasyRdf\Resource $new metadata to be merged with current metadata
      * @return EasyRdf\Resource
      */
-    static public function mergeMetadata(EasyRdf\Resource $cur, EasyRdf\Resource $new): EasyRdf\Resource {
+    static public function mergeMetadata(Resource $cur, Resource $new): Resource {
         $cur = self::cloneResource($cur, $new->propertyUris());
         
         foreach ($new->propertyUris() as $prop) {

@@ -236,7 +236,7 @@ abstract class Redmine {
      * @param string $value Redmine property value
      * @throws RuntimeException
      */
-    private function addValue(EasyRdf\Resource $res, stdClass $prop, string $value) {
+    private function addValue(Resource $res, stdClass $prop, string $value) {
         if (!$value) {
             return;
         }
@@ -281,13 +281,13 @@ abstract class Redmine {
      *   fetched from the Redmine REST API
      * @return \EasyRdf\Resource
      */
-    protected function mapProperties(array $data): EasyRdf\Resource {
+    protected function mapProperties(array $data): Resource {
         $this->getRmsUri(false); // to load metadata if resource already exists
 
         if ($this->fedoraRes) {
             $res = $this->fedoraRes->getMetadata();
         } else {
-            $graph = new EasyRdf\Graph();
+            $graph = new Graph();
             $res = $graph->resource('.');
         }
 

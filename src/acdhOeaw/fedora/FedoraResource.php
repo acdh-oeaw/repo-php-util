@@ -80,7 +80,7 @@ class FedoraResource {
      * @see $skipProp
      * @see $skipPropRegExp
      */
-    static private function getSparqlTriples(EasyRdf\Resource $metadata): string {
+    static private function getSparqlTriples(Resource $metadata): string {
         // make a deep copy of the metadata graph excluding forbidden properties
         $res = EasyRdfUtil::cloneResource($metadata, self::$skipProp, self::$skipPropRegExp);
 
@@ -213,7 +213,7 @@ class FedoraResource {
      * @param EasyRdf\Resource $metadata
      * @see updateMetadata()
      */
-    public function setMetadata(EasyRdf\Resource $metadata) {
+    public function setMetadata(Resource $metadata) {
         $this->metadata = $metadata;
         $this->updated = false;
     }
@@ -303,7 +303,7 @@ class FedoraResource {
      * @see updateMetadata()
      * @see setMetadata()
      */
-    public function getMetadata(bool $force = false): EasyRdf\Resource {
+    public function getMetadata(bool $force = false): Resource {
         $this->loadMetadata($force);
         return EasyRdfUtil::cloneResource($this->metadata);
     }
@@ -320,7 +320,7 @@ class FedoraResource {
             $request = new Request('GET', $this->uri . '/fcr:metadata');
             $resp = $this->fedora->sendRequest($request);
 
-            $graph = new EasyRdf\Graph();
+            $graph = new Graph();
             $graph->parse($resp->getBody());
             $this->metadata = $graph->resource($this->uri);
 

@@ -33,7 +33,6 @@ use EasyRdf\Resource;
 use EasyRdf\Sparql\Result;
 use RuntimeException;
 use BadMethodCallException;
-use acdhOeaw\util\EasyRdfUtil;
 use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\fedora\metadataQuery\HasValue;
@@ -169,7 +168,7 @@ class Fedora {
      * @return \acdhOeaw\rms\FedoraResource
      * @throws \BadMethodCallException
      */
-    public function createResource(EasyRdf\Resource $metadata, $data = '', string $path = '', string $method = 'POST'): FedoraResource {
+    public function createResource(Resource $metadata, $data = '', string $path = '', string $method = 'POST'): FedoraResource {
         if (!in_array($method, array('POST', 'PUT'))) {
             throw new BadMethodCallException('method must be PUT or POST');
         }
