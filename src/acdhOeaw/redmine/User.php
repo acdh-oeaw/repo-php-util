@@ -99,13 +99,13 @@ class User extends Redmine {
     protected function mapProperties(array $data): EasyRdf_Resource {
         $res = parent::mapProperties($data);
         
-        $given = $res->getLiteral(EasyRdfUtil::fixPropName('http://xmlns.com/foaf/0.1/givenName'));
-        $family = $res->getLiteral(EasyRdfUtil::fixPropName('http://xmlns.com/foaf/0.1/familyName'));
+        $given = $res->getLiteral('http://xmlns.com/foaf/0.1/givenName');
+        $family = $res->getLiteral('http://xmlns.com/foaf/0.1/familyName');
         $title = trim($given . ' ' . $family);
         
-        $res->delete(EasyRdfUtil::fixPropName('http://xmlns.com/foaf/0.1/name'));
+        $res->delete('http://xmlns.com/foaf/0.1/name');
         $res->addLiteral('http://xmlns.com/foaf/0.1/name', $title);
-        $res->delete(EasyRdfUtil::fixPropName('http://purl.org/dc/elements/1.1/title'));
+        $res->delete('http://purl.org/dc/elements/1.1/title');
         $res->addLiteral('http://purl.org/dc/elements/1.1/title', $title);
         
         return $res;

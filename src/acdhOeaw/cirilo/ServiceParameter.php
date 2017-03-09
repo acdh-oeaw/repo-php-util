@@ -65,7 +65,7 @@ class ServiceParameter {
 //echo ' found ' . "\n";
             } elseif (count($candidates) === 0) {
                 $metadata = (new EasyRdf_Graph())->resource('.');
-                $metadata->addLiteral(EasyRdfUtil::fixPropName(self::$config->get('fedoraTitleProp')), $p->title);
+                $metadata->addLiteral(self::$config->get('fedoraTitleProp'), $p->title);
                 self::$cache[$id] = self::$fedora->createResource($metadata);
 //echo ' not found ' . self::$cache[$id]->getUri() . "\n";
             } else {
@@ -99,27 +99,27 @@ class ServiceParameter {
         $fedoraRes = self::getFedoraResource($this, $service);
         $meta = $fedoraRes->getMetadata();
 
-        $relProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraRelProp'));
+        $relProp = self::$config->get('fedoraRelProp');
         $meta->delete($relProp);
         $meta->addResource($relProp, $service->getId());
         
-        $titleProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraTitleProp'));
+        $titleProp = self::$config->get('fedoraTitleProp');
         $meta->delete($titleProp);
         $meta->addLiteral($titleProp, $this->title);
         
-        $byValueProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraServiceParamByValueProp'));
+        $byValueProp = self::$config->get('fedoraServiceParamByValueProp');
         $meta->delete($byValueProp);
         $meta->addLiteral($byValueProp, $this->byValue);
         
-        $requiredProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraServiceParamRequiredProp'));
+        $requiredProp = self::$config->get('fedoraServiceParamRequiredProp');
         $meta->delete($requiredProp);
         $meta->addLiteral($requiredProp, $this->required);
         
-        $defaultValueProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraServiceParamDefaultValueProp'));
+        $defaultValueProp = self::$config->get('fedoraServiceParamDefaultValueProp');
         $meta->delete($defaultValueProp);
         $meta->addLiteral($defaultValueProp, $this->defaultValue);
         
-        $redPropertyProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraServiceParamRdfPropertyProp'));
+        $redPropertyProp = self::$config->get('fedoraServiceParamRdfPropertyProp');
         $meta->delete($redPropertyProp);
         $meta->addResource($redPropertyProp, $this->rdfProperty);
 

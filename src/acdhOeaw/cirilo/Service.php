@@ -100,7 +100,7 @@ class Service {
                 self::$cache[$s->pid] = $candidates[0];
             } elseif (count($candidates) === 0) {
                 $metadata = (new EasyRdf_Graph())->resource('.');
-                $metadata->addLiteral(EasyRdfUtil::fixPropName(self::$config->get('fedoraTitleProp')), $s->title);
+                $metadata->addLiteral(self::$config->get('fedoraTitleProp'), $s->title);
                 self::$cache[$s->pid] = self::$fedora->createResource($metadata);
             } else {
                 throw new RuntimeException('Many resources with matching given fedora 3 pid');
@@ -173,23 +173,23 @@ class Service {
         $fedoraRes = self::getFedoraResource($this);
         $meta = $fedoraRes->getMetadata();
 
-        $pidProp = EasyRdfUtil::fixPropName(self::$config->get('ciriloIdProp'));
+        $pidProp = self::$config->get('ciriloIdProp');
         $meta->delete($pidProp);
         $meta->addLiteral($pidProp, $this->pid);
         
-        $titleProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraTitleProp'));
+        $titleProp = self::$config->get('fedoraTitleProp');
         $meta->delete($titleProp);
         $meta->addLiteral($titleProp, $this->title);
         
-        $locProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraServiceLocProp'));
+        $locProp = self::$config->get('fedoraServiceLocProp');
         $meta->delete($locProp);
         $meta->addLiteral($locProp, $this->location);
         
-        $retProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraServiceRetMimeProp'));
+        $retProp = self::$config->get('fedoraServiceRetMimeProp');
         $meta->delete($retProp);
         $meta->addLiteral($retProp, $this->retMime);
         
-        $supProp = EasyRdfUtil::fixPropName(self::$config->get('fedoraServiceSupportsProp'));
+        $supProp = self::$config->get('fedoraServiceSupportsProp');
         $meta->delete($supProp);
         foreach ($this->suports as $i) {
             $meta->addLiteral($supProp, $i);

@@ -63,20 +63,19 @@ class EasyRdfUtil {
      * @param string $uri
      * @return string
      */
-    static public function escapeUri(string $uri): string {
+    static public function  escapeUri(string $uri): string {
         self::initSerializer();
         return self::$serializer->serialiseValue(new EasyRdf_Resource($uri));
     }
 
     /**
-     * Escapes a given strin as a literal
+     * Escapes a given string as a literal
      * 
      * @param string $literal
      * @return string
      */
     static public function escapeLiteral(string $literal): string {
         self::initSerializer();
-        $value = str_replace('\\', '\\\\', $literal); // EasyRdf does not escape backslashes!
         $value = self::$serializer->serialiseValue(new EasyRdf_Literal($value));
         return $value;
     }
@@ -195,18 +194,7 @@ class EasyRdfUtil {
      * @return string
      */
     static public function serialiseResource(EasyRdf_Resource $resource) {
-        $rdf = '';
-        foreach ($resource->propertyUris() as $prop) {
-            $fProp = self::fixPropName($prop);
-            $eProp = self::escapeUri($prop);
-            foreach ($resource->allLiterals($fProp) as $i) {
-                $rdf .= '<> ' . $eProp . ' ' . self::escapeLiteral($i) . " .\n";
-            }
-            foreach ($resource->allResources($fProp) as $i) {
-                $rdf .= '<> ' . $eProp . ' ' . self::escapeUri($i->getUri()) . " .\n";
-            }
-        }
-        return $rdf;
+        return $resource->getGraph()->serialise('ntriples');
     }
 
     /**

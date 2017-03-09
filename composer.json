@@ -15,12 +15,18 @@
     "require": {
         "php": ">=7.0",
         "guzzlehttp/guzzle": "~6.0",
-        "easyrdf/easyrdf": "*",
+        "easyrdf/easyrdf": "dev-acdh",
         "zozlak/util": "*"
     },
     "autoload": {
         "psr-4": {
             "acdhOeaw\\": "src/acdhOeaw/"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/acdh-oeaw/easyrdf"
+        }
+    ]
 }

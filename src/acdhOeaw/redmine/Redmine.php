@@ -291,7 +291,7 @@ abstract class Redmine {
             $res = $graph->resource('.');
         }
 
-        $res->delete(EasyRdfUtil::fixPropName(self::$idProp));
+        $res->delete(self::$idProp);
         $res->addResource(self::$idProp, $this->getIdValue());
 
         $res->delete('rdf:type');
@@ -300,7 +300,7 @@ abstract class Redmine {
         $deletedProps = array();
         foreach (self::$propMap as $redmineProp => $rdfProp) {
             if (!in_array($rdfProp->uri, $deletedProps)) {
-                $res->delete(EasyRdfUtil::fixPropName($rdfProp->uri));
+                $res->delete($rdfProp->uri);
                 $deletedProps[] = $rdfProp->uri;
             }
 

@@ -146,7 +146,7 @@ class Fedora {
      * @return string
      */
     public function getIdProp(): string {
-        return EasyRdfUtil::fixPropName($this->idProp);
+        return $this->idProp;
     }
 
     /**
@@ -185,7 +185,7 @@ class Fedora {
         // with the ones provided by user
         $curMetadata = $res->getMetadata();
         foreach ($metadata->propertyUris() as $prop) {
-            $prop = EasyRdfUtil::fixPropName($prop);
+            $prop = $prop;
             if ($curMetadata->hasProperty($prop)) {
                 $curMetadata->delete($prop);
             }

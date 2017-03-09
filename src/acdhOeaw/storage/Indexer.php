@@ -204,7 +204,7 @@ class Indexer {
         $this->resource = $resource;
 
         $metadata = $this->resource->getMetadata();
-        $locations = $metadata->allLiterals(EasyRdfUtil::fixPropName(self::$locProp));
+        $locations = $metadata->allLiterals(self::$locProp);
         if (count($locations) === 0) {
             throw new RuntimeException('Resouce lacks locationpath property');
         }
