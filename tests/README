@@ -1,0 +1,3 @@
+This directory contains code samples used to manually test the library.
+
+It can not be run automatically, cause it requires a running instance of the repository software stack.
