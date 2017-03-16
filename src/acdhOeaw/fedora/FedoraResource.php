@@ -69,26 +69,6 @@ class FedoraResource {
     static private $skipPropRegExp = '|^http://fedora[.]info/definitions/v4/repository#|';
 
     /**
-     * Serializes metadata to a form suitable for Fedora's SPARQL-update query.
-     * 
-     * This means the "ntriples" format with blank subject URIs and excluding
-     * properties Fedora reserves for itself (and rises errors when they are
-     * provided from the outside).
-     * 
-     * @param \EasyRdf\Resource $metadata metadata to serialize
-     * @return string
-     * @see $skipProp
-     * @see $skipPropRegExp
-     */
-    static private function getSparqlTriples(Resource $metadata): string {
-        // make a deep copy of the metadata graph excluding forbidden properties
-        $res = EasyRdfUtil::cloneResource($metadata, self::$skipProp, self::$skipPropRegExp);
-
-        $rdf = EasyRdfUtil::serialiseResource($res);
-        return $rdf;
-    }
-
-    /**
      * Resource's Fedora URI
      * 
      * @var string
@@ -450,6 +430,26 @@ class FedoraResource {
         return $this->fedora->getResourcesByQuery($query);
     }
 
+    /**
+     * Serializes metadata to a form suitable for Fedora's SPARQL-update query.
+     * 
+     * This means the "ntriples" format with subject URIs compliant with current
+     * Fedora connection and excluding properties Fedora reserves for itself 
+     * (and rises errors when they are provided from the outside).
+     * 
+     * @param \EasyRdf\Resource $metadata metadata to serialize
+     * @return string
+     * @see $skipProp
+     * @see $skipPropRegExp
+     */
+    private function getSparqlTriples(Resource $metadata): string {
+        $uri = $this->fedora->sanitizeUri($this->uri);
+        $res = EasyRdfUtil::cloneResource($metadata, self::$skipProp, self::$skipPropRegExp, $uri);
+
+        $rdf = EasyRdfUtil::serialiseResource($res);
+        return $rdf;
+    }
+    
     /**
      * Debugging helper allowing to take a look at the resource metadata 
      * in a console-friendly way

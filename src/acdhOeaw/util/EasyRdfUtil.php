@@ -162,11 +162,13 @@ class EasyRdfUtil {
      * @param \EasyRdf\Resource $resource metadata to clone
      * @param array $skipProp a list of fully qualified property URIs to skip
      * @param string $skipRegExp regular expression matching fully qualified property URIs to skip
+     * @param string $overwriteUri an URI of the target (cloned) resource 
+     *   (if empty source resource URI is used)
      * @return \EasyRdf\Resource
      */
-    static public function cloneResource(Resource $resource, array $skipProp = array(), string $skipRegExp = '/^$/'): Resource {
+    static public function cloneResource(Resource $resource, array $skipProp = array(), string $skipRegExp = '/^$/', string $overwriteUri = ''): Resource {
         $graph = new Graph();
-        $res = $graph->resource($resource->getUri());
+        $res = $graph->resource($overwriteUri ? $overwriteUri : $resource->getUri());
 
         foreach ($resource->propertyUris() as $prop) {
             if (in_array($prop, $skipProp) || preg_match($skipRegExp, $prop)) {
