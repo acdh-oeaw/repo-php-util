@@ -1,0 +1,167 @@
+<?php
+
+/*
+ * The MIT License
+ *
+ * Copyright 2017 zozlak.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+namespace acdhOeaw\fedora\metadataQuery;
+
+/**
+ * Description of Query
+ *
+ * @author zozlak
+ */
+class Query {
+
+    /**
+     *
+     * @var \acdhOeaw\fedora\metadataQuery\QueryParameter
+     */
+    private $param = array();
+    private $distinct;
+    private $select = array('*');
+    private $orderBy = array();
+    private $groupBy = array();
+    private $joinClause = '';
+
+    public function __construct() {
+        
+    }
+
+    public function addParameter(QueryParameter $p): Query {
+        $this->param[] = $p;
+        return $this;
+    }
+
+    public function addSubquery(Query $q): Query {
+        $this->param[] = $q;
+        return $this;
+    }
+
+    public function setDistinct(bool $distinct): Query {
+        $this->distinct = $distinct;
+        return $this;
+    }
+
+    public function setSelect(array $select): Query {
+        $this->select = $select;
+        return $this;
+    }
+    
+    public function setOrderBy(array $orderBy): Query {
+        $this->orderBy = $orderBy;
+        return $this;
+    }
+
+    public function setGroupBy(array $groupBy): Query {
+        $this->groupBy = $groupBy;
+        return $this;
+    }
+    
+    public function setJoinClause(string $joinClause): Query {
+        $clauses = array('optional', 'minus', 'filter exists', 'filter not exists', 'union');
+        if (!in_array(strtolower($joinClause), $clauses)) {
+            throw new \BadMethodCallException('wrong join clause');
+        }
+        $this->joinClause = $joinClause;
+        return $this;
+    }
+
+    public function getJoinClause(): string {
+        return $this->joinClause;
+    }
+
+    public function getQuery() {
+        $query = '';
+
+        $query .= 'SELECT ' . $this->getSelect() . "\n";
+
+        $where = $this->getWhere();
+        $filter = $this->getFilter();
+        $query .= "WHERE {\n" . $where . $filter . "}\n";
+
+        $query .= $this->getGroupBy();
+        $query .= $this->getOrderBy();
+
+        return $query;
+    }
+
+    private function getSubVars() {
+        $subVars = array();
+        foreach ($this->param as $p) {
+            if (method_exists($p, 'getSubVar')) {
+                $subVars[] .= $p->getSubVar();
+            } else {
+                $subVars = array_merge($subVars, $p->getSubVars());
+            }
+        }
+        return array_unique($subVars);
+    }
+
+    private function getWhere() {
+        $where = array();
+        foreach ($this->param as $p) {
+            if (method_exists($p, 'getQuery')) {
+                $where[] = $p->getJoinClause() . '{ ' . $p->getQuery() . " }\n";
+            } else {
+                $where[] = $p->getWhere() . "\n";
+            }
+        }
+        return implode('', $where);
+    }
+
+    private function getFilter() {
+        $filter = array();
+        foreach ($this->param as $p) {
+            if (method_exists($p, 'getFilter')) {
+                $f = $p->getFilter();
+                if ($f != '') {
+                    $filter[] = $f;
+                }
+            }
+        }
+        if (count($filter) == 0) {
+            return '';
+        }
+        return 'FILTER (' . implode(' && ', $filter) . ')';
+    }
+
+    private function getOrderBy() {
+        if (count($this->orderBy) == 0) {
+            return '';
+        }
+        return 'ORDER BY ' . implode(' ', $this->orderBy) . "\n";
+    }
+
+    private function getGroupBy() {
+        if (count($this->groupBy) == 0) {
+            return '';
+        }
+        return 'GROUP BY ' . implode(' ', $this->groupBy) . "\n";
+    }
+    
+    private function getSelect() {
+        return ' ' . ($this->distinct ? 'DISTINCT ' : '') . implode(' ', $this->select) . ' ';
+    }
+}
+

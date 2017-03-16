@@ -3,818 +3,1015 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta charset="utf-8"/>
-    <title>    API Documentation &raquo; \acdhOeaw\fedora\metadataQuery\MatchesRegEx
-</title>
+    <title>API Documentation</title>
     <meta name="author" content=""/>
     <meta name="description" content=""/>
 
-            <link href="../css/template.css" rel="stylesheet" media="all"/>
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
     
-            <!--[if lt IE 9]>
-        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
-        <![endif]-->
-        <script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script>
-        <script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
-        <script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script>
-        <script src="../js/bootstrap.js" type="text/javascript"></script>
-        <script src="../js/template.js" type="text/javascript"></script>
-        <script src="../js/prettify/prettify.min.js" type="text/javascript"></script>
-    
-            <link rel="shortcut icon" href="../img/favicon.ico"/>
-        <link rel="apple-touch-icon" href="../img/apple-touch-icon.png"/>
-        <link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png"/>
-        <link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png"/>
-    </head>
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
 <body>
 
-        <div class="navbar navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container">
-                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    <span class="icon-bar"></span> <span class="icon-bar"></span>
-                    <span class="icon-bar"></span> </a>
-                <a class="brand" href="../index.html">API Documentation</a>
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
 
-                <div class="nav-collapse">
-                    <ul class="nav">
-                        <li class="dropdown">
-                            <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
-                                API Documentation <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                                                    <li><a>Namespaces</a></li>
-                                                                        <li><a href="../namespaces/acdhOeaw.html">acdhOeaw</a></li>
-                                                                                                                                </ul>
-                        </li>
-                        <li class="dropdown" id="charts-menu">
-                            <a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
-                                Charts <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="../graph_class.html">
-                                        <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown" id="reports-menu">
-                            <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
-                                Reports <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="../errors.html">
-                                        <i class="icon-list-alt"></i>&#160;Errors
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="../markers.html">
-                                        <i class="icon-list-alt"></i>&#160;Markers
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="../deprecated.html">
-                                        <i class="icon-list-alt"></i>&#160;Deprecated
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">123</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1064429361"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-1064429361" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-383707343"></a>
+                                <a href="../namespaces/acdhOeaw.html" style="margin-left: 30px; padding-left: 0">acdhOeaw</a>
+            </div>
+            <div id="namespace-383707343" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1254224417"></a>
+                                <a href="../namespaces/acdhOeaw.cirilo.html" style="margin-left: 30px; padding-left: 0">cirilo</a>
+            </div>
+            <div id="namespace-1254224417" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.cirilo.Service.html">Service</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.cirilo.ServiceParameter.html">ServiceParameter</a></li>
+                                            </ul>
                 </div>
             </div>
         </div>
-        <div class="go_to_top">
-            <a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>
-        </div>
     </div>
-    
-    <div id="___" class="container">
-        <noscript>
-            <div class="alert alert-warning">
-                Javascript is disabled; several features are only available if Javascript is enabled.
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1290698452"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.html" style="margin-left: 30px; padding-left: 0">fedora</a>
             </div>
-        </noscript>
+            <div id="namespace-1290698452" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-        
-            <style>
-        .deprecated h2 {
-            text-decoration: line-through;
-        }
-    </style>
-    <div class="row">
-        <div class="span4">
-                    <div class="btn-group view pull-right" data-toggle="buttons-radio">
-        <button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button>
-        <button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-744194241"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.metadataQuery.html" style="margin-left: 30px; padding-left: 0">metadataQuery</a>
+            </div>
+            <div id="namespace-744194241" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html">HasProperty</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasTriple.html">HasTriple</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html">HasValue</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html">MatchesRegEx</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">Query</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html">QueryParameter</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="btn-group visibility" data-toggle="buttons-checkbox">
-        <button class="btn public active" title="Show public elements">Public</button>
-        <button class="btn protected" title="Show protected elements">Protected</button>
-        <button class="btn private" title="Show private elements">Private</button>
-        <button class="btn inherited active" title="Show inherited elements">Inherited</button>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.Fedora.html">Fedora</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.FedoraResource.html">FedoraResource</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.SparqlClient.html">SparqlClient</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
-        <ul class="side-nav nav nav-list">
-        <li class="nav-header">
-            <i class="icon-custom icon-method"></i> Methods
-            <ul>
-                                                                                                    <li class="method public inherited">
-        <a href="#method___construct" title="__construct :: ">
-            <span class="description"></span><pre>__construct</pre>
-        </a>
-    </li>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-704501908"></a>
+                                <a href="../namespaces/acdhOeaw.redmine.html" style="margin-left: 30px; padding-left: 0">redmine</a>
+            </div>
+            <div id="namespace-704501908" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-                                                                                                                                                                <li class="method public inherited">
-        <a href="#method_getFilter" title="getFilter :: ">
-            <span class="description"></span><pre>getFilter</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.redmine.Issue.html">Issue</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.redmine.Project.html">Project</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.redmine.User.html">User</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public inherited">
-        <a href="#method_getObjVar" title="getObjVar :: ">
-            <span class="description"></span><pre>getObjVar</pre>
-        </a>
-    </li>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-454025335"></a>
+                                <a href="../namespaces/acdhOeaw.storage.html" style="margin-left: 30px; padding-left: 0">storage</a>
+            </div>
+            <div id="namespace-454025335" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-                                                                                                        <li class="method public inherited">
-        <a href="#method_getOptional" title="getOptional :: ">
-            <span class="description"></span><pre>getOptional</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.storage.Indexer.html">Indexer</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.storage.Location.html">Location</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public inherited">
-        <a href="#method_getSubVar" title="getSubVar :: ">
-            <span class="description"></span><pre>getSubVar</pre>
-        </a>
-    </li>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1370680376"></a>
+                                <a href="../namespaces/acdhOeaw.util.html" style="margin-left: 30px; padding-left: 0">util</a>
+            </div>
+            <div id="namespace-1370680376" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-                                                                                                        <li class="method public inherited">
-        <a href="#method_getWhere" title="getWhere :: ">
-            <span class="description"></span><pre>getWhere</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.EasyRdfUtil.html">EasyRdfUtil</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public inherited">
-        <a href="#method_setObjVar" title="setObjVar :: ">
-            <span class="description"></span><pre>setObjVar</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public inherited">
-        <a href="#method_setOptional" title="setOptional :: ">
-            <span class="description"></span><pre>setOptional</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public inherited">
-        <a href="#method_setSubVar" title="setSubVar :: ">
-            <span class="description"></span><pre>setSubVar</pre>
-        </a>
-    </li>
-
-                                                </ul>
-        </li>
-        <li class="nav-header protected">» Protected
-            <ul>
-                                                                                                                <li class="method protected inherited">
-                            <a href="#method_applyOptional" title="applyOptional :: ">
-                                <span class="description"></span><pre>applyOptional</pre>
-                            </a>
-                        </li>
-                                                                                                                                                                                                                                                                                                                                                </ul>
-        </li>
-        <li class="nav-header private">» Private
-            <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                    </ul>
-        </li>
-        <li class="nav-header">
-            <i class="icon-custom icon-constant"></i> Constants
-            <ul>
-                            </ul>
-        </li>
-    </ul>
-
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
         </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/acdhOeaw.fedora.metadataQuery.html">\acdhOeaw\fedora\metadataQuery</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
 
-        <div class="span8">
-            <div class="element class">
-                <h1>MatchesRegEx</h1>
-                <small style="display: block; text-align: right">
-                                            Extends <a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html">\acdhOeaw\fedora\metadataQuery\HasValue</a>
-                                                        </small>
-                <p class="short_description">Description of MatchesRegEx</p>
-                <div class="details">
-                    <div class="long_description">
+                    <h1><small>\acdhOeaw\fedora\metadataQuery</small>MatchesRegEx</h1>
+                    <p><em>Description of MatchesRegEx</em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html#method_getWhere" class="">getWhere()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html#method_getFilter" class="">getFilter()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#method_setSubVar" class="">setSubVar()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#method_setObjVar" class="">setObjVar()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#method_setOptional" class="">setOptional()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#method_getSubVar" class="">getSubVar()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#method_getObjVar" class="">getObjVar()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#method_getOptional" class="">getOptional()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#method_applyOptional" class="">applyOptional()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html#property_value" class="">$value</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html#property_property" class="">$property</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#property_subVar" class="">$subVar</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#property_objVar" class="">$objVar</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#property_optional" class="">$optional</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html#property_flags" class="">$flags</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#property_counter" class="">$counter</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html#property_objVarPrefix" class="">$objVarPrefix</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/fedora.metadataQuery.MatchesRegEx.html"><div class="path-wrapper">fedora/metadataQuery/MatchesRegEx.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                        <div class="namespace-wrapper"><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html">\acdhOeaw\fedora\metadataQuery\QueryParameter</a></div>
+                                                                    
+                                        <div class="namespace-wrapper"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html">\acdhOeaw\fedora\metadataQuery\HasProperty</a></div>
+                                                                    
+                                        <div class="namespace-wrapper"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html">\acdhOeaw\fedora\metadataQuery\HasValue</a></div>
+                                                                                                    <div class="namespace-wrapper">\acdhOeaw\fedora\metadataQuery\MatchesRegEx</div>
+                            </dd>
+
                         
-                    </div>
-                    <table class="table table-bordered">
-                                                                                    <tr>
-                                    <th>
-                                        author
-                                                                            </th>
-                                    <td>
-                                                                                    
-                                                                                <p>zozlak</p>
-                                    </td>
-                                </tr>
-                                                                                                                <tr>
-                                    <th>
-                                        package
-                                                                            </th>
-                                    <td>
-                                                                                    
-                                                                                <p>Default</p>
-                                    </td>
-                                </tr>
-                                                                                                                                                                                </table>
-
-                    <h3><i class="icon-custom icon-method"></i> Methods</h3>
-                                                                <a id="method___construct"></a>
-                        <div class="element clickable method public  method___construct inherited" data-toggle="collapse" data-target=".method___construct .collapse">
-                            <h2>__construct</h2>
-                            <pre>__construct() </pre>
-                            <div class="labels">
-                                <span class="label">inherited</span>                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_applyOptional"></a>
-                        <div class="element clickable method protected  method_applyOptional inherited" data-toggle="collapse" data-target=".method_applyOptional .collapse">
-                            <h2>applyOptional</h2>
-                            <pre>applyOptional(\acdhOeaw\fedora\metadataQuery\string $query) </pre>
-                            <div class="labels">
-                                <span class="label">inherited</span>                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$query</h4>
-                                                <code>\acdhOeaw\fedora\metadataQuery\string</code><p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getFilter"></a>
-                        <div class="element clickable method public  method_getFilter inherited" data-toggle="collapse" data-target=".method_getFilter .collapse">
-                            <h2>getFilter</h2>
-                            <pre>getFilter() </pre>
-                            <div class="labels">
-                                <span class="label">inherited</span>                                                                                                <span class="label">abstract</span>                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getObjVar"></a>
-                        <div class="element clickable method public  method_getObjVar inherited" data-toggle="collapse" data-target=".method_getObjVar .collapse">
-                            <h2>getObjVar</h2>
-                            <pre>getObjVar() </pre>
-                            <div class="labels">
-                                <span class="label">inherited</span>                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getOptional"></a>
-                        <div class="element clickable method public  method_getOptional inherited" data-toggle="collapse" data-target=".method_getOptional .collapse">
-                            <h2>getOptional</h2>
-                            <pre>getOptional() </pre>
-                            <div class="labels">
-                                <span class="label">inherited</span>                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getSubVar"></a>
-                        <div class="element clickable method public  method_getSubVar inherited" data-toggle="collapse" data-target=".method_getSubVar .collapse">
-                            <h2>getSubVar</h2>
-                            <pre>getSubVar() </pre>
-                            <div class="labels">
-                                <span class="label">inherited</span>                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getWhere"></a>
-                        <div class="element clickable method public  method_getWhere inherited" data-toggle="collapse" data-target=".method_getWhere .collapse">
-                            <h2>getWhere</h2>
-                            <pre>getWhere() </pre>
-                            <div class="labels">
-                                <span class="label">inherited</span>                                                                                                <span class="label">abstract</span>                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_setObjVar"></a>
-                        <div class="element clickable method public  method_setObjVar inherited" data-toggle="collapse" data-target=".method_setObjVar .collapse">
-                            <h2>setObjVar</h2>
-                            <pre>setObjVar(\acdhOeaw\fedora\metadataQuery\string $objVar) </pre>
-                            <div class="labels">
-                                <span class="label">inherited</span>                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$objVar</h4>
-                                                <code>\acdhOeaw\fedora\metadataQuery\string</code><p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_setOptional"></a>
-                        <div class="element clickable method public  method_setOptional inherited" data-toggle="collapse" data-target=".method_setOptional .collapse">
-                            <h2>setOptional</h2>
-                            <pre>setOptional(\acdhOeaw\fedora\metadataQuery\bool $optional) </pre>
-                            <div class="labels">
-                                <span class="label">inherited</span>                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$optional</h4>
-                                                <code>\acdhOeaw\fedora\metadataQuery\bool</code><p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_setSubVar"></a>
-                        <div class="element clickable method public  method_setSubVar inherited" data-toggle="collapse" data-target=".method_setSubVar .collapse">
-                            <h2>setSubVar</h2>
-                            <pre>setSubVar(\acdhOeaw\fedora\metadataQuery\string $subVar) </pre>
-                            <div class="labels">
-                                <span class="label">inherited</span>                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$subVar</h4>
-                                                <code>\acdhOeaw\fedora\metadataQuery\string</code><p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-
-                        </div>
-                    
-                    
-                                                                <h3><i class="icon-custom icon-property"></i> Properties</h3>
-                                                    <a id="property_flags"> </a>
-                            <div class="element clickable property  protected property_flags" data-toggle="collapse" data-target=".property_flags .collapse">
-                                <h2>flags</h2>
-                                <pre>flags : </pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        
-                                                    </th>
-                                                    <td>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code></code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_value"> </a>
-                            <div class="element clickable property  protected property_value inherited" data-toggle="collapse" data-target=".property_value .collapse">
-                                <h2>value</h2>
-                                <pre>value : </pre>
-                                <div class="labels">
-                                    <span class="label">inherited</span>                                                                    </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        
-                                                    </th>
-                                                    <td>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code></code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_property"> </a>
-                            <div class="element clickable property  protected property_property inherited" data-toggle="collapse" data-target=".property_property .collapse">
-                                <h2>property</h2>
-                                <pre>property : </pre>
-                                <div class="labels">
-                                    <span class="label">inherited</span>                                                                    </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        
-                                                    </th>
-                                                    <td>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code></code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_counter"> </a>
-                            <div class="element clickable property  private property_counter inherited" data-toggle="collapse" data-target=".property_counter .collapse">
-                                <h2>counter</h2>
-                                <pre>counter : </pre>
-                                <div class="labels">
-                                    <span class="label">inherited</span>                                    <span class="label">static</span>                                </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        
-                                                    </th>
-                                                    <td>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code></code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_objVarPrefix"> </a>
-                            <div class="element clickable property  private property_objVarPrefix inherited" data-toggle="collapse" data-target=".property_objVarPrefix .collapse">
-                                <h2>objVarPrefix</h2>
-                                <pre>objVarPrefix : </pre>
-                                <div class="labels">
-                                    <span class="label">inherited</span>                                    <span class="label">static</span>                                </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        
-                                                    </th>
-                                                    <td>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code></code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_subVar"> </a>
-                            <div class="element clickable property  protected property_subVar inherited" data-toggle="collapse" data-target=".property_subVar .collapse">
-                                <h2>subVar</h2>
-                                <pre>subVar : </pre>
-                                <div class="labels">
-                                    <span class="label">inherited</span>                                                                    </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        
-                                                    </th>
-                                                    <td>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code></code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_objVar"> </a>
-                            <div class="element clickable property  protected property_objVar inherited" data-toggle="collapse" data-target=".property_objVar .collapse">
-                                <h2>objVar</h2>
-                                <pre>objVar : </pre>
-                                <div class="labels">
-                                    <span class="label">inherited</span>                                                                    </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        
-                                                    </th>
-                                                    <td>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code></code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_optional"> </a>
-                            <div class="element clickable property  protected property_optional inherited" data-toggle="collapse" data-target=".property_optional .collapse">
-                                <h2>optional</h2>
-                                <pre>optional : </pre>
-                                <div class="labels">
-                                    <span class="label">inherited</span>                                                                    </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        
-                                                    </th>
-                                                    <td>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code></code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                            </div>
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                author
+                            </th>
+                            <td>
+                                                                    <p>zozlak</p>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
             </div>
-            <a id="\acdhOeaw\fedora\metadataQuery\MatchesRegEx"></a>
-            <ul class="breadcrumb">
-                <li><a href="../index.html"><i class="icon-custom icon-class"></i></a></li>
-                    
-    
-    <li><span class="divider">\</span><a href="../namespaces/acdhOeaw.fedora.metadataQuery.html">metadataQuery</a></li>
 
-                <li class="active"><span class="divider">\</span><a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html">MatchesRegEx</a></li>
-            </ul>
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_value" name="property_value" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$value</h3>
+                <pre class="signature">$value : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\HasValue</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_property" name="property_property" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$property</h3>
+                <pre class="signature">$property : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\HasProperty</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_subVar" name="property_subVar" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$subVar</h3>
+                <pre class="signature">$subVar : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_objVar" name="property_objVar" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$objVar</h3>
+                <pre class="signature">$objVar : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_optional" name="property_optional" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$optional</h3>
+                <pre class="signature">$optional : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_flags" name="property_flags" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$flags</h3>
+                <pre class="signature">$flags : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_counter" name="property_counter" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$counter</h3>
+                <pre class="signature">$counter : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_objVarPrefix" name="property_objVarPrefix" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$objVarPrefix</h3>
+                <pre class="signature">$objVarPrefix : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct(  <span class="argument">$property</span>, \acdhOeaw\fedora\metadataQuery\string  <span class="argument">$regEx</span>, \acdhOeaw\fedora\metadataQuery\string  <span class="argument">$flags = &#039;i&#039;</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$property </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\acdhOeaw\fedora\metadataQuery\string</td>
+                                <td>$regEx </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>\acdhOeaw\fedora\metadataQuery\string</td>
+                                <td>$flags </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getWhere" name="method_getWhere" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getWhere()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getWhere() </pre>
+                <p><em></em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getFilter" name="method_getFilter" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getFilter()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getFilter() </pre>
+                <p><em></em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setSubVar" name="method_setSubVar" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setSubVar()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setSubVar(\acdhOeaw\fedora\metadataQuery\string  <span class="argument">$subVar</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\acdhOeaw\fedora\metadataQuery\string</td>
+                                <td>$subVar </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setObjVar" name="method_setObjVar" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setObjVar()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setObjVar(\acdhOeaw\fedora\metadataQuery\string  <span class="argument">$objVar</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\acdhOeaw\fedora\metadataQuery\string</td>
+                                <td>$objVar </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setOptional" name="method_setOptional" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setOptional()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setOptional(\acdhOeaw\fedora\metadataQuery\bool  <span class="argument">$optional</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\acdhOeaw\fedora\metadataQuery\bool</td>
+                                <td>$optional </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getSubVar" name="method_getSubVar" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getSubVar()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getSubVar() </pre>
+                <p><em></em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getObjVar" name="method_getObjVar" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getObjVar()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getObjVar() </pre>
+                <p><em></em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getOptional" name="method_getOptional" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getOptional()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getOptional() </pre>
+                <p><em></em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_applyOptional" name="method_applyOptional" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">applyOptional()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">applyOptional(\acdhOeaw\fedora\metadataQuery\string  <span class="argument">$query</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\acdhOeaw\fedora\metadataQuery\string</td>
+                                <td>$query </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html"><div class="path-wrapper">\acdhOeaw\fedora\metadataQuery\QueryParameter</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">MatchesRegEx.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/fedora/metadataQuery/MatchesRegEx.php.txt" class="language-php line-numbers"></pre>
         </div>
     </div>
 
-    </div>
-
-        <footer class="span12">
-            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
-            <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
-            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Thu, 16 Feb 2017 14:52:38 +0000.<br/>
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on March 16th, 2017 at 11:22.
+                </section>
+            </section>
+        </section>
     </footer>
-    </body>
+</div>
+
+</body>
 </html>

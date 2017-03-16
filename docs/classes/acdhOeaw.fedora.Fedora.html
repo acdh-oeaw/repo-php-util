@@ -3,1284 +3,1448 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta charset="utf-8"/>
-    <title>    API Documentation &raquo; \acdhOeaw\fedora\Fedora
-</title>
+    <title>API Documentation</title>
     <meta name="author" content=""/>
     <meta name="description" content=""/>
 
-            <link href="../css/template.css" rel="stylesheet" media="all"/>
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
     
-            <!--[if lt IE 9]>
-        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
-        <![endif]-->
-        <script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script>
-        <script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
-        <script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script>
-        <script src="../js/bootstrap.js" type="text/javascript"></script>
-        <script src="../js/template.js" type="text/javascript"></script>
-        <script src="../js/prettify/prettify.min.js" type="text/javascript"></script>
-    
-            <link rel="shortcut icon" href="../img/favicon.ico"/>
-        <link rel="apple-touch-icon" href="../img/apple-touch-icon.png"/>
-        <link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png"/>
-        <link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png"/>
-    </head>
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
 <body>
 
-        <div class="navbar navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container">
-                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    <span class="icon-bar"></span> <span class="icon-bar"></span>
-                    <span class="icon-bar"></span> </a>
-                <a class="brand" href="../index.html">API Documentation</a>
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
 
-                <div class="nav-collapse">
-                    <ul class="nav">
-                        <li class="dropdown">
-                            <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
-                                API Documentation <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                                                    <li><a>Namespaces</a></li>
-                                                                        <li><a href="../namespaces/acdhOeaw.html">acdhOeaw</a></li>
-                                                                                                                                </ul>
-                        </li>
-                        <li class="dropdown" id="charts-menu">
-                            <a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
-                                Charts <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="../graph_class.html">
-                                        <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown" id="reports-menu">
-                            <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
-                                Reports <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="../errors.html">
-                                        <i class="icon-list-alt"></i>&#160;Errors
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="../markers.html">
-                                        <i class="icon-list-alt"></i>&#160;Markers
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="../deprecated.html">
-                                        <i class="icon-list-alt"></i>&#160;Deprecated
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">123</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-773092588"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-773092588" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-864223711"></a>
+                                <a href="../namespaces/acdhOeaw.html" style="margin-left: 30px; padding-left: 0">acdhOeaw</a>
+            </div>
+            <div id="namespace-864223711" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1720460974"></a>
+                                <a href="../namespaces/acdhOeaw.cirilo.html" style="margin-left: 30px; padding-left: 0">cirilo</a>
+            </div>
+            <div id="namespace-1720460974" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.cirilo.Service.html">Service</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.cirilo.ServiceParameter.html">ServiceParameter</a></li>
+                                            </ul>
                 </div>
             </div>
         </div>
-        <div class="go_to_top">
-            <a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>
-        </div>
     </div>
-    
-    <div id="___" class="container">
-        <noscript>
-            <div class="alert alert-warning">
-                Javascript is disabled; several features are only available if Javascript is enabled.
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1562614531"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.html" style="margin-left: 30px; padding-left: 0">fedora</a>
             </div>
-        </noscript>
+            <div id="namespace-1562614531" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-        
-            <style>
-        .deprecated h2 {
-            text-decoration: line-through;
-        }
-    </style>
-    <div class="row">
-        <div class="span4">
-                    <div class="btn-group view pull-right" data-toggle="buttons-radio">
-        <button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button>
-        <button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1091059141"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.metadataQuery.html" style="margin-left: 30px; padding-left: 0">metadataQuery</a>
+            </div>
+            <div id="namespace-1091059141" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html">HasProperty</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasTriple.html">HasTriple</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html">HasValue</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html">MatchesRegEx</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">Query</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html">QueryParameter</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="btn-group visibility" data-toggle="buttons-checkbox">
-        <button class="btn public active" title="Show public elements">Public</button>
-        <button class="btn protected" title="Show protected elements">Protected</button>
-        <button class="btn private" title="Show private elements">Private</button>
-        <button class="btn inherited active" title="Show inherited elements">Inherited</button>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.Fedora.html">Fedora</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.FedoraResource.html">FedoraResource</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.SparqlClient.html">SparqlClient</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
-        <ul class="side-nav nav nav-list">
-        <li class="nav-header">
-            <i class="icon-custom icon-method"></i> Methods
-            <ul>
-                                                                                                    <li class="method public">
-        <a href="#method___construct" title="__construct :: Creates Fedora connection object from a given configuration.">
-            <span class="description">Creates Fedora connection object from a given configuration.</span><pre>__construct</pre>
-        </a>
-    </li>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1482005976"></a>
+                                <a href="../namespaces/acdhOeaw.redmine.html" style="margin-left: 30px; padding-left: 0">redmine</a>
+            </div>
+            <div id="namespace-1482005976" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-                                                                                                        <li class="method public">
-        <a href="#method_attachData" title="attachData :: Attaches binary content to a given Guzzle HTTP request">
-            <span class="description">Attaches binary content to a given Guzzle HTTP request</span><pre>attachData</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.redmine.Issue.html">Issue</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.redmine.Project.html">Project</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.redmine.User.html">User</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public">
-        <a href="#method_begin" title="begin :: Starts new Fedora transaction.">
-            <span class="description">Starts new Fedora transaction.</span><pre>begin</pre>
-        </a>
-    </li>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-249508695"></a>
+                                <a href="../namespaces/acdhOeaw.storage.html" style="margin-left: 30px; padding-left: 0">storage</a>
+            </div>
+            <div id="namespace-249508695" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-                                                                                                        <li class="method public">
-        <a href="#method_commit" title="commit :: Commits the current Fedora transaction.">
-            <span class="description">Commits the current Fedora transaction.</span><pre>commit</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.storage.Indexer.html">Indexer</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.storage.Location.html">Location</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public">
-        <a href="#method_createResource" title="createResource :: Creates a resource in the Fedora and returns corresponding Resource object">
-            <span class="description">Creates a resource in the Fedora and returns corresponding Resource object</span><pre>createResource</pre>
-        </a>
-    </li>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-448111304"></a>
+                                <a href="../namespaces/acdhOeaw.util.html" style="margin-left: 30px; padding-left: 0">util</a>
+            </div>
+            <div id="namespace-448111304" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-                                                                                                        <li class="method public">
-        <a href="#method_getIdProp" title="getIdProp :: Returns URI of the RDF property denoting ACDH ID as set upon object creation.">
-            <span class="description">Returns URI of the RDF property denoting ACDH ID as set upon object creation.</span><pre>getIdProp</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.EasyRdfUtil.html">EasyRdfUtil</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public">
-        <a href="#method_getRelProp" title="getRelProp :: Returns URI of the RDF property denoting relation of being a collection part.">
-            <span class="description">Returns URI of the RDF property denoting relation of being a collection part.</span><pre>getRelProp</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public">
-        <a href="#method_getResourceById" title="getResourceById :: Finds Fedora resources with a given id property value
-(as it is defined by the &quot;fedoraIdProp&quot; configuration option - see the init() method).">
-            <span class="description">Finds Fedora resources with a given id property value
-(as it is defined by the &quot;fedoraIdProp&quot; configuration option - see the init() method).</span><pre>getResourceById</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_getResourceByUri" title="getResourceByUri :: Returns a FedoraResource based on a given URI.">
-            <span class="description">Returns a FedoraResource based on a given URI.</span><pre>getResourceByUri</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_getResourcesById" title="getResourcesById :: Finds all Fedora resources with a given id property value
-(as it is defined by the &quot;fedoraIdProp&quot; configuration option - see the init() method).">
-            <span class="description">Finds all Fedora resources with a given id property value
-(as it is defined by the &quot;fedoraIdProp&quot; configuration option - see the init() method).</span><pre>getResourcesById</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_getResourcesByProperty" title="getResourcesByProperty :: Finds all Fedora resources having a given RDF property value.">
-            <span class="description">Finds all Fedora resources having a given RDF property value.</span><pre>getResourcesByProperty</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_getResourcesByPropertyRegEx" title="getResourcesByPropertyRegEx :: Finds all Fedora resources with a given RDF property matching given regular expression.">
-            <span class="description">Finds all Fedora resources with a given RDF property matching given regular expression.</span><pre>getResourcesByPropertyRegEx</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_getResourcesByQuery" title="getResourcesByQuery :: Finds all Fedora resources satisfying a given SPARQL query.">
-            <span class="description">Finds all Fedora resources satisfying a given SPARQL query.</span><pre>getResourcesByQuery</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_inTransaction" title="inTransaction :: Returns true if a Fedora transaction is opened and false otherwise.">
-            <span class="description">Returns true if a Fedora transaction is opened and false otherwise.</span><pre>inTransaction</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_rollback" title="rollback :: Rolls back the current Fedora transaction.">
-            <span class="description">Rolls back the current Fedora transaction.</span><pre>rollback</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_runQuery" title="runQuery :: Runs a SPARQL query defined by a Query object against repository
-triplestore.">
-            <span class="description">Runs a SPARQL query defined by a Query object against repository
-triplestore.</span><pre>runQuery</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_runSparql" title="runSparql :: Runs a SPARQL against repository triplestore.">
-            <span class="description">Runs a SPARQL against repository triplestore.</span><pre>runSparql</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_sanitizeUri" title="sanitizeUri :: Adjusts URI to the current object state by setting up the proper base
-URL and the transaction id.">
-            <span class="description">Adjusts URI to the current object state by setting up the proper base
-URL and the transaction id.</span><pre>sanitizeUri</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_sendRequest" title="sendRequest :: Sends a given HTTP request to the Fedora.">
-            <span class="description">Sends a given HTTP request to the Fedora.</span><pre>sendRequest</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_setTransactionId" title="setTransactionId :: Overrides the transaction URI to be used by the Fedora connection.">
-            <span class="description">Overrides the transaction URI to be used by the Fedora connection.</span><pre>setTransactionId</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_standardizeUri" title="standardizeUri :: Transforms an URI into &quot;a canonical form&quot; used in the triplestore to
-denote triples subject.">
-            <span class="description">Transforms an URI into &quot;a canonical form&quot; used in the triplestore to
-denote triples subject.</span><pre>standardizeUri</pre>
-        </a>
-    </li>
-
-                                                </ul>
-        </li>
-        <li class="nav-header protected">» Protected
-            <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ul>
-        </li>
-        <li class="nav-header private">» Private
-            <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </ul>
-        </li>
-        <li class="nav-header">
-            <i class="icon-custom icon-constant"></i> Constants
-            <ul>
-                            </ul>
-        </li>
-    </ul>
-
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
         </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/acdhOeaw.fedora.html">\acdhOeaw\fedora</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
 
-        <div class="span8">
-            <div class="element class">
-                <h1>Fedora</h1>
-                <small style="display: block; text-align: right">
-                                                        </small>
-                <p class="short_description">Represents a Fedora connection.</p>
-                <div class="details">
-                    <div class="long_description">
-                        <p>Provides transaction managment and methods for convinient search and creation
+                    <h1><small>\acdhOeaw\fedora</small>Fedora</h1>
+                    <p><em>Represents a Fedora connection.</em></p>
+                    <p>Provides transaction managment and methods for convinient search and creation
 of Fedora resources.</p>
-                    </div>
-                    <table class="table table-bordered">
-                                                                                    <tr>
-                                    <th>
-                                        author
-                                                                            </th>
-                                    <td>
-                                                                                    
-                                                                                <p>zozlak</p>
-                                    </td>
-                                </tr>
-                                                                                                                <tr>
-                                    <th>
-                                        package
-                                                                            </th>
-                                    <td>
-                                                                                    
-                                                                                <p>Default</p>
-                                    </td>
-                                </tr>
-                                                                                                                                                                                </table>
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_attachData" class="">attachData()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_getIdProp" class="">getIdProp()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_getRelProp" class="">getRelProp()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_createResource" class="">createResource()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_sendRequest" class="">sendRequest()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_getResourceByUri" class="">getResourceByUri()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_getResourceById" class="">getResourceById()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_getResourcesById" class="">getResourcesById()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_getResourcesByProperty" class="">getResourcesByProperty()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_getResourcesByPropertyRegEx" class="">getResourcesByPropertyRegEx()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_getResourcesByQuery" class="">getResourcesByQuery()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_runQuery" class="">runQuery()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_runSparql" class="">runSparql()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_sanitizeUri" class="">sanitizeUri()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_standardizeUri" class="">standardizeUri()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin" class="">begin()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_rollback" class="">rollback()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_setTransactionId" class="">setTransactionId()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_commit" class="">commit()</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#method_inTransaction" class="">inTransaction()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#property_apiUrl" class="">$apiUrl</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#property_txUrl" class="">$txUrl</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#property_client" class="">$client</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#property_idProp" class="">$idProp</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#property_sparqlClient" class="">$sparqlClient</a><br />
+                                                                    <a href="../classes/acdhOeaw.fedora.Fedora.html#property_relProp" class="">$relProp</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/fedora.Fedora.html"><div class="path-wrapper">fedora/Fedora.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\acdhOeaw\fedora\Fedora</div>
+                            </dd>
 
-                    <h3><i class="icon-custom icon-method"></i> Methods</h3>
-                                                                <a id="method___construct"></a>
-                        <div class="element clickable method public  method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
-                            <h2>Creates Fedora connection object from a given configuration.</h2>
-                            <pre>__construct(\zozlak\util\Config $cfg) </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                author
+                            </th>
+                            <td>
+                                                                    <p>zozlak</p>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_apiUrl" name="property_apiUrl" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$apiUrl</h3>
+                <pre class="signature">$apiUrl : string</pre>
+                <p><em>Fedora API base URL</em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_txUrl" name="property_txUrl" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$txUrl</h3>
+                <pre class="signature">$txUrl : string</pre>
+                <p><em>Current transaction URI</em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_client" name="property_client" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$client</h3>
+                <pre class="signature">$client : \GuzzleHttp\Client</pre>
+                <p><em>HTTP client object</em></p>
+                
+
+                                <h4>Type</h4>
+                \GuzzleHttp\Client
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_idProp" name="property_idProp" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$idProp</h3>
+                <pre class="signature">$idProp : string</pre>
+                <p><em>Fully qualified URI of the RDF property used to identify resources</em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            <dt>See also</dt>
+                                                                <dd><a href=""><span class="namespace-wrapper">\acdhOeaw\fedora\getId()</span></a></dd>
+                                            <dd><a href=""><span class="namespace-wrapper">\acdhOeaw\fedora\getIds()</span></a></dd>
+                                            <dd><a href=""><span class="namespace-wrapper">\acdhOeaw\fedora\updateContent()</span></a></dd>
+                                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_sparqlClient" name="property_sparqlClient" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$sparqlClient</h3>
+                <pre class="signature">$sparqlClient : \acdhOeaw\fedora\SparqlClient</pre>
+                <p><em>SPARQL client object</em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/acdhOeaw.fedora.SparqlClient.html">\acdhOeaw\fedora\SparqlClient</a>
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_relProp" name="property_relProp" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$relProp</h3>
+                <pre class="signature">$relProp : string</pre>
+                <p><em>Fully qualified URI of the RDF property used to denote relation of being
+a collection part</em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
 
                             
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"><p>Required configuration parameters include:</p>
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_attachData" name="method_attachData" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">attachData()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">attachData(\GuzzleHttp\Psr7\Request  <span class="argument">$request</span>, string  <span class="argument">$body</span>) : \GuzzleHttp\Psr7\Request</pre>
+                <p><em>Attaches binary content to a given Guzzle HTTP request</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\GuzzleHttp\Psr7\Request</td>
+                                <td>$request </td>
+                                <td><p>HTTP request</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$body </td>
+                                <td><p>binary content to be attached
+It can be a file name, a string or an URL
+If it is URL, a &quot;redirecting Fedora resource&quot; will be created</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \GuzzleHttp\Psr7\Request
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct(\zozlak\util\Config  <span class="argument">$cfg</span>) </pre>
+                <p><em>Creates Fedora connection object from a given configuration.</em></p>
+                <p>Required configuration parameters include:</p>
 <ul>
 <li>fedoraApiUrl - base URL of the Fedora REST API</li>
 <li>fedoraIdProp - URI of the RDF property denoting resource ACDH ID</li>
 <li>fedoraUser - login required to connect to the Fedora REST API</li>
 <li>fedoraPswd - password required to connect to the Fedora REST API</li>
 <li>sparqlUrl - SPARQL endpoint URL</li>
-</ul></div>
+</ul>
 
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\zozlak\util\Config</td>
+                                <td>$cfg </td>
+                                <td><p>configuration object</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
 
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$cfg</h4>
-                                                <code>\zozlak\util\Config</code><p><p>configuration object</p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getIdProp" name="method_getIdProp" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getIdProp()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getIdProp() : string</pre>
+                <p><em>Returns URI of the RDF property denoting ACDH ID as set upon object creation.</em></p>
+                
 
-                        </div>
-                                            <a id="method_attachData"></a>
-                        <div class="element clickable method public  method_attachData" data-toggle="collapse" data-target=".method_attachData .collapse">
-                            <h2>Attaches binary content to a given Guzzle HTTP request</h2>
-                            <pre>attachData(\GuzzleHttp\Psr7\Request $request, string $body) : \GuzzleHttp\Psr7\Request</pre>
-                            <div class="labels">
-                                                                <span class="label">static</span>                                                                                                                            </div>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
 
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getRelProp" name="method_getRelProp" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getRelProp()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getRelProp() : string</pre>
+                <p><em>Returns URI of the RDF property denoting relation of being a collection part.</em></p>
+                
 
-                                    <table class="table">
-                                                                                                                    </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
 
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$request</h4>
-                                                <code>\GuzzleHttp\Psr7\Request</code><p><p>HTTP request</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$body</h4>
-                                                <code>string</code><p><p>binary content to be attached
-It can be a file name, a string or an URL
-If it is URL, a &quot;redirecting Fedora resource&quot; will be created</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>\GuzzleHttp\Psr7\Request</code><p></p>
-                                                                    </div>
-                            </div>
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_createResource" name="method_createResource" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">createResource()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">createResource(\acdhOeaw\fedora\EasyRdf\Resource  <span class="argument">$metadata</span>, mixed  <span class="argument">$data = &#039;&#039;</span>, string  <span class="argument">$path = &#039;&#039;</span>, string  <span class="argument">$method = &#039;POST&#039;</span>) : \acdhOeaw\rms\FedoraResource</pre>
+                <p><em>Creates a resource in the Fedora and returns corresponding Resource object</em></p>
+                
 
-                        </div>
-                                            <a id="method_begin"></a>
-                        <div class="element clickable method public  method_begin" data-toggle="collapse" data-target=".method_begin .collapse">
-                            <h2>Starts new Fedora transaction.</h2>
-                            <pre>begin() </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\acdhOeaw\fedora\EasyRdf\Resource</td>
+                                <td>$metadata </td>
+                                <td><p>resource metadata</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$data </td>
+                                <td><p>optional resource data as a string,
+file name or an array: ['content-type' =&gt; 'foo', 'data' =&gt; 'bar']</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$path </td>
+                                <td><p>optional Fedora resource path (see also the <code>$method</code>
+parameter)</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$method </td>
+                                <td><p>creation method to use - POST or PUT, by default POST</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\BadMethodCallException</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    \acdhOeaw\rms\FedoraResource
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
 
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"><p>Only one transaction can be opened at the same time,
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_sendRequest" name="method_sendRequest" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">sendRequest()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">sendRequest(\GuzzleHttp\Psr7\Request  <span class="argument">$request</span>) : \GuzzleHttp\Psr7\Response</pre>
+                <p><em>Sends a given HTTP request to the Fedora.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\GuzzleHttp\Psr7\Request</td>
+                                <td>$request </td>
+                                <td><p>request to be send</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \GuzzleHttp\Psr7\Response
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getResourceByUri" name="method_getResourceByUri" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getResourceByUri()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getResourceByUri(string  <span class="argument">$uri</span>) : \acdhOeaw\fedora\FedoraResource</pre>
+                <p><em>Returns a FedoraResource based on a given URI.</em></p>
+                <p>Request URI is imported into the current connection meaning base
+Fedora API URL will and the current transaction URI (if there is
+an active transaction) will replace ones in passed URI.</p>
+<p>It is not checked if a resource with a given URI exists.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$uri </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getResourceById" name="method_getResourceById" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getResourceById()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getResourceById(string  <span class="argument">$value</span>) : \acdhOeaw\fedora\FedoraResource</pre>
+                <p><em>Finds Fedora resources with a given id property value
+(as it is defined by the &quot;fedoraIdProp&quot; configuration option - see the init() method).</em></p>
+                <p>If there is no or are many such resources, an error is thrown.</p>
+<p>Be aware that only property values at the beginning of the current transaction
+are be searched (see documentation of the begin() method).</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$value </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\RuntimeException</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                            <dt>See also</dt>
+                                                                <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_getResourcesById"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::getResourcesById()</span></a></dd>
+                                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getResourcesById" name="method_getResourcesById" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getResourcesById()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getResourcesById(string  <span class="argument">$value</span>) : array</pre>
+                <p><em>Finds all Fedora resources with a given id property value
+(as it is defined by the &quot;fedoraIdProp&quot; configuration option - see the init() method).</em></p>
+                <p>If you are sure only one resource with a given id should exist
+(but it's RDF, so think about it twice), take a look at the getResourceById() method.</p>
+<p>Be aware that only property values at the beginning of the current transaction
+are be searched (see documentation of the begin() method).</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$value </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                            <dt>See also</dt>
+                                                                <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_getResourceById"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::getResourceById()</span></a></dd>
+                                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getResourcesByProperty" name="method_getResourcesByProperty" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getResourcesByProperty()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getResourcesByProperty(string  <span class="argument">$property</span>, string  <span class="argument">$value = &#039;&#039;</span>) : array</pre>
+                <p><em>Finds all Fedora resources having a given RDF property value.</em></p>
+                <p>If the value is not provided, all resources with a given property set
+(to any value) are returned.</p>
+<p>Be aware that all property values introduced during the transaction
+are not taken into account (see documentation of the begin() method)</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$property </td>
+                                <td><p>fully qualified property URI</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$value </td>
+                                <td><p>optional property value</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                            <dt>See also</dt>
+                                                                <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::begin()</span></a></dd>
+                                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getResourcesByPropertyRegEx" name="method_getResourcesByPropertyRegEx" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getResourcesByPropertyRegEx()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getResourcesByPropertyRegEx(string  <span class="argument">$property</span>, string  <span class="argument">$regEx</span>, string  <span class="argument">$flags = &#039;i&#039;</span>) : array</pre>
+                <p><em>Finds all Fedora resources with a given RDF property matching given regular expression.</em></p>
+                <p>Be aware that all property values introduced during the transaction
+are not taken into account (see documentation of the begin() method)</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$property </td>
+                                <td><p>fully qualified property URI</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$regEx </td>
+                                <td><p>regular expression to match against</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$flags </td>
+                                <td><p>regular expression flags (by default &quot;i&quot; - case insensitive)</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                            <dt>See also</dt>
+                                                                <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::begin()</span></a></dd>
+                                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getResourcesByQuery" name="method_getResourcesByQuery" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getResourcesByQuery()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getResourcesByQuery(\acdhOeaw\fedora\metadataQuery\Query  <span class="argument">$query</span>, string  <span class="argument">$resVar = &#039;?res&#039;</span>) : array</pre>
+                <p><em>Finds all Fedora resources satisfying a given SPARQL query.</em></p>
+                <p>Be aware that the triplestore state is not affected by all actions
+performed during the active transaction.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">\acdhOeaw\fedora\metadataQuery\Query</a></td>
+                                <td>$query </td>
+                                <td><p>SPARQL query fetching resources from the triplestore</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$resVar </td>
+                                <td><p>name of the SPARQL variable containing resource
+URIs</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                            <dt>See also</dt>
+                                                                <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::begin()</span></a></dd>
+                                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_runQuery" name="method_runQuery" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">runQuery()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">runQuery(\acdhOeaw\fedora\metadataQuery\Query  <span class="argument">$query</span>, boolean  <span class="argument">$debug = false</span>) : \EasyRdf\Sparql\Result</pre>
+                <p><em>Runs a SPARQL query defined by a Query object against repository
+triplestore.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">\acdhOeaw\fedora\metadataQuery\Query</a></td>
+                                <td>$query </td>
+                                <td><p>query to run</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$debug </td>
+                                <td><p>should the underlying SPARQL query be displayed</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \EasyRdf\Sparql\Result
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_runSparql" name="method_runSparql" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">runSparql()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">runSparql(string  <span class="argument">$query</span>) : \EasyRdf\Sparql\Result</pre>
+                <p><em>Runs a SPARQL against repository triplestore.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$query </td>
+                                <td><p>SPARQL query to run</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \EasyRdf\Sparql\Result
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_sanitizeUri" name="method_sanitizeUri" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">sanitizeUri()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">sanitizeUri(string  <span class="argument">$uri</span>) : string</pre>
+                <p><em>Adjusts URI to the current object state by setting up the proper base
+URL and the transaction id.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$uri </td>
+                                <td><p>resource URI</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_standardizeUri" name="method_standardizeUri" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">standardizeUri()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">standardizeUri(string  <span class="argument">$uri</span>) : string</pre>
+                <p><em>Transforms an URI into &quot;a canonical form&quot; used in the triplestore to
+denote triples subject.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$uri </td>
+                                <td><p>URI to transform</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_begin" name="method_begin" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">begin()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">begin() </pre>
+                <p><em>Starts new Fedora transaction.</em></p>
+                <p>Only one transaction can be opened at the same time,
 so make sure you committed previous transactions before starting a new one.</p>
 <p>Be aware that all metadata modified during the transaction will be not
 visible in the triplestore coupled with the Fedora until the transaction
-is committed.</p></div>
+is committed.</p>
 
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    see
-                                                </th>
-                                                <td>
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_rollback">\acdhOeaw\fedora\Fedora::rollback()</a>
-                                                                                                                
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_commit">\acdhOeaw\fedora\Fedora::commit()</a>
-                                                                                                                
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                            <dt>See also</dt>
+                                                                <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_rollback"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::rollback()</span></a></dd>
+                                            <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_commit"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::commit()</span></a></dd>
+                                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
 
-                                    
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_rollback" name="method_rollback" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">rollback()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">rollback() </pre>
+                <p><em>Rolls back the current Fedora transaction.</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                            <dt>See also</dt>
+                                                                <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::begin()</span></a></dd>
+                                            <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_commit"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::commit()</span></a></dd>
+                                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setTransactionId" name="method_setTransactionId" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setTransactionId()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setTransactionId(\acdhOeaw\fedora\type  <span class="argument">$txUrl</span>) </pre>
+                <p><em>Overrides the transaction URI to be used by the Fedora connection.</em></p>
+                <p>Use with care.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\acdhOeaw\fedora\type</td>
+                                <td>$txUrl </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_commit" name="method_commit" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">commit()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">commit() </pre>
+                <p><em>Commits the current Fedora transaction.</em></p>
+                <p>After the commit all the metadata modified during the transaction
+will be finally available in the triplestore associated with the Fedora.</p>
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                            <dt>See also</dt>
+                                                                <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::begin()</span></a></dd>
+                                            <dd><a href="../classes/acdhOeaw.fedora.Fedora.html#method_rollback"><span class="namespace-wrapper">\acdhOeaw\fedora\Fedora::rollback()</span></a></dd>
+                                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_inTransaction" name="method_inTransaction" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">inTransaction()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">inTransaction() : boolean</pre>
+                <p><em>Returns true if a Fedora transaction is opened and false otherwise.</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
                                                                     </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_commit"></a>
-                        <div class="element clickable method public  method_commit" data-toggle="collapse" data-target=".method_commit .collapse">
-                            <h2>Commits the current Fedora transaction.</h2>
-                            <pre>commit() </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"><p>After the commit all the metadata modified during the transaction
-will be finally available in the triplestore associated with the Fedora.</p></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    see
-                                                </th>
-                                                <td>
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin">\acdhOeaw\fedora\Fedora::begin()</a>
-                                                                                                                
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_rollback">\acdhOeaw\fedora\Fedora::rollback()</a>
-                                                                                                                
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_createResource"></a>
-                        <div class="element clickable method public  method_createResource" data-toggle="collapse" data-target=".method_createResource .collapse">
-                            <h2>Creates a resource in the Fedora and returns corresponding Resource object</h2>
-                            <pre>createResource(\EasyRdf_Resource $metadata, mixed $data = &#039;&#039;, string $path = &#039;&#039;, string $method = &#039;POST&#039;) : \acdhOeaw\rms\FedoraResource</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\BadMethodCallException</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$metadata</h4>
-                                                <code>\EasyRdf_Resource</code><p><p>resource metadata</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$data</h4>
-                                                <code>mixed</code><p><p>optional resource data as a string,
-file name or an array: ['content-type' =&gt; 'foo', 'data' =&gt; 'bar']</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$path</h4>
-                                                <code>string</code><p><p>optional Fedora resource path (see also the <code>$method</code>
-parameter)</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$method</h4>
-                                                <code>string</code><p><p>creation method to use - POST or PUT, by default POST</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>\acdhOeaw\rms\FedoraResource</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getIdProp"></a>
-                        <div class="element clickable method public  method_getIdProp" data-toggle="collapse" data-target=".method_getIdProp .collapse">
-                            <h2>Returns URI of the RDF property denoting ACDH ID as set upon object creation.</h2>
-                            <pre>getIdProp() : string</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getRelProp"></a>
-                        <div class="element clickable method public  method_getRelProp" data-toggle="collapse" data-target=".method_getRelProp .collapse">
-                            <h2>Returns URI of the RDF property denoting relation of being a collection part.</h2>
-                            <pre>getRelProp() : string</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getResourceById"></a>
-                        <div class="element clickable method public  method_getResourceById" data-toggle="collapse" data-target=".method_getResourceById .collapse">
-                            <h2>Finds Fedora resources with a given id property value
-(as it is defined by the &quot;fedoraIdProp&quot; configuration option - see the init() method).</h2>
-                            <pre>getResourceById(string $value) : \acdhOeaw\fedora\FedoraResource</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"><p>If there is no or are many such resources, an error is thrown.</p>
-<p>Be aware that only property values at the beginning of the current transaction
-are be searched (see documentation of the begin() method).</p></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    see
-                                                </th>
-                                                <td>
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_getResourcesById">\acdhOeaw\fedora\Fedora::getResourcesById()</a>
-                                                                                                                
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\RuntimeException</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$value</h4>
-                                                <code>string</code><p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code><a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a></code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getResourceByUri"></a>
-                        <div class="element clickable method public  method_getResourceByUri" data-toggle="collapse" data-target=".method_getResourceByUri .collapse">
-                            <h2>Returns a FedoraResource based on a given URI.</h2>
-                            <pre>getResourceByUri(string $uri) : \acdhOeaw\fedora\FedoraResource</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"><p>Request URI is imported into the current connection meaning base
-Fedora API URL will and the current transaction URI (if there is
-an active transaction) will replace ones in passed URI.</p>
-<p>It is not checked if a resource with a given URI exists.</p></div>
-
-                                    <table class="table">
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$uri</h4>
-                                                <code>string</code><p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code><a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a></code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getResourcesById"></a>
-                        <div class="element clickable method public  method_getResourcesById" data-toggle="collapse" data-target=".method_getResourcesById .collapse">
-                            <h2>Finds all Fedora resources with a given id property value
-(as it is defined by the &quot;fedoraIdProp&quot; configuration option - see the init() method).</h2>
-                            <pre>getResourcesById(string $value) : array</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"><p>If you are sure only one resource with a given id should exist
-(but it's RDF, so think about it twice), take a look at the getResourceById() method.</p>
-<p>Be aware that only property values at the beginning of the current transaction
-are be searched (see documentation of the begin() method).</p></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    see
-                                                </th>
-                                                <td>
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_getResourceById">\acdhOeaw\fedora\Fedora::getResourceById()</a>
-                                                                                                                
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$value</h4>
-                                                <code>string</code><p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>array</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getResourcesByProperty"></a>
-                        <div class="element clickable method public  method_getResourcesByProperty" data-toggle="collapse" data-target=".method_getResourcesByProperty .collapse">
-                            <h2>Finds all Fedora resources having a given RDF property value.</h2>
-                            <pre>getResourcesByProperty(string $property, string $value = &#039;&#039;) : array</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"><p>If the value is not provided, all resources with a given property set
-(to any value) are returned.</p>
-<p>Be aware that all property values introduced during the transaction
-are not taken into account (see documentation of the begin() method)</p></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    see
-                                                </th>
-                                                <td>
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin">\acdhOeaw\fedora\Fedora::begin()</a>
-                                                                                                                
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$property</h4>
-                                                <code>string</code><p><p>fully qualified property URI</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$value</h4>
-                                                <code>string</code><p><p>optional property value</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>array</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getResourcesByPropertyRegEx"></a>
-                        <div class="element clickable method public  method_getResourcesByPropertyRegEx" data-toggle="collapse" data-target=".method_getResourcesByPropertyRegEx .collapse">
-                            <h2>Finds all Fedora resources with a given RDF property matching given regular expression.</h2>
-                            <pre>getResourcesByPropertyRegEx(string $property, string $regEx, string $flags = &#039;i&#039;) : array</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"><p>Be aware that all property values introduced during the transaction
-are not taken into account (see documentation of the begin() method)</p></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    see
-                                                </th>
-                                                <td>
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin">\acdhOeaw\fedora\Fedora::begin()</a>
-                                                                                                                
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$property</h4>
-                                                <code>string</code><p><p>fully qualified property URI</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$regEx</h4>
-                                                <code>string</code><p><p>regular expression to match against</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$flags</h4>
-                                                <code>string</code><p><p>regular expression flags (by default &quot;i&quot; - case insensitive)</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>array</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getResourcesByQuery"></a>
-                        <div class="element clickable method public  method_getResourcesByQuery" data-toggle="collapse" data-target=".method_getResourcesByQuery .collapse">
-                            <h2>Finds all Fedora resources satisfying a given SPARQL query.</h2>
-                            <pre>getResourcesByQuery(\acdhOeaw\fedora\metadataQuery\Query $query, string $resVar = &#039;?res&#039;) : array</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"><p>Be aware that the triplestore state is not affected by all actions
-performed during the active transaction.</p></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    see
-                                                </th>
-                                                <td>
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin">\acdhOeaw\fedora\Fedora::begin()</a>
-                                                                                                                
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$query</h4>
-                                                <code><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">\acdhOeaw\fedora\metadataQuery\Query</a></code><p><p>SPARQL query fetching resources from the triplestore</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$resVar</h4>
-                                                <code>string</code><p><p>name of the SPARQL variable containing resource
-URIs</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>array</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_inTransaction"></a>
-                        <div class="element clickable method public  method_inTransaction" data-toggle="collapse" data-target=".method_inTransaction .collapse">
-                            <h2>Returns true if a Fedora transaction is opened and false otherwise.</h2>
-                            <pre>inTransaction() : boolean</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                            <h3>Response</h3>
-                                        <code>boolean</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_rollback"></a>
-                        <div class="element clickable method public  method_rollback" data-toggle="collapse" data-target=".method_rollback .collapse">
-                            <h2>Rolls back the current Fedora transaction.</h2>
-                            <pre>rollback() </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    see
-                                                </th>
-                                                <td>
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_begin">\acdhOeaw\fedora\Fedora::begin()</a>
-                                                                                                                
-                                                                                                                                                                        
-                                                                                                                                                                            <a href="../classes/acdhOeaw.fedora.Fedora.html#method_commit">\acdhOeaw\fedora\Fedora::commit()</a>
-                                                                                                                
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_runQuery"></a>
-                        <div class="element clickable method public  method_runQuery" data-toggle="collapse" data-target=".method_runQuery .collapse">
-                            <h2>Runs a SPARQL query defined by a Query object against repository
-triplestore.</h2>
-                            <pre>runQuery(\acdhOeaw\fedora\metadataQuery\Query $query, boolean $debug = false) : \EasyRdf_Sparql_Result</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$query</h4>
-                                                <code><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">\acdhOeaw\fedora\metadataQuery\Query</a></code><p><p>query to run</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$debug</h4>
-                                                <code>boolean</code><p><p>should the underlying SPARQL query be displayed</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>\EasyRdf_Sparql_Result</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_runSparql"></a>
-                        <div class="element clickable method public  method_runSparql" data-toggle="collapse" data-target=".method_runSparql .collapse">
-                            <h2>Runs a SPARQL against repository triplestore.</h2>
-                            <pre>runSparql(string $query) : \EasyRdf_Sparql_Result</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$query</h4>
-                                                <code>string</code><p><p>SPARQL query to run</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>\EasyRdf_Sparql_Result</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_sanitizeUri"></a>
-                        <div class="element clickable method public  method_sanitizeUri" data-toggle="collapse" data-target=".method_sanitizeUri .collapse">
-                            <h2>Adjusts URI to the current object state by setting up the proper base
-URL and the transaction id.</h2>
-                            <pre>sanitizeUri(string $uri) : string</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$uri</h4>
-                                                <code>string</code><p><p>resource URI</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_sendRequest"></a>
-                        <div class="element clickable method public  method_sendRequest" data-toggle="collapse" data-target=".method_sendRequest .collapse">
-                            <h2>Sends a given HTTP request to the Fedora.</h2>
-                            <pre>sendRequest(\GuzzleHttp\Psr7\Request $request) : \GuzzleHttp\Psr7\Response</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$request</h4>
-                                                <code>\GuzzleHttp\Psr7\Request</code><p><p>request to be send</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>\GuzzleHttp\Psr7\Response</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_setTransactionId"></a>
-                        <div class="element clickable method public  method_setTransactionId" data-toggle="collapse" data-target=".method_setTransactionId .collapse">
-                            <h2>Overrides the transaction URI to be used by the Fedora connection.</h2>
-                            <pre>setTransactionId(\acdhOeaw\fedora\type $txUrl) </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"><p>Use with care.</p></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$txUrl</h4>
-                                                <code>\acdhOeaw\fedora\type</code><p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_standardizeUri"></a>
-                        <div class="element clickable method public  method_standardizeUri" data-toggle="collapse" data-target=".method_standardizeUri .collapse">
-                            <h2>Transforms an URI into &quot;a canonical form&quot; used in the triplestore to
-denote triples subject.</h2>
-                            <pre>standardizeUri(string $uri) : string</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$uri</h4>
-                                                <code>string</code><p><p>URI to transform</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                    
-                    
-                                                                <h3><i class="icon-custom icon-property"></i> Properties</h3>
-                                                    <a id="property_apiUrl"> </a>
-                            <div class="element clickable property  private property_apiUrl" data-toggle="collapse" data-target=".property_apiUrl .collapse">
-                                <h2>Fedora API base URL</h2>
-                                <pre>apiUrl : string</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>string</code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_txUrl"> </a>
-                            <div class="element clickable property  private property_txUrl" data-toggle="collapse" data-target=".property_txUrl .collapse">
-                                <h2>Current transaction URI</h2>
-                                <pre>txUrl : string</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>string</code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_client"> </a>
-                            <div class="element clickable property  private property_client" data-toggle="collapse" data-target=".property_client .collapse">
-                                <h2>HTTP client object</h2>
-                                <pre>client : \GuzzleHttp\Client</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>\GuzzleHttp\Client</code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_idProp"> </a>
-                            <div class="element clickable property  private property_idProp" data-toggle="collapse" data-target=".property_idProp .collapse">
-                                <h2>Fully qualified URI of the RDF property used to identify resources</h2>
-                                <pre>idProp : string</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    
-                                                                                                            </td>
-                                                </tr>
-                                                                                            <tr>
-                                                    <th>
-                                                        see
-                                                    </th>
-                                                    <td>
-                                                                                                                    
-                                                                                                                    
-                                                                                                                    
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>string</code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_sparqlClient"> </a>
-                            <div class="element clickable property  private property_sparqlClient" data-toggle="collapse" data-target=".property_sparqlClient .collapse">
-                                <h2>SPARQL client object</h2>
-                                <pre>sparqlClient : \acdhOeaw\fedora\SparqlClient</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code><a href="../classes/acdhOeaw.fedora.SparqlClient.html">\acdhOeaw\fedora\SparqlClient</a></code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_relProp"> </a>
-                            <div class="element clickable property  private property_relProp" data-toggle="collapse" data-target=".property_relProp .collapse">
-                                <h2>Fully qualified URI of the RDF property used to denote relation of being
-a collection part</h2>
-                                <pre>relProp : string</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>string</code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                            </div>
-            </div>
-            <a id="\acdhOeaw\fedora\Fedora"></a>
-            <ul class="breadcrumb">
-                <li><a href="../index.html"><i class="icon-custom icon-class"></i></a></li>
-                    
-    
-    <li><span class="divider">\</span><a href="../namespaces/acdhOeaw.fedora.html">fedora</a></li>
-
-                <li class="active"><span class="divider">\</span><a href="../classes/acdhOeaw.fedora.Fedora.html">Fedora</a></li>
-            </ul>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">Fedora.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/fedora/Fedora.php.txt" class="language-php line-numbers"></pre>
         </div>
     </div>
 
-    </div>
-
-        <footer class="span12">
-            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
-            <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
-            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Thu, 16 Feb 2017 14:52:37 +0000.<br/>
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on March 16th, 2017 at 11:22.
+                </section>
+            </section>
+        </section>
     </footer>
-    </body>
+</div>
+
+</body>
 </html>
