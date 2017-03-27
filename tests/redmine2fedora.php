@@ -32,7 +32,7 @@ use acdhOeaw\redmine\User;
 require_once 'init.php';
 
 $fedora->begin();
-
+/*
 echo "\nUsers:\n";
 $users = User::fetchAll(true);
 echo "\n\tsaving:\n";
@@ -60,7 +60,7 @@ foreach ($projects as $i) {
     }
 }
 $pb->finish();
-
+*/
 echo "\nIssues:\n";
 $issues = Issue::fetchAll(true, ['tracker_id' => 5]);
 echo "\n\tsaving:\n";

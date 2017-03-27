@@ -26,8 +26,13 @@
 
 use EasyRdf\Graph;
 use acdhOeaw\storage\Indexer;
+use acdhOeaw\schema\MetadataCollection;
 
 require_once 'init.php';
+
+$graph = new MetadataCollection($fedora, '/home/zozlak/roboty/ACDH/repo/userstories/troesmis_6665/metadata/actors/O06_Ersteller_google-csv_openrefine.ttl');
+$graph->import();
+exit();
 
 $fedora->begin();
 
