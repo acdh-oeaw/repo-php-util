@@ -142,18 +142,28 @@ class FedoraResource {
      */
     public function getId(): string {
         $ids = $this->getIds();
-        if (count($ids) !== 1) {
-            throw new RuntimeException((count($ids) == 0 ? 'No' : 'Many') . ' ids for ' . $this->getUri());
+        if (count($ids) === 0) {
+            throw new RuntimeException('No ACDH id for ' . $this->getUri());
         }
-        return $ids[0];
+        $acdhId = null;
+        foreach ($ids as $id) {
+            if (strpos($id, $this->fedora->getIdNamespace()) === 0) {
+                if ($acdhId !== null) {
+                    throw new RuntimeException('Many ACDH ids for ' . $this->getUri());
+                }
+                $acdhId = $id;
+            }
+        }
+        if ($acdhId === null) {
+            throw new RuntimeException('No ACDH id for ' . $this->getUri());
+        }
+        return $acdhId;
     }
 
     /**
-     * Returns an array of resource's ACDH IDs.
+     * Returns an array of resource's IDs.
      * 
-     * If you are sure only one id should be present 
-     * (but it's RDF, so think about it twice), 
-     * take a look at the getId() method.
+     * If you want to get an ACDH ID, use the getId() method.
      * 
      * @return array
      * @see getId()
@@ -183,7 +193,7 @@ class FedoraResource {
         $request = new Request('DELETE', $this->getUri());
         $this->fedora->sendRequest($request);
     }
-    
+
     /**
      * Replaces resource metadata with a given RDF graph.
      * 
@@ -376,7 +386,7 @@ class FedoraResource {
         $query->addParameter($this->getChildrenQueryParameter());
         return $query;
     }
-    
+
     /**
      * Return the SPARQL query triple object denoting relation of being
      * this resource's child
@@ -386,7 +396,7 @@ class FedoraResource {
     public function getChildrenQueryParameter(): QueryParameter {
         return new HasValue($this->fedora->getRelProp(), $this->getId());
     }
-    
+
     /**
      * Returns all resource's children
      * 
@@ -406,9 +416,9 @@ class FedoraResource {
      */
     public function getChildrenByProperty(string $property, string $value = ''): array {
         $query = $this->getChildrenQuery();
-        if($value != ''){
+        if ($value != '') {
             $param = new HasValue($property, $value);
-        }else{
+        } else {
             $param = new HasProperty($property);
         }
         $query->addParameter($param);
@@ -449,7 +459,7 @@ class FedoraResource {
         $rdf = EasyRdfUtil::serialiseResource($res);
         return $rdf;
     }
-    
+
     /**
      * Debugging helper allowing to take a look at the resource metadata 
      * in a console-friendly way

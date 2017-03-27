@@ -105,6 +105,13 @@ class Fedora {
     private $idProp;
 
     /**
+     * Namespace used by ACDH ids
+     * 
+     * @var string
+     */
+    private $idNamespace;
+    
+    /**
      * SPARQL client object
      * @var SparqlClient
      */
@@ -135,6 +142,7 @@ class Fedora {
         $this->apiUrl = preg_replace('|/$|', '', $cfg->get('fedoraApiUrl'));
         $this->idProp = $cfg->get('fedoraIdProp');
         $this->relProp = $cfg->get('fedoraRelProp');
+        $this->idNamespace = $cfg->get('fedoraIdNamespace');
         $authHeader = 'Basic ' . base64_encode($cfg->get('fedoraUser') . ':' . $cfg->get('fedoraPswd'));
         $this->client = new Client(['verify' => false, 'headers' => ['Authorization' => $authHeader]]);
         $this->sparqlClient = new SparqlClient($cfg->get('sparqlUrl'), $cfg->get('fedoraUser'), $cfg->get('fedoraPswd'));
@@ -146,6 +154,14 @@ class Fedora {
      */
     public function getIdProp(): string {
         return $this->idProp;
+    }
+
+    /**
+     * Returns URI of the namespace used by ACDH ids.
+     * @return string
+     */
+    public function getIdNamespace(): string {
+        return $this->idNamespace;
     }
 
     /**

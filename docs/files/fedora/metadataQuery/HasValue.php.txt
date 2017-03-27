@@ -47,9 +47,11 @@ class HasValue extends HasProperty {
         $val = $valIsUri ? EasyRdfUtil::escapeUri($this->value) : EasyRdfUtil::escapeLiteral($this->value);
 
         $type = '';
+        /*
         if (!is_numeric($this->value) && !$valIsUri) {
             $type = '^^xsd:string';
         }
+        */
         $query = $this->subVar . ' ' . $this->property . ' ' . $val . $type . ' .';
         return $this->applyOptional($query);
     }

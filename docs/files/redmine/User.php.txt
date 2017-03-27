@@ -27,6 +27,7 @@
 namespace acdhOeaw\redmine;
 
 use EasyRdf\Resource;
+use acdhOeaw\schema\MetadataCollection;
 
 /**
  * Represents a Redmine user
@@ -97,16 +98,7 @@ class User extends Redmine {
      */
     protected function mapProperties(array $data): Resource {
         $res = parent::mapProperties($data);
-        
-        $given = $res->getLiteral('http://xmlns.com/foaf/0.1/givenName');
-        $family = $res->getLiteral('http://xmlns.com/foaf/0.1/familyName');
-        $title = trim($given . ' ' . $family);
-        
-        $res->delete('http://xmlns.com/foaf/0.1/name');
-        $res->addLiteral('http://xmlns.com/foaf/0.1/name', $title);
-        $res->delete('http://purl.org/dc/elements/1.1/title');
-        $res->addLiteral('http://purl.org/dc/elements/1.1/title', $title);
-        
+        $res = MetadataCollection::makeAgent($res);        
         return $res;
     }
 }
