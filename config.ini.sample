@@ -2,7 +2,6 @@ mappingsFile="property_mappings.json"
 
 redmineApiUrl="https://redmine.acdh.oeaw.ac.at"
 redmineApiKey="putYourKeyHere"
-redmineIdProp="http://www.w3.org/2000/01/rdf-schema#seeAlso"
 
 sparqlUrl="http://fedora.localhost/blazegraph/sparql"
 

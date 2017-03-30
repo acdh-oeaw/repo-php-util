@@ -32,7 +32,7 @@ use acdhOeaw\storage\Indexer;
 use acdhOeaw\cirilo\Service;
 use zozlak\util\Config;
 
-$conf = new Config('config.ini');
+$conf = new Config('tests/config.ini');
 
 $fedora = new Fedora($conf);
 Redmine::init($conf, $fedora);

@@ -3,4 +3,5 @@
 /composer.lock
 /playground.php
 /docs/phpdoc-cache*
-/config.ini
+config.ini
+
