@@ -319,31 +319,30 @@ class Indexer {
                 $skip = $this->isSkipped($i);
                 $upload = $i->isFile() && $this->uploadSizeLimit > $i->getSize();
 
-                $metadata = $this->createMetadata($path, $i);
+                if (!$skip) {
+                    $metadata = $this->createMetadata($path, $i);
+                    try {
+                        // resource already exists and should be updated
+                        $res = $this->getResource($path, $i);
+                        echo $verbose ? "update " : "";
 
-                try {
-                    // resource already exists and should be updated
-                    $res = $this->getResource($path, $i);
-                    echo $verbose ? "update " : "";
+                        $metadata = EasyRdfUtil::mergeMetadata($res->getMetadata(), $metadata);
+                        $res->setMetadata($metadata);
+                        $res->updateMetadata();
+                        if ($upload) {
+                            echo $verbose ? "+ upload " : "";
+                            $res->updateContent($i->getPathname(), true);
+                        }
 
-                    $metadata = EasyRdfUtil::mergeMetadata($res->getMetadata(), $metadata);
-                    $res->setMetadata($metadata);
-                    $res->updateMetadata();
-                    if ($upload) {
-                        echo $verbose ? "+ upload " : "";
-                        $res->updateContent($i->getPathname(), true);
-                    }
-
-                    $indexedRes[] = $res;
-                } catch (DomainException $e) {
-                    // resource does not exist and must be created
-                    if (!$skip) {
+                        $indexedRes[] = $res;
+                    } catch (DomainException $e) {
+                        // resource does not exist and must be created
                         $res = $this->resource->getFedora()->createResource($metadata, $upload ? $i->getPathname() : '');
                         $indexedRes[] = $res;
                         echo $verbose ? "create " : "";
-                    } else {
-                        echo $verbose ? "skip " : "";
                     }
+                } else {
+                    echo $verbose ? "skip " : "";
                 }
 
                 echo $verbose ? $i->getPathname() . "\n" : "";
@@ -360,7 +359,7 @@ class Indexer {
                     $ind->setPaths(array(substr($i->getPathname(), strlen(self::$containerDir))));
                     $recRes = $ind->index($verbose);
                     $indexedRes = array_merge($indexedRes, $recRes);
-                    echo $verbose ? "returning " . $path . "\n" : "";
+                    echo $verbose ? "going back from " . $path . "\n" : "";
                 }
             }
         }
