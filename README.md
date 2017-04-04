@@ -122,12 +122,10 @@ if you do not want to loose any metadata triples.
     * If a property can have multiple values, assure you are deleting it only once (do not repeat deletion for the every new value you encounter).
 * Think twice when dealing with `rdfs:identifier` and `rdf:isPartOf` properties (these two are very important).
 
-Due to a bug in the EasyRdf library use `achdOeaw\util\EasyRdfUtil::fixPropName()` to pass property URI to EasyRdf's library methods.
-
 **Good example.**
 
 ```php
-$myProperty = \achdOeaw\util\EasyRdfUtil::fixPropName('http://my.new/#property'
+$myProperty = 'http://my.new/#property'
 
 $fedora->begin();
 
@@ -146,7 +144,7 @@ $fedora->commit();
 **Bad example 1.** You will end up with a resource having only your new triples. All other metadata will be lost.
 
 ```php
-$myProperty = \achdOeaw\util\EasyRdfUtil::fixPropName('http://my.new/#property'
+$myProperty = 'http://my.new/#property'
 
 $fedora->begin();
 
@@ -164,7 +162,7 @@ $fedora->commit();
 **Bad example 2.** You will end up with both old and new values of your property.
 
 ```php
-$myExistingProperty = \achdOeaw\util\EasyRdfUtil::fixPropName('http://my.existing/#property'
+$myExistingProperty = 'http://my.existing/#property'
 
 $fedora->begin();
 
@@ -182,7 +180,7 @@ $fedora->commit();
 **Bad example 3.** You will end up with only last added value of your property.
 
 ```php
-$myMultivalueProperty = \achdOeaw\util\EasyRdfUtil::fixPropName('http://my.existing/#property'
+$myMultivalueProperty = 'http://my.existing/#property'
 
 $fedora->begin();
 
@@ -253,7 +251,7 @@ $fedora->begin();
 $resource = $fedora->getResourcesByProperty($conf->get('redmineIdProp'), 'https://redmine.acdh.oeaw.ac.at/issues/5488')[0];
 $ind = new acdhOeaw\storage\Indexer($resource);
 $ind->setFilter('|[.]xml$|i');
-$ind->setPaths(array('directory/to/index/path'));
+$ind->setPaths(array('directoryToIndex')); // read next chapter
 $ind->setUploadSizeLimit(100000000);
 $ind->setDepth(1);
 $ind->setFlatStructure(true);
@@ -261,3 +259,27 @@ $ind->index(true);
 
 $fedora->commit();
 ```
+
+### How files are matched with repository resources
+
+A file is matched with a repository resource if two conditions are met:
+
+* the file and the resource have the same parent resource
+* the *relative file path* is the same as resource's `fedoraLocProperty` metadata property value
+    * to make your life easier the `Indexer` class switches all `\` to `/` and character encoding is assured to be UTF-8 before the comparison
+
+*relative file path* is a full path to the file with the `containerDir` configuration property value skipped. 
+
+E.g. if your `containerDir` is `/mnt/acdh_resources/container/` and full file path is `/mnt/acdh_resources/container/myProject/myFile`,
+the *relative file path* is `myProject/myFile`.
+
+**It is extremely important to assure that your *relative file paths* are proper.**
+If they are not, you risk data duplication on next import.
+
+**It is clearly wrong to use empty `containerDir`** configuration property** and pass full path to `Indexer::setPaths()`.**
+
+## Importing set of RDF data
+
+If you have a bunch of data in a form of an RDF graph, you can ingest it easily with the `MetadataCollection` class.
+
+
