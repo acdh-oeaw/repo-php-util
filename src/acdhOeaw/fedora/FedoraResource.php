@@ -356,6 +356,7 @@ class FedoraResource {
         } else {
             throw new RuntimeException('Resource is not a binary one. Turn on the $convert parameter if you are sure what you are doing.');
         }
+        $this->loadMetadata(true);
     }
 
     /**
