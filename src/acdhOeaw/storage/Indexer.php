@@ -404,8 +404,8 @@ class Indexer {
         $path = str_replace('\\', '/', $path . '/' . $i->getFilename());
         $metadata->addLiteral(self::$locProp, $path);
         $metadata->addLiteral(self::$titleProp, $i->getFilename());
-        $metadata->addLiteral('ebucore:filename', $i->getFilename());
-        $metadata->addLiteral('ebucore:hasMimeType', mime_content_type($i->getPathname()));
+        $metadata->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename', $i->getFilename());
+        $metadata->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType', mime_content_type($i->getPathname()));
         $metadata->addResource(self::$relProp, $this->resource->getId());
         if ($i->isFile()) {
             $metadata->addLiteral(self::$sizeProp, $i->getSize());
