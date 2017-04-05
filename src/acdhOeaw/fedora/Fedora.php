@@ -387,7 +387,7 @@ class Fedora {
      */
     public function sanitizeUri(string $uri): string {
         $baseUrl = !$this->txUrl ? $this->apiUrl : $this->txUrl;
-        $uri = preg_replace('|^https?://[^/]+/rest/(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
+        $uri = preg_replace('|^https?://[^/]+/rest/?(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
         $uri = $baseUrl . '/' . $uri;
         return $uri;
     }
