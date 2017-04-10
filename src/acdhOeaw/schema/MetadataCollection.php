@@ -118,9 +118,10 @@ class MetadataCollection extends Graph {
         }
     }
 
-    public function import() {
+    public function import(): array {
         $idProp = $this->fedora->getIdProp();
 
+        $resources = array();
         foreach ($this->resources() as $i) {
             echo $i->getUri() . "\n";
 
@@ -172,12 +173,17 @@ class MetadataCollection extends Graph {
                 
                 $res->setMetadata($meta);
                 $res->updateMetadata();
+                
+                $resources[] = $res;
             } else {
                 echo "\tcreate\n";
 //echo EasyRdfUtil::cloneResource($i)->getGraph()->serialise('ntriples');
                 $res = $this->fedora->createResource($i);
+
+                $resources[] = $res;
             }
         }
+        return $resources;
     }
 
 }

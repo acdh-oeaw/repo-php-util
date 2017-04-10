@@ -26,17 +26,16 @@
 
 require_once 'init.php';
 
-use acdhOeaw\fedora\Fedora;
 use acdhOeaw\schema\MetadataCollection;
-use zozlak\util\Config;
-
-$cfg = new Config('tests/config.ini');
-$fedora = new Fedora($cfg);
 
 $graph = new MetadataCollection($fedora, 'tests/graph.ttl');
 $graph->removeLiteralIds();
-$graph->assureTitles($cfg->get('fedoraTitleProp'));
+$graph->assureTitles($conf->get('fedoraTitleProp'));
 
 $fedora->begin();
-$graph->import();
+$resources = $graph->import();
 $fedora->commit();
+
+foreach ($resources as $i) {
+    echo $i->getUri(true) . "\n";
+}
