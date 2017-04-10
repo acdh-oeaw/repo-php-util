@@ -168,6 +168,12 @@ class Indexer {
     private $uploadSizeLimit = 0;
 
     /**
+     * URI of the RDF class assigned to indexed resources
+     * @var string
+     */
+    private $class;
+    
+    /**
      * How many subsequent subdirectories should be indexed.
      * 
      * @var int 
@@ -203,7 +209,8 @@ class Indexer {
      */
     public function __construct(FedoraResource $resource, string $encoding = null) {
         $this->resource = $resource;
-
+        $this->class = self::$defaultClass;
+        
         $metadata = $this->resource->getMetadata();
         $locations = $metadata->allLiterals(self::$locProp);
         if (count($locations) === 0) {
@@ -289,6 +296,10 @@ class Indexer {
         $this->depth = $depth;
     }
 
+    public function setRdfClass(string $class) {
+        $this->class = $class;
+    }
+    
     /**
      * Sets if Fedora resources should be created for empty directories.
      * 
@@ -398,8 +409,8 @@ class Indexer {
     private function createMetadata(string $path, DirectoryIterator $i): Resource {
         $graph = new Graph();
         $metadata = $graph->resource('newResource');
-        if (self::$defaultClass != '') {
-            $metadata->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', self::$defaultClass);
+        if ($this->class != '') {
+            $metadata->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', $this->class);
         }
         $path = str_replace('\\', '/', $path . '/' . $i->getFilename());
         $metadata->addLiteral(self::$locProp, $path);
