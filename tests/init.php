@@ -29,12 +29,15 @@ require_once 'vendor/autoload.php';
 use acdhOeaw\redmine\Redmine;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\storage\Indexer;
-use acdhOeaw\cirilo\Service;
+use acdhOeaw\schema\Object;
 use zozlak\util\Config;
+use zozlak\util\ClassLoader;
+
+$loader = new ClassLoader('src');
 
 $conf = new Config('tests/config.ini');
 
 $fedora = new Fedora($conf);
 Redmine::init($conf, $fedora);
 Indexer::init($conf);
-Service::init($conf, $fedora);
+Object::init($conf);

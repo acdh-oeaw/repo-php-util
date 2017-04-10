@@ -24,12 +24,12 @@
  * THE SOFTWARE.
  */
 
-use acdhOeaw\cirilo\Service;
+use acdhOeaw\schema\cirilo\Service;
 
 require_once 'init.php';
 
 $fedora->begin();
-$services = Service::fromSdepFile('/home/zozlak/roboty/ACDH/repo/userstories/reuse_cirilo_services_7991/models/sdep_tei.xml');
+$services = Service::fromSdepFile($fedora, '/home/zozlak/roboty/ACDH/repo/userstories/reuse_cirilo_services_7991/models/sdep_tei.xml');
 foreach ($services as $i) {
     $i->updateRms();
 }
