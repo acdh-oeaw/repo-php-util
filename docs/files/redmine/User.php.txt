@@ -98,7 +98,7 @@ class User extends Redmine {
      */
     protected function mapProperties(array $data): Resource {
         $res = parent::mapProperties($data);
-        $res = MetadataCollection::makeAgent($res);        
+        $res = MetadataCollection::makeAgent($res);     
         return $res;
     }
 }

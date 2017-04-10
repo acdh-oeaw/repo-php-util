@@ -46,6 +46,11 @@ use zozlak\util\ProgressBar;
 abstract class Redmine {
 
     /**
+     * @var string
+     */
+    static protected $seeAlsoProp = 'http://www.w3.org/2000/01/rdf-schema#seeAlso';
+
+    /**
      * Redmine API base URL
      * @var string
      */
@@ -146,7 +151,7 @@ abstract class Redmine {
         self::$propMap = (array) json_decode(file_get_contents($cfg->get('mappingsFile')));
         self::$apiUrl = $cfg->get('redmineApiUrl');
         self::$apiKey = $cfg->get('redmineApiKey');
-        self::$idProp = $cfg->get('redmineIdProp');
+        self::$idProp = $cfg->get('fedoraIdProp');
         self::$fedora = $fedora;
         self::$classes = $cfg->get('redmineClasses');
     }
@@ -289,10 +294,11 @@ abstract class Redmine {
         } else {
             $graph = new Graph();
             $res = $graph->resource('.');
+            $res->addResource(self::$idProp, $this->getIdValue());
         }
 
-        $res->delete(self::$idProp);
-        $res->addResource(self::$idProp, $this->getIdValue());
+        $res->delete(self::$seeAlsoProp);
+        $res->addResource(self::$seeAlsoProp, $this->getIdValue());
 
         $res->delete('rdf:type');
         $res->addResource('rdf:type', self::$classes[get_called_class()]);
@@ -347,10 +353,10 @@ abstract class Redmine {
      */
     private function getRmsUri(bool $create = false): string {
         if (!$this->fedoraRes) {
-            $resources = self::$fedora->getResourcesByProperty(self::$idProp, $this->getIdValue());
+            $resources = self::$fedora->getResourcesById($this->getIdValue());
             if (count($resources) > 1) {
                 foreach ($resources as $i) {
-                    print_r([$i->getUri(), $i->getIds()]);
+                    print_r(array($i->getUri(), $i->getIds()));
                 }
                 throw new RuntimeException('Many matching Fedora resources');
             } elseif (count($resources) == 1) {
@@ -358,6 +364,7 @@ abstract class Redmine {
             } else if ($create) {
                 try {
                     $this->fedoraRes = self::$fedora->createResource($this->metadata);
+                    $this->metadata = $this->fedoraRes->getMetadata();
                 } catch (ClientException $e) {
                     echo $this->metadata->getGraph()->serialise('ntriples') . "\n";
                     throw $e;
@@ -374,10 +381,10 @@ abstract class Redmine {
         if (!$this->fedoraRes) {
             $this->getRmsUri(true);
         }
+//if (count($this->metadata->allResources(self::$idProp)) > 0){echo implode(', ', $this->metadata->allResources(self::$idProp)) . "\n";}
         $this->metadata = EasyRdfUtil::mergeMetadata($this->fedoraRes->getMetadata(), $this->metadata);
         $this->fedoraRes->setMetadata($this->metadata);
         try {
-            $this->fedoraRes->updateMetadata();
         } catch (ClientException $e) {
             echo $this->metadata->getGraph()->serialise('ntriples') . "\n";
             throw $e;

@@ -81,6 +81,8 @@ class Indexer {
     /**
      * URI of the default RDF class assigned to indexed resources
      * @var string
+     * @see setRdfClass()
+     * @see init()
      */
     static private $defaultClass;
 
@@ -296,6 +298,12 @@ class Indexer {
         $this->depth = $depth;
     }
 
+    /**
+     * Sets a class assigned to ingested resources.
+     * @param string $class class URI
+     * @see $defaultClass
+     * @see init()
+     */
     public function setRdfClass(string $class) {
         $this->class = $class;
     }

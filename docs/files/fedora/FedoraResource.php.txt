@@ -125,10 +125,12 @@ class FedoraResource {
     /**
      * Returns resource's Fedora URI
      * 
+     * @param bool $standardized should the Uri be standardized (in the form
+     *   used in a triplestore) or current Fedora connection specific
      * @return string
      */
-    public function getUri(): string {
-        return $this->uri;
+    public function getUri(bool $standardized = false): string {
+        return $standardized ? $this->fedora->standardizeUri($this->uri) : $this->uri;
     }
 
     /**
@@ -190,7 +192,7 @@ class FedoraResource {
      * Removes the resource from the Fedora
      */
     public function delete() {
-        $request = new Request('DELETE', $this->getUri());
+        $request = new Request('DELETE', $this->fedora->sanitizeUri($this->getUri()));
         $this->fedora->sendRequest($request);
     }
 
@@ -354,6 +356,7 @@ class FedoraResource {
         } else {
             throw new RuntimeException('Resource is not a binary one. Turn on the $convert parameter if you are sure what you are doing.');
         }
+        $this->loadMetadata(true);
     }
 
     /**
