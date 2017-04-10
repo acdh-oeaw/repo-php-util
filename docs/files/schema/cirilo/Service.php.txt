@@ -1,0 +1,109 @@
+<?php
+
+/*
+ * The MIT License
+ *
+ * Copyright 2017 zozlak.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+namespace acdhOeaw\schema\cirilo;
+
+use SimpleXMLElement;
+use Exception;
+use EasyRdf\Resource;
+use acdhOeaw\fedora\Fedora;
+use acdhOeaw\schema\Object;
+use acdhOeaw\schema\dissemination\Service as DissService;
+
+/**
+ * Transforms Fedora 3 service deployment resource
+ * (see http://fedorarepository.org/sites/fedorarepository.org/files/documentation/3.2.1/Creating%20a%20Service%20Deployment.html)
+ * into an ACDH repository dissemination service description (being a set of
+ * Fedora resources).
+ * 
+ * @author zozlak
+ */
+class Service extends Object {
+
+    static public function fromSdepFile(Fedora $fedora, string $sdepFile) {
+        $dom = simplexml_load_file($sdepFile);
+        $dom->registerXPathNamespace('fmm', 'http://fedora.comm.nsdlib.org/service/methodmap');
+
+        $services = array();
+        foreach ($dom->xpath('//fmm:Method') as $s) {
+            try {
+                $services[] = self::parseService($fedora, $s, $dom);
+            } catch (Exception $e) {
+                echo "\t" . $e . "\n";
+            }
+        }
+        return $services;
+    }
+
+    static public function parseService(Fedora $fedora, SimpleXMLElement $service, SimpleXMLElement $sdep): DissService {
+        $service->registerXPathNamespace('fmm', 'http://fedora.comm.nsdlib.org/service/methodmap');
+        $sdep->registerXPathNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+        $sdep->registerXPathNamespace('fedora-model', 'info:fedora/fedora-system:def/model#');
+        $sdep->registerXPathNamespace('http', 'http://schemas.xmlsoap.org/wsdl/http/');
+        $sdep->registerXPathNamespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+        $sdep->registerXPathNamespace('wsdl', 'http://schemas.xmlsoap.org/wsdl/');
+
+        $id = self::$config->get('fedoraServiceIdNamespace') . str_replace(':', '/', $sdep->xpath('//dc:identifier')[0]) . '/' . $service['operationName'];
+        $location = (string) $sdep->xpath('//wsdl:binding/wsdl:operation[@name="' . $service['operationName'] . '"]/http:operation')[0]['location'];
+        $location = preg_replace('#https?://[^/]+/#i', self::$config->get('ciriloLocationBase'), $location);
+        $retMime = (string) $service->xpath('./fmm:MethodReturnType')[0]['wsdlMsgTOMIME'];
+
+        $supports = array();
+        foreach ($sdep->xpath('//fedora-model:isContractorOf/@rdf:resource') as $i) {
+            $supports[] = (string) $i;
+        }
+
+        $obj = new DissService($fedora, $id, $location, $retMime, $supports);
+
+        foreach ($service->xpath('./fmm:DatastreamInputParm') as $i) {
+            self::parseParameter($obj, $i);
+        }
+        foreach ($service->xpath('./fmm:UserInputParm') as $i) {
+            self::parseParameter($obj, $i);
+        }
+        foreach ($service->xpath('./fmm:DefaultInputParm') as $i) {
+            self::parseParameter($obj, $i);
+        }
+        
+        return $obj;
+    }
+
+    static private function parseParameter(DissService $service, SimpleXMLElement $p) {
+        $name = (string) $p['parmName'];
+        $byValue = (string) $p['passBy'] == 'VALUE';
+        $required = ((string) $p['required']) === 'true';
+        $defaultValue = (string) $p['defaultValue'];
+        $rdfProperty = self::$config->get('ciriloServiceParamRdfPrefix') . (string) $p['parmName'];
+
+        $service->addParameter($name, $byValue, $required, $defaultValue, $rdfProperty);
+    }
+
+    public function getMetadata(): Resource {
+        
+    }
+
+}
+

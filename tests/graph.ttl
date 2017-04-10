@@ -1,0 +1,112 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+_:N200
+        a foaf:Person;
+        foaf:familyName "Gugl" ;
+        foaf:firstName "Christian" .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P01> a foaf:Person ;
+	dcterms:identifier "P01" ;
+	foaf:familyName "Alexandrescu" ;
+	foaf:firstName "Cristina Georgeta" ;
+	foaf:mbox "cgetalexandrescu@gmail.com" ;
+	foaf:member <https://id.acdh.oeaw.ac.at/troesmis%2FAcademia+Rom%C3%A2n%C4%83> .
+
+<https://id.acdh.oeaw.ac.at/troesmis%2FAcademia+Rom%C3%A2n%C4%83> foaf:name "Academia Română" .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P02> a foaf:Person ;
+	dcterms:identifier "P02" ;
+	foaf:familyName "Gugl" ;
+	foaf:firstName "Christian" ;
+	foaf:mbox "christian.gugl@oeaw.ac.at" ;
+	foaf:account "orcid.org/0000-0001-6607-959X" ;
+	foaf:member <https://id.acdh.oeaw.ac.at/troesmis%2FInstitut+f%C3%BCr+Kulturgeschichte+der+Antike> .
+
+<https://id.acdh.oeaw.ac.at/troesmis%2FInstitut+f%C3%BCr+Kulturgeschichte+der+Antike> foaf:name "Institut für Kulturgeschichte der Antike" .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P03> a foaf:Person ;
+	dcterms:identifier "P03" ;
+	foaf:familyName "Kainrath" ;
+	foaf:firstName "Barbara" ;
+	foaf:mbox "barbara.kainrath@oeaw.ac.at" ;
+	foaf:member <https://id.acdh.oeaw.ac.at/troesmis%2FInstitut+f%C3%BCr+Kulturgeschichte+der+Antike> .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P04> a foaf:Person ;
+	dcterms:identifier "P04" ;
+	foaf:familyName "Waldner" ;
+	foaf:firstName "Alice" ;
+	foaf:mbox "alice.waldner@oeai.at" ;
+	foaf:account "orcid.org/0000-0002-6749-4493" ;
+	foaf:member <https://id.acdh.oeaw.ac.at/troesmis%2F%C3%96sterreichisches+Arch%C3%A4ologisches+Institut+> .
+
+<https://id.acdh.oeaw.ac.at/troesmis%2F%C3%96sterreichisches+Arch%C3%A4ologisches+Institut+> foaf:name "Österreichisches Archäologisches Institut " .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P05> a foaf:Person ;
+	dcterms:identifier "P05" ;
+	foaf:familyName "Jernej" ;
+	foaf:firstName "Renate" .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P06> a foaf:Person ;
+	dcterms:identifier "P06" ;
+	foaf:familyName "Kitz" ;
+	foaf:firstName "Isabella" ;
+	foaf:mbox "isabella.kitz@oeaw.ac.at" ;
+	foaf:member <https://id.acdh.oeaw.ac.at/troesmis%2FInstitut+f%C3%BCr+Kulturgeschichte+der+Antike> .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P07> a foaf:Person ;
+	dcterms:identifier "P07" ;
+	foaf:familyName "Zotter" ;
+	foaf:firstName "Karoline" .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P08> a foaf:Person ;
+	dcterms:identifier "P08" ;
+	foaf:familyName "Grabherr" ;
+	foaf:firstName "Gerald" ;
+	foaf:mbox "Gerald.Grabherr@uibk.ac.at" ;
+	foaf:account "orcid.org/0000-0003-4146-6424" ;
+	foaf:member <https://id.acdh.oeaw.ac.at/troesmis%2FUniversit%C3%A4t+Innsbruck> .
+
+<https://id.acdh.oeaw.ac.at/troesmis%2FUniversit%C3%A4t+Innsbruck> foaf:name "Universität Innsbruck" .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P09> a foaf:Person ;
+	dcterms:identifier "P09" ;
+	foaf:familyName "Mandl" ;
+	foaf:firstName "Maria" .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P10> a foaf:Person ;
+	dcterms:identifier "P10" ;
+	foaf:familyName "Hernandez Cordero" ;
+	foaf:firstName "Moises" ;
+	foaf:mbox "Moises.Hernandez.Cordero@oeaw.ac.at" ;
+	foaf:member <https://id.acdh.oeaw.ac.at/troesmis%2FInstitut+f%C3%BCr+Kulturgeschichte+der+Antike> .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P11> a foaf:Person ;
+	dcterms:identifier "P11" ;
+	foaf:familyName "Jansa" ;
+	foaf:firstName "Viktor" ;
+	foaf:mbox "viktor.jansa@oeaw.ac.at" ;
+	foaf:account "http://orcid.org/0000-0002-5920-5866" ;
+	foaf:member <https://id.acdh.oeaw.ac.at/troesmis%2FInstitut+f%C3%BCr+Kulturgeschichte+der+Antike> .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P12> a foaf:Person ;
+	dcterms:identifier "P12" ;
+	foaf:familyName "de Kramer" ;
+	foaf:firstName "Marleen" ;
+	foaf:mbox "mck@7reasons.net" ;
+	foaf:member <https://id.acdh.oeaw.ac.at/troesmis/7reaosns> .
+
+<https://id.acdh.oeaw.ac.at/troesmis/7reaosns> foaf:name "7reaosns" .
+
+<https://id.acdh.oeaw.ac.at/troesmis/P13> a foaf:Person ;
+	dcterms:identifier "P13" ;
+	foaf:familyName "Sauer" ;
+	foaf:firstName "Roman" ;
+	foaf:mbox "Roman.Sauer@omv.com" ;
+	foaf:member <https://id.acdh.oeaw.ac.at/troesmis%2FOMV+Austria+Exploration+%26+Production+GmbH> .
+
+<https://id.acdh.oeaw.ac.at/troesmis%2FOMV+Austria+Exploration+%26+Production+GmbH> foaf:name "OMV Austria Exploration & Production GmbH" .

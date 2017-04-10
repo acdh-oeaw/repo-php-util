@@ -28,12 +28,11 @@ require_once 'init.php';
 
 use acdhOeaw\schema\MetadataCollection;
 
-$graph = new MetadataCollection($fedora, 'tests/graph.ttl');
+$graph = new MetadataCollection($fedora, 'tests/tunico-corpus.ttl');
 $graph->removeLiteralIds();
-$graph->assureTitles($conf->get('fedoraTitleProp'));
 
 $fedora->begin();
-$resources = $graph->import();
+$resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, MetadataCollection::SKIP, true);
 $fedora->commit();
 
 foreach ($resources as $i) {
