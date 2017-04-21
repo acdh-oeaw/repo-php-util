@@ -56,47 +56,52 @@ use acdhOeaw\fedora\Fedora;
  * @author zozlak
  */
 class Parameter extends Object {
-    
+
     private $serviceId;
+    private $name;
     private $byValue;
     private $required;
     private $defaultValue;
     private $rdfProperty;
 
-    public function __construct(Fedora $fedora, string $id, Service $service, bool $byValue, bool $required, string $defaultValue, string $rdfProperty) {
+    public function __construct(Fedora $fedora, string $id, Service $service,
+                                string $name, bool $byValue, bool $required,
+                                string $defaultValue, string $rdfProperty) {
         parent::__construct($fedora, $id);
 
-        $this->serviceId = $service->getResource()->getId();
-        $this->byValue = $byValue;
-        $this->required = $required;
+        $this->serviceId    = $service->getResource()->getId();
+        $this->name         = $name;
+        $this->byValue      = $byValue;
+        $this->required     = $required;
         $this->defaultValue = $defaultValue;
-        $this->rdfProperty = $rdfProperty;        
+        $this->rdfProperty  = $rdfProperty;
     }
-    
+
     public function getMetadata(): Resource {
         $meta = (new Graph())->resource('.');
-        
+
         $relProp = self::$config->get('fedoraRelProp');
         $meta->addResource($relProp, $this->serviceId);
 
         $idProp = $this->fedora->getIdProp();
         $meta->addResource($idProp, $this->getId());
-        
+
         $titleProp = self::$config->get('fedoraTitleProp');
-        $meta->addLiteral($titleProp, $this->getId());
-        
+        $meta->addLiteral($titleProp, $this->name);
+
         $byValueProp = self::$config->get('fedoraServiceParamByValueProp');
         $meta->addLiteral($byValueProp, $this->byValue);
-        
+
         $requiredProp = self::$config->get('fedoraServiceParamRequiredProp');
         $meta->addLiteral($requiredProp, $this->required);
-        
+
         $defaultValueProp = self::$config->get('fedoraServiceParamDefaultValueProp');
         $meta->addLiteral($defaultValueProp, $this->defaultValue);
-        
+
         $redPropertyProp = self::$config->get('fedoraServiceParamRdfPropertyProp');
         $meta->addLiteral($redPropertyProp, $this->rdfProperty);
-        
+
         return $meta;
     }
+
 }

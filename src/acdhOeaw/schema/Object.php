@@ -88,12 +88,9 @@ abstract class Object {
         $this->findResource();
 
         $current = $this->res->getMetadata();
-        $meta = EasyRdfUtil::mergeMetadata($current, $this->getMetadata());
-        $idProp = $this->fedora->getIdProp();
-        foreach ($current->allResources($idProp) as $i) {
-            $meta->addResource($idProp, $i);
-        }
+        $idProp = array($this->fedora->getIdProp());
 
+        $meta = EasyRdfUtil::mergePreserve($current, $this->getMetadata(), $idProp);
         $this->res->setMetadata($meta);
         $this->res->updateMetadata();
     }

@@ -54,10 +54,11 @@ class Service extends Object {
 
     private $location;
     private $retMime;
-    private $params = array();
+    private $params   = array();
     private $supports = array();
 
-    public function __construct(Fedora $fedora, string $id, string $location, string $retMime, array $supports) {
+    public function __construct(Fedora $fedora, string $id, string $location,
+                                string $retMime, array $supports) {
         parent::__construct($fedora, $id);
 
         if ($id == '' || $location == '' || $retMime == '' || count($supports) == 0) {
@@ -65,14 +66,18 @@ class Service extends Object {
         }
 
         $this->location = $location;
-        $this->retMime = $retMime;
+        $this->retMime  = $retMime;
         $this->supports = $supports;
-        $this->fedora = $fedora;
+        $this->fedora   = $fedora;
     }
 
-    public function addParameter(string $name, bool $byValue, bool $required, string $defaultValue = '', string $rdfProperty = '_') {
-        $id = $this->getId() . '/' . $name;
-        $this->params[] = new Parameter($this->fedora, $id, $this, $byValue, $required, $defaultValue, $rdfProperty);
+    public function addParameter(string $name, bool $byValue, bool $required,
+                                 string $defaultValue = '',
+                                 string $rdfProperty = '_') {
+        $id             = $this->getId() . '/' . $name;
+        $this->params[] = new Parameter(
+            $this->fedora, $id, $this, $name, $byValue, $required, $defaultValue, $rdfProperty
+        );
     }
 
     public function getMetadata(): Resource {
