@@ -442,7 +442,11 @@ class Fedora {
      */
     public function begin() {
         $resp = $this->client->post($this->apiUrl . '/fcr:tx');
-        $this->txUrl = $resp->getHeader('Location')[0];
+        $loc = $resp->getHeader('Location');
+        if (count($loc) == 0) {
+            throw new RuntimeException('wrong response from fedora');
+        }
+        $this->txUrl = $loc[0];
     }
 
     /**
