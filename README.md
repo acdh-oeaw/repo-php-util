@@ -63,7 +63,7 @@ The metadata are represented by the [EasyRdf Resource](http://www.easyrdf.org/do
 Prepare resource metadata and (optionally) its binary content and call the `createResource()` method of the `Fedora` class.
 
 ```php
-$graph = new EasyRdf_Graph();
+$graph = new EasyRdf\Graph();
 $metadata = $graph->resource('.'); // the resource URI you provide here is irrelevant and can be any string, just it can not be empty; it is an EasyRdf library limitation
 $metadata->addLiteral('http://my.data/#property', 'myDataPropertyValue');
 $metadata->addResource('http://my.object/#property', 'http://my.Object/Property/Value');
@@ -148,7 +148,7 @@ $myProperty = 'http://my.new/#property'
 
 $fedora->begin();
 
-$graph = new EasyRdf_Graph();
+$graph = new EasyRdf\Graph();
 $metadata = $graph->resource('.');
 foreach(array('value1', 'value2') as $i){
     $metadata->addLiteral($myProperty, $i);
