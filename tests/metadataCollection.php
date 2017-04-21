@@ -27,14 +27,49 @@
 require_once 'init.php';
 
 use acdhOeaw\schema\MetadataCollection;
+use EasyRdf\Resource;
 
-$graph = new MetadataCollection($fedora, 'tests/tunico-corpus.ttl');
-$graph->removeLiteralIds();
+$verbose = true;
+
+echo "\n######################################################\n\n";
+
+$graph = new MetadataCollection($conf, $fedora, 'tests/graph-small.ttl');
+$toDel = new Resource('https://id.acdh.oeaw.ac.at/tunico/someId', $graph);
+$res   = $graph->resourcesMatching('http://purl.org/dc/terms/isPartOf', $toDel)[0];
+$res->delete('http://purl.org/dc/terms/isPartOf', $toDel);
 
 $fedora->begin();
-$resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, MetadataCollection::SKIP, true);
+$resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
 $fedora->commit();
 
-foreach ($resources as $i) {
-    echo $i->getUri(true) . "\n";
+echo "\n######################################################\n\n";
+sleep(5);
+
+$graph = new MetadataCollection($conf, $fedora, 'tests/graph-small.ttl');
+
+$fedora->begin();
+$resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
+$fedora->commit();
+
+echo "\n######################################################\n\n";
+sleep(5);
+
+$graph = new MetadataCollection($conf, $fedora, 'tests/graph-large.ttl');
+
+$fedora->begin();
+$resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
+$fedora->commit();
+
+echo "\n######################################################\n\n";
+sleep(5);
+
+$graph = new MetadataCollection($conf, $fedora, 'tests/graph-cycle.ttl');
+
+$fedora->begin();
+try {
+    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
+    throw new RuntimeException('no error');
+} catch (RuntimeException $e) {
+    
 }
+$fedora->rollback();

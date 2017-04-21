@@ -34,51 +34,27 @@ use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\util\EasyRdfUtil;
-
-/*
-  TODO
-  - dopisać sprawdzanie unikalności locationpath w doorkeeperze
-
-  - iterujemy się przez wszystkie resource w grafie
-  - jesli nie są blank nodes, to promujemy subject do dct:identifier
-  - sprawdzamy, czy mają jakiś dct:identifier - jeśli nie, rzucamy błędem
-  - próbujemy im dopasować resource w repozytorium
-  - jeśli więcej niż jeden, rzucamy błędem
-  - jeśli dokładnie jeden, aktualizujemy
-  - jeśli brak, to dodajemy
-  - dać możliwość "dry run"
-  - przesunąć wszystkie ACDH ID do https://id.acdh.oeaw.ac.at/uuid/
- */
+use acdhOeaw\fedora\metadataQuery\Query;
+use acdhOeaw\fedora\metadataQuery\HasProperty;
+use zozlak\util\Config;
 
 /**
- * Description of Graph
+ * Imports whole metadata graph into the repository.
  *
  * @author zozlak
  */
 class MetadataCollection extends Graph {
 
-    const SKIP = 1;
+    const SKIP   = 1;
     const CREATE = 2;
-    const UPDATE = 3;
 
     /**
-     * Assures a resource will have foaf:name and dc:title
+     * Makes given resource a proper agent
      * 
      * @param \EasyRdf\Resource $res
      * @return \EasyRdf\Resource
      */
     static public function makeAgent(Resource $res): Resource {
-        $name = $res->getLiteral('http://xmlns.com/foaf/0.1/name');
-        $given = $res->getLiteral('http://xmlns.com/foaf/0.1/givenName');
-        $family = $res->getLiteral('http://xmlns.com/foaf/0.1/familyName');
-        $title = trim($given . ' ' . $family);
-        $title = trim($title ? $title : $name);
-
-        $res->delete('http://xmlns.com/foaf/0.1/name');
-        $res->addLiteral('http://xmlns.com/foaf/0.1/name', $title);
-        $res->delete('http://purl.org/dc/elements/1.1/title');
-        $res->addLiteral('http://purl.org/dc/elements/1.1/title', $title);
-
         $res->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://xmlns.com/foaf/0.1/Agent');
 
         return $res;
@@ -96,118 +72,186 @@ class MetadataCollection extends Graph {
      */
     private $resource;
 
-    public function __construct(Fedora $fedora, string $file, string $format = null) {
+    /**
+     * Index anyId => resURI
+     * @var array
+     */
+    private $ids;
+
+    /**
+     * Index resURI => ACDH Id
+     * @var array
+     */
+    private $acdhIds;
+
+    /**
+     *
+     * @var string
+     */
+    private $titleProp;
+
+    /**
+     * 
+     * @param Fedora $fedora
+     * @param string $file
+     * @param string $format
+     */
+    public function __construct(Config $cfg, Fedora $fedora, string $file,
+                                string $format = null) {
         parent::__construct();
         $this->parseFile($file, $format);
 
-        $this->fedora = $fedora;
+        $this->titleProp = $cfg->get('fedoraTitleProp');
+        $this->fedora    = $fedora;
     }
 
+    /**
+     * Sets the repository resource being parent of all resources in the
+     * graph imported by the import() method.
+     * 
+     * @param FedoraResource $res
+     * @see import()
+     */
     public function setResource(FedoraResource $res) {
         $this->resource = $res;
     }
 
     /**
-     * Removes literal ids from the graph.
-     * 
-     * @param bool $verbose
-     */
-    public function removeLiteralIds(bool $verbose = true) {
-        if ($verbose) {
-            echo "removing literal ids...\n";
-        }
-        $idProp = $this->fedora->getIdProp();
-        foreach ($this->resources() as $i) {
-            foreach ($i->allLiterals($idProp) as $j) {
-                $i->delete($idProp, $j);
-                if ($verbose) {
-                    echo "\tremoved " . $j . " from " . $i->getUri() . "\n";
-                }
-            }
-        }
-    }
-
-    /**
      * Imports the whole graph by looping over all resources.
      * 
-     * @param string $namespace
-     * @param int $singleInNmsp
-     * @param int $singleOutNmsp
+     * A repository resource is created for every node containing at least one 
+     * cfg:fedoraIdProp property and:
+     * - containg at least one other property
+     * - or being within $namespace
+     * - or when $singleOutNmsp equals to MetadataCollection::CREATE
+     * 
+     * Resources without cfg:fedoraIdProp property are skipped as we are unable
+     * to identify them on the next import (which would lead to duplication).
+     * 
+     * Resource with a fully qualified URI is considered as having
+     * cfg:fedoraIdProp (its URI is taken as cfg:fedoraIdProp property value).
+     * 
+     * Resources in the graph can denote relationships in any way but all
+     * object URIs already existing in the repository and all object URIs in the
+     * $namespace will be turned into ACDH ids.
+     * This means graph can not contain circular dependencies between resources
+     * which do not already exist in the repository, like:
+     * ```
+     * _:a some:Prop _:b .
+     * _:b some:Prop _:a .
+     * ```
+     * The $errorOnCycle parameter determines behaviour of the method when such
+     * a cycle exists in the graph.
+     * 
+     * @param string $namespace repository resources will be created for all
+     *   resources in this namespace
+     * @param int $singleOutNmsp should repository resources be created
+     *   representing URIs outside $namespace (MetadataCollection::SKIP or
+     *   MetadataCollection::CREATE)
+     * @param bool $errorOnCycle if error should be thrown if not all resources
+     *   were imported due to circular dependencies
      * @param bool $verbose
      * @return array
      * @throws InvalidArgumentException
      */
-    public function import(string $namespace, int $singleInNmsp, int $singleOutNmsp, bool $verbose = true): array {
-        $dict = array(self::SKIP, self::CREATE, self::UPDATE);
-        if (!in_array($singleInNmsp, $dict) || !in_array($singleOutNmsp, $dict)) {
-            throw new InvalidArgumentException('singleInNmsp and singleOutNmsp parameters must be one of MetadataCollection::SKIP, MetadataCollection::CREATE and MetadataCollection::UPDATE');
+    public function import(string $namespace, int $singleOutNmsp,
+                           bool $errorOnCycle = true, bool $verbose = false): array {
+        $dict = array(self::SKIP, self::CREATE);
+        if (!in_array($singleOutNmsp, $dict)) {
+            throw new InvalidArgumentException('singleOutNmsp parameters must be one of MetadataCollection::SKIP, MetadataCollection::CREATE');
         }
 
-        $ids = $this->sanitizeIds();
+        $this->removeLiteralIds($verbose);
+        $this->promoteUrisToIds();
+        $this->buildIndex();
+        $this->mapUris($namespace, false, $verbose);
 
-        $resources = array();
-        foreach ($this->resources() as $i) {
-            if ($verbose) {
-                echo $i->getUri() . "\n";
+        $imported     = array();
+        $toBeImported = array_values($this->resources());
+        $n            = count($toBeImported);
+        while (count($toBeImported) > 0 && $n > 0) {
+            $n--;
+            $i = $toBeImported[$n];
+
+            if ($this->containsWrongRefs($i, $namespace)) {
+                echo $verbose ? "Skipping " . $i->getUri() . " - contains wrong references\n" : "";
+                continue;
             }
 
+            echo $verbose ? "Importing " . $i->getUri() . "\n" : "";
             try {
-                $resources[] = $this->importResource($i, $namespace, $singleInNmsp, $singleOutNmsp, $ids, $verbose);
+                $res = $this->importResource($i, $namespace, $singleOutNmsp, $verbose);
+                $id  = $res->getId();
+
+                $uri                         = $res->getUri(true);
+                $imported[$uri]              = $res;
+                $this->acdhIds[$uri]         = $id;
+                $this->acdhIds[$i->getUri()] = $id;
+
+                $this->mapUris($namespace, false, $verbose);
             } catch (DomainException $e) {
-                if ($verbose) {
-                    echo "\t" . $e->getMessage() . "\n";
-                }
+                echo $verbose ? "\t" . $e->getMessage() . "\n" : "";
+            } finally {
+                array_splice($toBeImported, $n, 1);
+                $n = count($toBeImported);
             }
         }
-        return $resources;
+        if (count($toBeImported) > 0 && $errorOnCycle) {
+            throw new RuntimeException('graph contains cycles');
+        }
+
+        return $imported;
     }
 
     /**
-     * Imports a single resource.
      * 
      * @param Resource $res
      * @param string $namespace
-     * @param int $singleInNmsp
-     * @param int $singleOutNmsp
-     * @param array $ids
+     * @param int $onlyIdsInNmsp
+     * @param int $onlyIdsOutNmsp
+     * @param bool $verbose
      * @return FedoraResource
      * @throws DomainException
-     * @throws RuntimeException
      */
-    private function importResource(Resource $res, string $namespace, int $singleInNmsp, int $singleOutNmsp, array $ids, bool $verbose): FedoraResource {
+    private function importResource(Resource $res, string $namespace,
+                                    int $onlyIdsOutNmsp, bool $verbose): FedoraResource {
         $idProp = $this->fedora->getIdProp();
 
         if (count($res->allResources($idProp)) == 0) {
             // it does not make sense to process resource without ids 
             // cause we will be unable to match in the future
             throw new DomainException("no ids - skipping");
-        } elseif (isset($ids[$res->getUri()])) {
+        } elseif ($this->fedora->isAcdhId($res->getUri())) {
             // ACDH ids by definition can be only objects (and never subjects)
-            throw new DomainException("id resource - skipping");
+            throw new DomainException("ACDH id resource - skipping");
         }
 
         list($matches, $inNmsp) = $this->findMatches($res, $namespace);
+        $action    = $inNmsp ? self::CREATE : $onlyIdsOutNmsp;
+        $inNmsp    = $inNmsp ? "in" : "outside";
         $propCount = count($res->propertyUris());
 
         // special cases for resource containing only ids
-        if ($propCount == 1 && $inNmsp && $singleInNmsp == self::SKIP) {
-            throw new DomainException("only ids (in namespace) - skipping");
-        } elseif ($propCount == 1 && !$inNmsp && $singleOutNmsp == self::SKIP) {
-            throw new DomainException("only ids (outside namespace) - skipping");
+        if ($propCount == 1) {
+            if ($this->isIdElsewhere($res)) {
+                throw new DomainException("single id assigned to another resource - skipping");
+            } elseif ($action == self::SKIP) {
+                throw new DomainException("only ids (" . $inNmsp . " namespace) - skipping");
+            } elseif (count($matches) == 0 && $action == self::CREATE) {
+                // add title
+                $res->addLiteral($this->titleProp, $res->getResource($idProp));
+            }
         }
 
-        $res = $this->sanitizeResource($res);
+        $res = $this->sanitizeResource($res, $namespace);
 
         if (count($matches) == 1) {
-            if ($propCount == 1 && $inNmsp && $singleInNmsp != self::UPDATE) {
-                throw new DomainException("found (in namespace) - skipping update");
-            } elseif ($propCount == 1 && !$inNmsp && $singleOutNmsp != self::UPDATE) {
-                throw new DomainException("found (outside namespace) - skipping update");
-            }
-            
             $repoRes = array_pop($matches);
             echo $verbose ? "\tupdating " . $repoRes->getUri(true) . "\n" : "";
-            $meta = $this->mergeMetadata($repoRes->getMetadata(), $res);
+
+            $old  = $repoRes->getMetadata();
+            $meta = EasyRdfUtil::mergePreserve($old, $res, array($idProp));
+
             $repoRes->setMetadata($meta);
             $repoRes->updateMetadata();
         } else {
@@ -219,42 +263,194 @@ class MetadataCollection extends Graph {
     }
 
     /**
-     * Cleans up id properties in the graph.
      * 
-     * Especially promotes subjects being fully qualified URLs to ids.
-     * @return array
+     * @param Resource $res
+     * @return bool
      */
-    private function sanitizeIds(): array {
+    private function isIdElseWhere(Resource $res): bool {
         $idProp = $this->fedora->getIdProp();
 
-        $ids = array();
-        foreach ($this->resources() as $i) {
-            // promote fully qualified resource URI to id
-            if (!$i->isBNode()) {
-                $i->addResource($idProp, $i->getUri());
+        $revMatches = $this->reversePropertyUris($res);
+        foreach ($revMatches as $prop) {
+            if ($prop != $idProp) {
+                continue;
             }
-            foreach ($i->allResources($idProp) as $j) {
-                $ids[$j->getUri()] = '';
+            $matches = $this->resourcesMatching($prop, $res);
+            foreach ($matches as $i) {
+                if ($i->getUri() != $res->getUri()) {
+                    return true;
+                }
             }
         }
-        return $ids;
+        return false;
     }
 
     /**
-     * Merges metadata preservind ids from the old metadata.
      * 
-     * @param Resource $old
-     * @param Resource $new
-     * @return Resource
+     * @param Resource $res
+     * @return boolean
      */
-    private function mergeMetadata(Resource $old, Resource $new): Resource {
+    private function containsWrongRefs(Resource $res, string $namespace): bool {
         $idProp = $this->fedora->getIdProp();
-        $ids = $old->allResources($idProp);
-        $new = EasyRdfUtil::mergeMetadata($old, $new);
-        foreach ($ids as $id) {
-            $new->addResource($idProp, $id->getUri());
+        foreach ($res->propertyUris() as $prop) {
+            if ($prop == $idProp) {
+                continue;
+            }
+            foreach ($res->allResources($prop) as $val) {
+                $valUri   = $val->getUri();
+                $inNmsp   = strpos($valUri, $namespace) === 0;
+                $isAcdhId = $this->fedora->isAcdhId($valUri);
+                if ($val->isBNode() || ($inNmsp && !$isAcdhId)) {
+                    return true;
+                }
+            }
         }
-        return $new;
+        return false;
+    }
+
+    /**
+     * Changes all URIs into ACDH ids of corresponding repository resources
+     */
+    private function mapUris(string $namespace, bool $force, bool $verbose) {
+        $idProp = $this->fedora->getIdProp();
+
+        echo $verbose ? "Mapping URIs to ACDH ids...\n" : "";
+        $nothingToDo = true;
+
+        foreach ($this->resources() as $res) {
+            foreach ($res->propertyUris() as $prop) {
+                if ($prop == $idProp) {
+                    continue;
+                }
+
+                foreach ($res->allResources($prop) as $val) {
+                    $uri = $val->getUri();
+
+                    // already points to ACDH id
+                    if ($this->fedora->isAcdhId($uri)) {
+                        continue;
+                    }
+
+                    $known  = isset($this->ids[$uri]);
+                    $inNmsp = strpos($uri, $namespace) === 0 || $val->isBNode();
+                    if (!$known && $inNmsp && $force) {
+                        throw new RuntimeException('uri ' . $val . ' can not be resolved to known resource');
+                    } elseif (!$known || !$inNmsp) {
+                        continue;
+                    }
+
+                    $targetUri = $this->ids[$uri];
+                    if (isset($this->acdhIds[$targetUri]) || isset($this->acdhIds[$uri])) {
+                        $targetId = isset($this->acdhIds[$targetUri]) ? $this->acdhIds[$targetUri] : $this->acdhIds[$uri];
+                        $res->delete($prop, $val);
+                        $res->addResource($prop, $targetId);
+                        if ($verbose) {
+                            echo "\tswitching " . $val . " into " . $targetId . "\n";
+                        }
+                    } elseif ($verbose) {
+                        echo "\t" . $uri . " should be replaced by target resurce's ACDH id but it is not yet known (" . $targetUri . ")\n";
+                    }
+                    $nothingToDo = false;
+                }
+            }
+        }
+        echo $verbose && $nothingToDo ? "\t...nothing to map\n" : "";
+    }
+
+    /**
+     * 
+     * @param Resource $res
+     * @param string $namespace
+     * @return type
+     */
+    private function findMatches(Resource $res, string $namespace) {
+        $idProp = $this->fedora->getIdProp();
+
+        $matches = array();
+        $inNmsp  = false;
+        foreach ($res->allResources($idProp) as $id) {
+            $inNmsp = $inNmsp || strpos($id, $namespace) === 0;
+
+            $id = $id->getUri();
+            if (!isset($this->ids[$id]) || $this->ids[$id] === '_') {
+                continue;
+            }
+            if (!isset($matches[$this->ids[$id]])) {
+                $matches[$this->ids[$id]] = $this->fedora->getResourceByUri($this->ids[$id]);
+            }
+        }
+        return array(array_values($matches), $inNmsp);
+    }
+
+    /**
+     * Promotes subjects being fully qualified URLs to ids.
+     */
+    private function promoteUrisToIds() {
+        $idProp = $this->fedora->getIdProp();
+
+        foreach ($this->resources() as $i) {
+            if (!$i->isBNode()) {
+                $i->addResource($idProp, $i->getUri());
+            }
+        }
+    }
+
+    /**
+     * 
+     * @throws RuntimeException
+     */
+    private function buildIndex() {
+        $idProp = $this->fedora->getIdProp();
+        $idNmsp = $this->fedora->getIdNamespace();
+
+        $this->ids     = array();
+        $this->acdhIds = array();
+
+        $query = new Query();
+        $param = (new HasProperty($this->fedora->getIdProp()))->
+            setSubVar('?res')->
+            setObjVar('?id');
+        $query->addParameter($param);
+
+        $ids = $this->fedora->runQuery($query);
+        foreach ($ids as $i) {
+            $i->id  = $i->id->getUri();
+            $i->res = $i->res->getUri();
+
+            $this->ids[$i->id] = $i->res;
+            if (strpos($i->id, $idNmsp) === 0) {
+                $this->acdhIds[$i->res] = $i->id;
+            }
+        }
+
+        foreach ($this->resourcesMatching($idProp) as $i) {
+            $matched = array();
+            foreach ($i->allResources($idProp) as $j) {
+                $j = $j->getUri();
+
+                $matches = $this->fedora->getResourcesById($j);
+                if (count($matches) > 1) {
+                    throw new RuntimeException('repository inconsitent');
+                } elseif (count($matches) == 1) {
+                    $res                     = $matches[0];
+                    $matched[$res->getUri()] = '';
+
+                    $this->ids[$j]                     = $res->getUri();
+                    $this->acdhIds[$res->getUri(true)] = $res->getId();
+                    $this->acdhIds[$i->getUri()]       = $res->getId();
+                } else {
+                    $this->ids[$j] = '_';
+                }
+            }
+            if (count($matched) > 1) {
+                throw new RuntimeException('repository inconsitent');
+            }
+
+            if ($i->isBNode()) {
+                $matched                 = array_keys($matched);
+                $this->ids[$i->getUri()] = count($matched) > 0 ? $matched[0] : '_';
+            }
+        }
     }
 
     /**
@@ -262,8 +458,13 @@ class MetadataCollection extends Graph {
      * 
      * @param Resource $res
      * @return Resource
+     * @throws InvalidArgumentException
      */
-    private function sanitizeResource(Resource $res): Resource {
+    private function sanitizeResource(Resource $res, string $namespace): Resource {
+        if ($this->containsWrongRefs($res, $namespace)) {
+            throw new InvalidArgumentException('resource contains references to blank nodes');
+        }
+
         if ($res->isA('http://xmlns.com/foaf/0.1/Person') || $res->isA('http://xmlns.com/foaf/0.1/Agent')) {
             $res = self::makeAgent($res);
         }
@@ -276,32 +477,22 @@ class MetadataCollection extends Graph {
     }
 
     /**
-     * Finds matching resources already existing in the repository.
+     * Removes literal ids from the graph.
      * 
-     * @param Resource $res
-     * @param string $namespace
-     * @return array
-     * @throws \RuntimeException
+     * @param bool $verbose
      */
-    private function findMatches(Resource $res, string $namespace): array {
-        $idProp = $this->fedora->getIdProp();
-        $ids = $res->allResources($idProp);
+    private function removeLiteralIds(bool $verbose = true) {
+        echo $verbose ? "Removing literal ids...\n" : "";
 
-        $matches = array();
-        $inNmsp = false;
-        foreach ($ids as $id) {
-            $nmspTmp = strpos($id, $namespace) === 0;
-            foreach ($this->fedora->getResourcesById($id) as $res) {
-                $uri = $res->getUri(true);
-                $matches[$uri] = $res;
-                if (count($matches) > 1) {
-                    throw new RuntimeException('many matching resources for id ' . $id);
+        $idProp = $this->fedora->getIdProp();
+        foreach ($this->resources() as $i) {
+            foreach ($i->allLiterals($idProp) as $j) {
+                $i->delete($idProp, $j);
+                if ($verbose) {
+                    echo "\tremoved " . $j . " from " . $i->getUri() . "\n";
                 }
             }
-            $inNmsp = $inNmsp || $nmspTmp;
         }
-
-        return array($matches, $inNmsp);
     }
 
 }
