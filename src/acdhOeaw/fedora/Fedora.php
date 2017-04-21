@@ -112,6 +112,13 @@ class Fedora {
     private $idNamespace;
     
     /**
+     * Namespace used by ontology entities' ids
+     * 
+     * @var string
+     */
+    private $vocabsNamespace;
+    
+    /**
      * SPARQL client object
      * @var SparqlClient
      */
@@ -135,6 +142,8 @@ class Fedora {
      * - fedoraUser - login required to connect to the Fedora REST API
      * - fedoraPswd - password required to connect to the Fedora REST API
      * - sparqlUrl - SPARQL endpoint URL
+     * - fedoraIdNamespace - namespace used for primary ids
+     * - fedoraVocabsNamespace - id namespace used by ontology entities
      * 
      * @param \zozlak\util\Config $cfg configuration object
      */
@@ -143,6 +152,7 @@ class Fedora {
         $this->idProp = $cfg->get('fedoraIdProp');
         $this->relProp = $cfg->get('fedoraRelProp');
         $this->idNamespace = $cfg->get('fedoraIdNamespace');
+        $this->vocabsNamespace = $cfg->get('fedoraVocabsNamespace');
         $authHeader = 'Basic ' . base64_encode($cfg->get('fedoraUser') . ':' . $cfg->get('fedoraPswd'));
         $this->client = new Client(['verify' => false, 'headers' => ['Authorization' => $authHeader]]);
         $this->sparqlClient = new SparqlClient($cfg->get('sparqlUrl'), $cfg->get('fedoraUser'), $cfg->get('fedoraPswd'));
@@ -163,6 +173,14 @@ class Fedora {
     public function getIdNamespace(): string {
         return $this->idNamespace;
     }
+    
+    /**
+     * Returns URI of the namespace used by ontology entities' ids.
+     * @return string
+     */
+    public function getVocabsNamespace(): string {
+        return $this->vocabsNamespace;
+    }
 
     /**
      * Returns URI of the RDF property denoting relation of being a collection part.
@@ -172,6 +190,10 @@ class Fedora {
         return $this->relProp;
     }
 
+    public function isAcdhId(string $uri): bool {
+        return strpos($uri, $this->idNamespace) === 0 || strpos($uri, $this->vocabsNamespace) === 0;
+    }
+    
     /**
      * Creates a resource in the Fedora and returns corresponding Resource object
      * 
