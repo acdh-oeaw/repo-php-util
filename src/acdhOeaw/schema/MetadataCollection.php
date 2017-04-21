@@ -39,7 +39,7 @@ use acdhOeaw\fedora\metadataQuery\HasProperty;
 use zozlak\util\Config;
 
 /**
- * Imports whole metadata graph into the repository.
+ * Class for importing whole metadata graph into the repository.
  *
  * @author zozlak
  */
@@ -61,13 +61,13 @@ class MetadataCollection extends Graph {
     }
 
     /**
-     *
+     * Fedora connection object
      * @var \acdhOeaw\fedora\Fedora
      */
     private $fedora;
 
     /**
-     *
+     * Parent resource for all imported graph nodes
      * @var \acdhOeaw\fedora\FedoraResource
      */
     private $resource;
@@ -85,13 +85,15 @@ class MetadataCollection extends Graph {
     private $acdhIds;
 
     /**
-     *
+     * RDF property for storing a resource title
      * @var string
      */
     private $titleProp;
 
     /**
+     * Creates a new metadata parser.
      * 
+     * @param Config $cfg
      * @param Fedora $fedora
      * @param string $file
      * @param string $format
@@ -204,10 +206,10 @@ class MetadataCollection extends Graph {
     }
 
     /**
+     * Imports single graph node.
      * 
      * @param Resource $res
      * @param string $namespace
-     * @param int $onlyIdsInNmsp
      * @param int $onlyIdsOutNmsp
      * @param bool $verbose
      * @return FedoraResource
@@ -263,6 +265,8 @@ class MetadataCollection extends Graph {
     }
 
     /**
+     * Checks if a given resource is a cfg:fedoraIdProp of some other node in
+     * the graph.
      * 
      * @param Resource $res
      * @return bool
@@ -286,8 +290,11 @@ class MetadataCollection extends Graph {
     }
 
     /**
+     * Checks if a node contains wrong esdges (blank ones or non-id edges
+     * pointing to ids in $namespace but not being ACDH ids).
      * 
      * @param Resource $res
+     * @param string $namespace
      * @return boolean
      */
     private function containsWrongRefs(Resource $res, string $namespace): bool {
@@ -310,6 +317,11 @@ class MetadataCollection extends Graph {
 
     /**
      * Changes all URIs into ACDH ids of corresponding repository resources
+     * 
+     * @param string $namespace
+     * @param bool $force
+     * @param bool $verbose
+     * @throws RuntimeException
      */
     private function mapUris(string $namespace, bool $force, bool $verbose) {
         $idProp = $this->fedora->getIdProp();
@@ -358,6 +370,7 @@ class MetadataCollection extends Graph {
     }
 
     /**
+     * Finds repository resources matching given one.
      * 
      * @param Resource $res
      * @param string $namespace
@@ -396,8 +409,10 @@ class MetadataCollection extends Graph {
     }
 
     /**
+     * Builds index used by findMatches()
      * 
      * @throws RuntimeException
+     * @see findMatches()
      */
     private function buildIndex() {
         $idProp = $this->fedora->getIdProp();
@@ -457,6 +472,7 @@ class MetadataCollection extends Graph {
      * Cleans up resource metadata.
      * 
      * @param Resource $res
+     * @param string $namespace
      * @return Resource
      * @throws InvalidArgumentException
      */

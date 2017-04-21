@@ -21,13 +21,13 @@
 <path fill="none" stroke="gray" d="M464.34,-840C464.34,-840 824.679,-840 824.679,-840 830.679,-840 836.679,-846 836.679,-852 836.679,-852 836.679,-1116 836.679,-1116 836.679,-1122 830.679,-1128 824.679,-1128 824.679,-1128 464.34,-1128 464.34,-1128 458.34,-1128 452.34,-1122 452.34,-1116 452.34,-1116 452.34,-852 452.34,-852 452.34,-846 458.34,-840 464.34,-840"/>
 <text text-anchor="middle" x="644.51" y="-1115.2" font-family="Times,serif" font-size="11.00" fill="gray">schema</text>
 </g>
-<g id="clust4" class="cluster"><title>cluster_\acdhOeaw\schema\cirilo</title>
-<path fill="none" stroke="gray" d="M731.679,-1028C731.679,-1028 787.679,-1028 787.679,-1028 793.679,-1028 799.679,-1034 799.679,-1040 799.679,-1040 799.679,-1088 799.679,-1088 799.679,-1094 793.679,-1100 787.679,-1100 787.679,-1100 731.679,-1100 731.679,-1100 725.679,-1100 719.679,-1094 719.679,-1088 719.679,-1088 719.679,-1040 719.679,-1040 719.679,-1034 725.679,-1028 731.679,-1028"/>
-<text text-anchor="middle" x="759.679" y="-1087.2" font-family="Times,serif" font-size="11.00" fill="gray">cirilo</text>
+<g id="clust4" class="cluster"><title>cluster_\acdhOeaw\schema\dissemination</title>
+<path fill="none" stroke="gray" d="M725.179,-974C725.179,-974 794.179,-974 794.179,-974 800.179,-974 806.179,-980 806.179,-986 806.179,-986 806.179,-1088 806.179,-1088 806.179,-1094 800.179,-1100 794.179,-1100 794.179,-1100 725.179,-1100 725.179,-1100 719.179,-1100 713.179,-1094 713.179,-1088 713.179,-1088 713.179,-986 713.179,-986 713.179,-980 719.179,-974 725.179,-974"/>
+<text text-anchor="middle" x="759.679" y="-1087.2" font-family="Times,serif" font-size="11.00" fill="gray">dissemination</text>
 </g>
-<g id="clust5" class="cluster"><title>cluster_\acdhOeaw\schema\dissemination</title>
-<path fill="none" stroke="gray" d="M725.179,-894C725.179,-894 794.179,-894 794.179,-894 800.179,-894 806.179,-900 806.179,-906 806.179,-906 806.179,-1008 806.179,-1008 806.179,-1014 800.179,-1020 794.179,-1020 794.179,-1020 725.179,-1020 725.179,-1020 719.179,-1020 713.179,-1014 713.179,-1008 713.179,-1008 713.179,-906 713.179,-906 713.179,-900 719.179,-894 725.179,-894"/>
-<text text-anchor="middle" x="759.679" y="-1007.2" font-family="Times,serif" font-size="11.00" fill="gray">dissemination</text>
+<g id="clust5" class="cluster"><title>cluster_\acdhOeaw\schema\cirilo</title>
+<path fill="none" stroke="gray" d="M731.679,-894C731.679,-894 787.679,-894 787.679,-894 793.679,-894 799.679,-900 799.679,-906 799.679,-906 799.679,-954 799.679,-954 799.679,-960 793.679,-966 787.679,-966 787.679,-966 731.679,-966 731.679,-966 725.679,-966 719.679,-960 719.679,-954 719.679,-954 719.679,-906 719.679,-906 719.679,-900 725.679,-894 731.679,-894"/>
+<text text-anchor="middle" x="759.679" y="-953.2" font-family="Times,serif" font-size="11.00" fill="gray">cirilo</text>
 </g>
 <g id="clust6" class="cluster"><title>cluster_\acdhOeaw\redmine</title>
 <path fill="none" stroke="gray" d="M731.679,-328C731.679,-328 787.679,-328 787.679,-328 793.679,-328 799.679,-334 799.679,-340 799.679,-340 799.679,-496 799.679,-496 799.679,-502 793.679,-508 787.679,-508 787.679,-508 731.679,-508 731.679,-508 725.679,-508 719.679,-502 719.679,-496 719.679,-496 719.679,-340 719.679,-340 719.679,-334 725.679,-328 731.679,-328"/>
@@ -49,41 +49,41 @@
 <path fill="none" stroke="gray" d="M728.179,-114C728.179,-114 791.179,-114 791.179,-114 797.179,-114 803.179,-120 803.179,-126 803.179,-126 803.179,-228 803.179,-228 803.179,-234 797.179,-240 791.179,-240 791.179,-240 728.179,-240 728.179,-240 722.179,-240 716.179,-234 716.179,-228 716.179,-228 716.179,-126 716.179,-126 716.179,-120 722.179,-114 728.179,-114"/>
 <text text-anchor="middle" x="759.679" y="-227.2" font-family="Times,serif" font-size="11.00" fill="gray">storage</text>
 </g>
-<!-- \\acdhOeaw\\schema\\cirilo\\Service -->
-<g id="node1" class="node"><title>\\acdhOeaw\\schema\\cirilo\\Service</title>
-<polygon fill="none" stroke="black" points="791.679,-1072 727.679,-1072 727.679,-1036 791.679,-1036 791.679,-1072"/>
-<text text-anchor="middle" x="759.679" y="-1051.2" font-family="Courier,monospace" font-size="11.00">Service</text>
+<!-- \\acdhOeaw\\schema\\dissemination\\Parameter -->
+<g id="node1" class="node"><title>\\acdhOeaw\\schema\\dissemination\\Parameter</title>
+<polygon fill="none" stroke="black" points="798.179,-1072 721.179,-1072 721.179,-1036 798.179,-1036 798.179,-1072"/>
+<text text-anchor="middle" x="759.679" y="-1051.2" font-family="Courier,monospace" font-size="11.00">Parameter</text>
 </g>
 <!-- \\acdhOeaw\\schema\\Object -->
 <g id="node5" class="node"><title>\\acdhOeaw\\schema\\Object</title>
-<polygon fill="none" stroke="black" points="544.34,-992 460.34,-992 460.34,-956 544.34,-956 544.34,-992"/>
-<text text-anchor="start" x="468.34" y="-977.2" font-family="Courier,monospace" font-size="11.00">«abstract»</text>
-<text text-anchor="start" x="481.84" y="-965.2" font-family="Courier,monospace" font-size="11.00">Object</text>
+<polygon fill="none" stroke="black" points="544.34,-1018 460.34,-1018 460.34,-982 544.34,-982 544.34,-1018"/>
+<text text-anchor="start" x="468.34" y="-1003.2" font-family="Courier,monospace" font-size="11.00">«abstract»</text>
+<text text-anchor="start" x="481.84" y="-991.2" font-family="Courier,monospace" font-size="11.00">Object</text>
 </g>
-<!-- \\acdhOeaw\\schema\\cirilo\\Service&#45;&gt;\\acdhOeaw\\schema\\Object -->
-<g id="edge9" class="edge"><title>\\acdhOeaw\\schema\\cirilo\\Service&#45;&gt;\\acdhOeaw\\schema\\Object</title>
-<path fill="none" stroke="black" d="M727.625,-1044.27C684.548,-1030.77 606.132,-1006.21 554.38,-989.991"/>
-<polygon fill="none" stroke="black" points="555.312,-986.616 544.723,-986.966 553.219,-993.296 555.312,-986.616"/>
+<!-- \\acdhOeaw\\schema\\dissemination\\Parameter&#45;&gt;\\acdhOeaw\\schema\\Object -->
+<g id="edge2" class="edge"><title>\\acdhOeaw\\schema\\dissemination\\Parameter&#45;&gt;\\acdhOeaw\\schema\\Object</title>
+<path fill="none" stroke="black" d="M721.003,-1046.03C676.877,-1036.7 603.568,-1021.2 554.367,-1010.79"/>
+<polygon fill="none" stroke="black" points="555.067,-1007.36 544.559,-1008.72 553.619,-1014.21 555.067,-1007.36"/>
 </g>
 <!-- \\acdhOeaw\\schema\\dissemination\\Service -->
 <g id="node2" class="node"><title>\\acdhOeaw\\schema\\dissemination\\Service</title>
-<polygon fill="none" stroke="black" points="791.679,-992 727.679,-992 727.679,-956 791.679,-956 791.679,-992"/>
-<text text-anchor="middle" x="759.679" y="-971.2" font-family="Courier,monospace" font-size="11.00">Service</text>
+<polygon fill="none" stroke="black" points="791.679,-1018 727.679,-1018 727.679,-982 791.679,-982 791.679,-1018"/>
+<text text-anchor="middle" x="759.679" y="-997.2" font-family="Courier,monospace" font-size="11.00">Service</text>
 </g>
 <!-- \\acdhOeaw\\schema\\dissemination\\Service&#45;&gt;\\acdhOeaw\\schema\\Object -->
-<g id="edge10" class="edge"><title>\\acdhOeaw\\schema\\dissemination\\Service&#45;&gt;\\acdhOeaw\\schema\\Object</title>
-<path fill="none" stroke="black" d="M727.625,-974C684.727,-974 606.784,-974 555.027,-974"/>
-<polygon fill="none" stroke="black" points="554.723,-970.5 544.723,-974 554.723,-977.5 554.723,-970.5"/>
+<g id="edge8" class="edge"><title>\\acdhOeaw\\schema\\dissemination\\Service&#45;&gt;\\acdhOeaw\\schema\\Object</title>
+<path fill="none" stroke="black" d="M727.625,-1000C684.727,-1000 606.784,-1000 555.027,-1000"/>
+<polygon fill="none" stroke="black" points="554.723,-996.5 544.723,-1000 554.723,-1003.5 554.723,-996.5"/>
 </g>
-<!-- \\acdhOeaw\\schema\\dissemination\\Parameter -->
-<g id="node3" class="node"><title>\\acdhOeaw\\schema\\dissemination\\Parameter</title>
-<polygon fill="none" stroke="black" points="798.179,-938 721.179,-938 721.179,-902 798.179,-902 798.179,-938"/>
-<text text-anchor="middle" x="759.679" y="-917.2" font-family="Courier,monospace" font-size="11.00">Parameter</text>
+<!-- \\acdhOeaw\\schema\\cirilo\\Service -->
+<g id="node3" class="node"><title>\\acdhOeaw\\schema\\cirilo\\Service</title>
+<polygon fill="none" stroke="black" points="791.679,-938 727.679,-938 727.679,-902 791.679,-902 791.679,-938"/>
+<text text-anchor="middle" x="759.679" y="-917.2" font-family="Courier,monospace" font-size="11.00">Service</text>
 </g>
-<!-- \\acdhOeaw\\schema\\dissemination\\Parameter&#45;&gt;\\acdhOeaw\\schema\\Object -->
-<g id="edge11" class="edge"><title>\\acdhOeaw\\schema\\dissemination\\Parameter&#45;&gt;\\acdhOeaw\\schema\\Object</title>
-<path fill="none" stroke="black" d="M721.003,-927.968C676.877,-937.3 603.568,-952.803 554.367,-963.208"/>
-<polygon fill="none" stroke="black" points="553.619,-959.789 544.559,-965.283 555.067,-966.638 553.619,-959.789"/>
+<!-- \\acdhOeaw\\schema\\cirilo\\Service&#45;&gt;\\acdhOeaw\\schema\\Object -->
+<g id="edge4" class="edge"><title>\\acdhOeaw\\schema\\cirilo\\Service&#45;&gt;\\acdhOeaw\\schema\\Object</title>
+<path fill="none" stroke="black" d="M727.625,-929.73C684.548,-943.226 606.132,-967.794 554.38,-984.009"/>
+<polygon fill="none" stroke="black" points="553.219,-980.704 544.723,-987.034 555.312,-987.384 553.219,-980.704"/>
 </g>
 <!-- \\acdhOeaw\\schema\\MetadataCollection -->
 <g id="node4" class="node"><title>\\acdhOeaw\\schema\\MetadataCollection</title>
@@ -111,7 +111,7 @@
 <text text-anchor="middle" x="502.34" y="-14.3" font-family="Times,serif" font-size="14.00" fill="gray">\acdhOeaw\redmine\Redmine</text>
 </g>
 <!-- \\acdhOeaw\\redmine\\Issue&#45;&gt;\\acdhOeaw\\redmine\\Redmine -->
-<g id="edge2" class="edge"><title>\\acdhOeaw\\redmine\\Issue&#45;&gt;\\acdhOeaw\\redmine\\Redmine</title>
+<g id="edge3" class="edge"><title>\\acdhOeaw\\redmine\\Issue&#45;&gt;\\acdhOeaw\\redmine\\Redmine</title>
 <path fill="none" stroke="black" d="M732.42,-457.922C718,-454.313 701,-447.563 690.679,-435 578.796,-298.8 740.328,-172.554 618.679,-45 614.497,-40.6143 609.749,-36.8805 604.621,-33.7067"/>
 <polygon fill="none" stroke="black" points="606.128,-30.5432 595.665,-28.8778 602.806,-36.7046 606.128,-30.5432"/>
 </g>
@@ -121,7 +121,7 @@
 <text text-anchor="middle" x="759.679" y="-405.2" font-family="Courier,monospace" font-size="11.00">User</text>
 </g>
 <!-- \\acdhOeaw\\redmine\\User&#45;&gt;\\acdhOeaw\\redmine\\Redmine -->
-<g id="edge3" class="edge"><title>\\acdhOeaw\\redmine\\User&#45;&gt;\\acdhOeaw\\redmine\\Redmine</title>
+<g id="edge5" class="edge"><title>\\acdhOeaw\\redmine\\User&#45;&gt;\\acdhOeaw\\redmine\\Redmine</title>
 <path fill="none" stroke="black" d="M732.553,-403.811C718.178,-400.165 701.178,-393.415 690.679,-381 592.063,-264.384 725.648,-154.005 618.679,-45 614.388,-40.6274 609.534,-36.9068 604.306,-33.7458"/>
 <polygon fill="none" stroke="black" points="605.666,-30.5062 595.188,-28.9378 602.401,-36.6981 605.666,-30.5062"/>
 </g>
@@ -131,7 +131,7 @@
 <text text-anchor="middle" x="759.679" y="-351.2" font-family="Courier,monospace" font-size="11.00">Project</text>
 </g>
 <!-- \\acdhOeaw\\redmine\\Project&#45;&gt;\\acdhOeaw\\redmine\\Redmine -->
-<g id="edge6" class="edge"><title>\\acdhOeaw\\redmine\\Project&#45;&gt;\\acdhOeaw\\redmine\\Redmine</title>
+<g id="edge9" class="edge"><title>\\acdhOeaw\\redmine\\Project&#45;&gt;\\acdhOeaw\\redmine\\Redmine</title>
 <path fill="none" stroke="black" d="M727.564,-346.78C714.471,-342.263 700.116,-335.115 690.679,-324 607.795,-226.377 710.251,-134.525 618.679,-45 614.252,-40.6712 609.27,-36.9872 603.926,-33.8562"/>
 <polygon fill="none" stroke="black" points="605.12,-30.5355 594.624,-29.0927 601.929,-36.7661 605.12,-30.5355"/>
 </g>
@@ -151,7 +151,7 @@
 <text text-anchor="middle" x="268.5" y="-728.2" font-family="Courier,monospace" font-size="11.00">HasProperty</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\metadataQuery\\HasValue&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasProperty -->
-<g id="edge4" class="edge"><title>\\acdhOeaw\\fedora\\metadataQuery\\HasValue&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasProperty</title>
+<g id="edge6" class="edge"><title>\\acdhOeaw\\fedora\\metadataQuery\\HasValue&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasProperty</title>
 <path fill="none" stroke="black" d="M466.631,-753.958C429.013,-749.577 368.464,-742.525 324.386,-737.392"/>
 <polygon fill="none" stroke="black" points="324.742,-733.91 314.404,-736.23 323.932,-740.863 324.742,-733.91"/>
 </g>
@@ -167,7 +167,7 @@
 <text text-anchor="middle" x="759.679" y="-701.2" font-family="Courier,monospace" font-size="11.00">MatchesRegEx</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\metadataQuery\\MatchesRegEx&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasValue -->
-<g id="edge5" class="edge"><title>\\acdhOeaw\\fedora\\metadataQuery\\MatchesRegEx&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasValue</title>
+<g id="edge7" class="edge"><title>\\acdhOeaw\\fedora\\metadataQuery\\MatchesRegEx&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasValue</title>
 <path fill="none" stroke="black" d="M710.652,-714.157C663.913,-724.041 593.464,-738.94 547.932,-748.569"/>
 <polygon fill="none" stroke="black" points="547.109,-745.166 538.05,-750.659 548.558,-752.014 547.109,-745.166"/>
 </g>
@@ -177,12 +177,12 @@
 <text text-anchor="middle" x="502.34" y="-701.2" font-family="Courier,monospace" font-size="11.00">HasTriple</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\metadataQuery\\HasTriple&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasProperty -->
-<g id="edge7" class="edge"><title>\\acdhOeaw\\fedora\\metadataQuery\\HasTriple&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasProperty</title>
+<g id="edge10" class="edge"><title>\\acdhOeaw\\fedora\\metadataQuery\\HasTriple&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasProperty</title>
 <path fill="none" stroke="black" d="M463.833,-708.368C425.986,-712.776 367.144,-719.628 324.119,-724.639"/>
 <polygon fill="none" stroke="black" points="323.623,-721.173 314.095,-725.806 324.433,-728.126 323.623,-721.173"/>
 </g>
 <!-- \\acdhOeaw\\fedora\\metadataQuery\\HasProperty&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\QueryParameter -->
-<g id="edge8" class="edge"><title>\\acdhOeaw\\fedora\\metadataQuery\\HasProperty&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\QueryParameter</title>
+<g id="edge11" class="edge"><title>\\acdhOeaw\\fedora\\metadataQuery\\HasProperty&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\QueryParameter</title>
 <path fill="none" stroke="black" d="M222.572,-731C203.864,-731 181.782,-731 161.369,-731"/>
 <polygon fill="none" stroke="black" points="161.19,-727.5 151.19,-731 161.19,-734.5 161.19,-727.5"/>
 </g>

@@ -327,6 +327,7 @@ class Indexer {
      * @return array a list FedoraResource objects representing indexed resources
      */
     public function index(bool $verbose = false): array {
+        self::$resourceCache = array();
         $indexedRes = array();
 
         foreach ($this->paths as $path) {

@@ -39,6 +39,8 @@ acdhOeaw\storage\Indexer::init($config);
 
 You can find detailed API documentation in the `docs` folder.
 
+To read it on-line go to https://rawgit.com/acdh-oeaw/repo-php-util/master/docs/index.html
+
 # Usage
 
 (it is assumed that you already run the initialization code, especially that the `$fedora` object is created)

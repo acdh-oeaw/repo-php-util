@@ -119,7 +119,7 @@ class FedoraResource {
      */
     public function __construct(Fedora $fedora, string $uri) {
         $this->fedora = $fedora;
-        $this->uri = $uri;
+        $this->uri    = $uri;
     }
 
     /**
@@ -149,7 +149,9 @@ class FedoraResource {
         }
         $acdhId = null;
         foreach ($ids as $id) {
-            if (strpos($id, $this->fedora->getIdNamespace()) === 0) {
+            $inIdNmsp     = strpos($id, $this->fedora->getIdNamespace()) === 0;
+            $inVocabsNmsp = strpos($id, $this->fedora->getVocabsNamespace()) === 0;
+            if ($inIdNmsp || $inVocabsNmsp) {
                 if ($acdhId !== null) {
                     throw new RuntimeException('Many ACDH ids for ' . $this->getUri());
                 }
@@ -207,7 +209,7 @@ class FedoraResource {
      */
     public function setMetadata(Resource $metadata) {
         $this->metadata = $metadata;
-        $this->updated = false;
+        $this->updated  = false;
     }
 
     /**
@@ -246,20 +248,20 @@ class FedoraResource {
             switch ($mode) {
                 case 'ADD':
                     $delete = '';
-                    $where = '';
+                    $where  = '';
                     break;
                 case 'UPDATE':
                     if (!$this->metadataOld) {
-                        $metadataTmp = $this->metadata;
+                        $metadataTmp    = $this->metadata;
                         $this->loadMetadata(true);
                         $this->metadata = $metadataTmp;
                     }
                     $delete = self::getSparqlTriples($this->metadataOld);
-                    $where = '';
+                    $where  = '';
                     break;
                 case 'OVERWRITE':
                     $delete = '<> ?prop ?value .';
-                    $where = '<> ?prop ?value . FILTER (!regex(str(?prop), "^http://fedora[.]info")';
+                    $where  = '<> ?prop ?value . FILTER (!regex(str(?prop), "^http://fedora[.]info")';
                     foreach (self::$skipProp as $i) {
                         $where .= ' && str(?prop) != str(' . EasyRdfUtil::escapeUri($i) . ')';
                     }
@@ -267,7 +269,7 @@ class FedoraResource {
                     break;
             }
             $insert = self::getSparqlTriples($this->metadata);
-            $body = sprintf('DELETE {%s} INSERT {%s} WHERE {%s}', $delete, $insert, $where);
+            $body   = sprintf('DELETE {%s} INSERT {%s} WHERE {%s}', $delete, $insert, $where);
 
             $headers = array('Content-Type' => 'application/sparql-update');
             $request = new Request('PATCH', $this->uri . '/fcr:metadata', $headers, $body);
@@ -310,9 +312,9 @@ class FedoraResource {
     private function loadMetadata(bool $force = false) {
         if (!$this->metadata || $force) {
             $request = new Request('GET', $this->uri . '/fcr:metadata');
-            $resp = $this->fedora->sendRequest($request);
+            $resp    = $this->fedora->sendRequest($request);
 
-            $graph = new Graph();
+            $graph          = new Graph();
             $graph->parse($resp->getBody());
             $this->metadata = $graph->resource($this->uri);
 
@@ -351,7 +353,7 @@ class FedoraResource {
             $this->fedora->sendRequest($request);
         } else if ($convert) {
             $this->fedora->sendRequest(new Request('DELETE', $this->getUri()));
-            $newRes = $this->fedora->createResource($this->metadata, $data);
+            $newRes    = $this->fedora->createResource($this->metadata, $data);
             $this->uri = $newRes->getUri();
         } else {
             throw new RuntimeException('Resource is not a binary one. Turn on the $convert parameter if you are sure what you are doing.');
@@ -437,7 +439,8 @@ class FedoraResource {
      * @param string $flags regular expression flags
      * @return array
      */
-    public function getChildrenByPropertyRegEx(string $property, string $regEx, string $flags = 'i'): array {
+    public function getChildrenByPropertyRegEx(string $property, string $regEx,
+                                               string $flags = 'i'): array {
         $query = $this->getChildrenQuery();
         $query->addParameter(new MatchesRegEx($property, $regEx, $flags));
         return $this->fedora->getResourcesByQuery($query);
