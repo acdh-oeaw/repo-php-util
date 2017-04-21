@@ -63,7 +63,7 @@ class EasyRdfUtil {
      * @param string $uri
      * @return string
      */
-    static public function  escapeUri(string $uri): string {
+    static public function escapeUri(string $uri): string {
         self::initSerializer();
         return self::$serializer->serialiseValue(new Resource($uri));
     }
@@ -103,7 +103,8 @@ class EasyRdfUtil {
      * @return bool
      */
     static public function isPathOp(string $op): bool {
-        return in_array($op, array('!', '^', '|', '/', '*', '+', '?', '!^', '(', ')'));
+        return in_array($op, array('!', '^', '|', '/', '*', '+', '?', '!^', '(',
+            ')'));
     }
 
     /**
@@ -166,9 +167,12 @@ class EasyRdfUtil {
      *   (if empty source resource URI is used)
      * @return \EasyRdf\Resource
      */
-    static public function cloneResource(Resource $resource, array $skipProp = array(), string $skipRegExp = '/^$/', string $overwriteUri = ''): Resource {
+    static public function cloneResource(Resource $resource,
+                                         array $skipProp = array(),
+                                         string $skipRegExp = '/^$/',
+                                         string $overwriteUri = ''): Resource {
         $graph = new Graph();
-        $res = $graph->resource($overwriteUri ? $overwriteUri : $resource->getUri());
+        $res   = $graph->resource($overwriteUri ? $overwriteUri : $resource->getUri());
 
         foreach ($resource->propertyUris() as $prop) {
             if (in_array($prop, $skipProp) || preg_match($skipRegExp, $prop)) {
@@ -210,10 +214,11 @@ class EasyRdfUtil {
      * @param EasyRdf\Resource $cur current metadata
      * @param EasyRdf\Resource $new metadata to be merged with current metadata
      * @return EasyRdf\Resource
+     * @see mergePreserve()
      */
     static public function mergeMetadata(Resource $cur, Resource $new): Resource {
         $cur = self::cloneResource($cur, $new->propertyUris());
-        
+
         foreach ($new->propertyUris() as $prop) {
             $prop = self::fixPropName($prop);
             foreach ($new->allLiterals($prop) as $i) {
@@ -224,6 +229,36 @@ class EasyRdfUtil {
             }
         }
         return $cur;
+    }
+
+    /**
+     * Merges two metadata sets.
+     * 
+     * The final metadata contains:
+     * 
+     * - All properties existing in `new`.
+     * - Those properties from `cur` which do not exist in `new`.
+     * - `preserve` properties from `cur`
+     * 
+     * @param EasyRdf\Resource $cur current metadata
+     * @param EasyRdf\Resource $new metadata to be merged with current metadata
+     * @param array $preserve URIs of `cur` properties to be kept
+     * @return EasyRdf\Resource
+     * @see mergeMetadata()
+     */
+    static public function mergePreserve(Resource $cur, Resource $new,
+                                         array $preserve): Resource {
+        $save = array();
+        foreach ($preserve as $prop) {
+            $save[$prop] = $cur->all($prop);
+        }
+        $new = self::mergeMetadata($cur, $new);
+        foreach ($save as $prop => $values) {
+            foreach ($values as $val) {
+                $new->add($prop, $val);
+            }
+        }
+        return $new;
     }
 
 }
