@@ -15,7 +15,7 @@
     "require": {
         "php": ">=7.0",
         "guzzlehttp/guzzle": "~6.0",
-        "acdh-oeaw/easyrdf": ">=0.11.3",
+        "acdh-oeaw/easyrdf": ">=0.12.0",
         "zozlak/util": "*"
     },
     "autoload": {

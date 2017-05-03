@@ -1,9 +1,9 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
 namespace acdhOeaw\schema;
@@ -31,36 +35,36 @@ use DomainException;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
-use acdhOeaw\util\EasyRdfUtil;
 use zozlak\util\Config;
 
 /**
- * Description of Object
+ * Basic class for representing real-world entities to be imported into 
+ * the repository.
  *
  * @author zozlak
  */
 abstract class Object {
 
     /**
-     *
+     * Debug mode switch.
      * @var boolean 
      */
-    static public $debug  = false;
+    static public $debug = false;
 
     /**
-     *
+     * Repository resources cache.
      * @var array
      */
     static private $cache = array();
 
     /**
-     *
+     * Configuration properties.
      * @var \zozlak\util\Config
      */
     static protected $config;
 
     /**
-     * 
+     * Initializes config.
      * @param \zozlak\util\Config $cfg
      */
     static public function init(Config $cfg) {
@@ -68,31 +72,34 @@ abstract class Object {
     }
 
     /**
+     * Clears repository resources cache.
      * 
+     * Cache should be cleaned after every Fedora session commit/rollback. 
      */
     static public function clearCache() {
         self::$cache = array();
     }
 
     /**
-     *
+     * Repository resource representing given entity.
      * @var \acdhOeaw\fedora\FedoraResource
      */
     private $res;
 
     /**
-     *
+     * Entity id.
      * @var string
      */
     private $id;
 
     /**
-     *
+     * Fedora connection object.
      * @var \acdhOeaw\fedora\Fedora 
      */
     protected $fedora;
 
     /**
+     * Creates an object representing a real-world entity.
      * 
      * @param Fedora $fedora
      * @param string $id
@@ -103,14 +110,19 @@ abstract class Object {
     }
 
     /**
-     * 
+     * Creates RDF metadata from the real-world entity stored in this object.
      */
     abstract public function getMetadata(): Resource;
 
     /**
+     * Returns repository resource representing given real-world entity.
      * 
-     * @param bool $create
-     * @param bool $uploadBinary
+     * If it does not exist, it can be created.
+     * 
+     * @param bool $create should repository resource be created if it does not
+     *   exist?
+     * @param bool $uploadBinary should binary data of the real-world entity
+     *   be uploaded uppon repository resource creation?
      * @return FedoraResource
      */
     public function getResource(bool $create = true, bool $uploadBinary = true): FedoraResource {
@@ -121,6 +133,10 @@ abstract class Object {
     }
 
     /**
+     * Returns primary id of the real-world entity stored in this object
+     * (as it was set up in the object contructor).
+     * 
+     * Please do not confuse this id with the random internal ACDH repo id.
      * 
      * @return string
      */
@@ -129,9 +145,13 @@ abstract class Object {
     }
 
     /**
+     * Updates repository resource representing a real-world entity stored in
+     * this object.
      * 
-     * @param bool $create
-     * @param bool $uploadBinary
+     * @param bool $create should repository resource be created if it does not
+     *   exist?
+     * @param bool $uploadBinary should binary data of the real-world entity
+     *   be uploaded uppon repository resource creation?
      * @return FedoraResource
      */
     public function updateRms(bool $create = true, bool $uploadBinary = true): FedoraResource {
@@ -140,9 +160,9 @@ abstract class Object {
         // if it has just been created it would be a waste of time to update it
         if (!$created) {
             $current = $this->res->getMetadata();
-            $idProp  = array($this->fedora->getIdProp());
+            $idProp  = $this->fedora->getIdProp();
 
-            $meta = EasyRdfUtil::mergePreserve($current, $this->getMetadata(), $idProp);
+            $meta = $current->merge($this->getMetadata(), array($idProp));
             $this->res->setMetadata($meta);
             $this->res->updateMetadata();
 
@@ -156,10 +176,13 @@ abstract class Object {
     }
 
     /**
+     * Tries to find a repository resource representing a given object.
      * 
-     * @param bool $create
-     * @param bool $uploadBinary
-     * @return boolean
+     * @param bool $create should repository resource be created if it was not
+     *   found?
+     * @param bool $uploadBinary should binary data of the real-world entity
+     *   be uploaded uppon repository resource creation?
+     * @return boolean if a repository resource was found
      * @throws RuntimeException
      */
     protected function findResource(bool $create = true,
@@ -196,7 +219,7 @@ abstract class Object {
     }
 
     /**
-     * Provides resource's binary data.
+     * Provides entity binary data.
      * @return type
      */
     protected function getBinaryData(): string {

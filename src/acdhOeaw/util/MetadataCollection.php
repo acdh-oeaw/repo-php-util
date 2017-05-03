@@ -1,9 +1,9 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,13 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
-namespace acdhOeaw\schema;
+namespace acdhOeaw\util;
 
 use RuntimeException;
 use DomainException;
@@ -33,7 +37,6 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
-use acdhOeaw\util\EasyRdfUtil;
 use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
 use zozlak\util\Config;
@@ -251,8 +254,8 @@ class MetadataCollection extends Graph {
             $repoRes = array_pop($matches);
             echo $verbose ? "\tupdating " . $repoRes->getUri(true) . "\n" : "";
 
-            $old  = $repoRes->getMetadata();
-            $meta = EasyRdfUtil::mergePreserve($old, $res, array($idProp));
+            $meta = $repoRes->getMetadata();
+            $meta->merge($res, array($idProp));
 
             $repoRes->setMetadata($meta);
             $repoRes->updateMetadata();

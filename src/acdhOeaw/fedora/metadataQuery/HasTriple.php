@@ -1,9 +1,9 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,14 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
 namespace acdhOeaw\fedora\metadataQuery;
 
-use acdhOeaw\util\EasyRdfUtil;
 use BadMethodCallException;
 
 /**
@@ -41,13 +44,13 @@ class HasTriple extends HasProperty {
     public function __construct(string $sub, $prop, string $obj) {
         parent::__construct($prop);
 
-        if (!EasyRdfUtil::isVariable($sub) && !EasyRdfUtil::isUri($sub)) {
+        if (!self::isVariable($sub) && !self::isUri($sub)) {
             throw new BadMethodCallException('$sub parameter must be a valid SPARQL variable name or an URI');
         }
-        $this->subVar = EasyRdfUtil::isVariable($sub) ? $sub : EasyRdfUtil::escapeUri($sub);
+        $this->subVar = self::isVariable($sub) ? $sub : self::escapeUri($sub);
 
-        if (!EasyRdfUtil::isVariable($obj)) {
-            $obj = EasyRdfUtil::isUri($obj) ? EasyRdfUtil::escapeUri($sub) : EasyRdfUtil::escapeLiteral($sub);
+        if (!self::isVariable($obj)) {
+            $obj = self::isUri($obj) ? self::escapeUri($sub) : self::escapeLiteral($sub);
         }
         $this->objVar = $obj;
     }

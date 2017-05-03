@@ -3,7 +3,7 @@
 /**
  * The MIT License
  *
- * Copyright 2016 zozlak.
+ * Copyright 2016 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
 namespace acdhOeaw\fedora;
@@ -62,13 +66,13 @@ class Fedora {
         $headers = $request->getHeaders();
         if (file_exists($body)) {
             $headers['Content-Type'] = mime_content_type($body);
-            $body = fopen($body, 'rb');
+            $body                    = fopen($body, 'rb');
         } elseif (is_array($body) && isset($body['contentType']) && isset($body['data'])) {
             $headers['Content-Type'] = $body['contentType'];
-            $body = file_exists($body['data']) ? fopen($body, 'rb') : $body['data'];
+            $body                    = file_exists($body['data']) ? fopen($body, 'rb') : $body['data'];
         } elseif (preg_match('|^[a-z0-9]+://|i', $body)) {
             $headers['Content-Type'] = 'message/external-body; access-type=URL; URL="' . $body . '"';
-            $body = null;
+            $body                    = null;
         }
         return new Request($request->getMethod(), $request->getUri(), $headers, $body);
     }
@@ -110,20 +114,20 @@ class Fedora {
      * @var string
      */
     private $idNamespace;
-    
+
     /**
      * Namespace used by ontology entities' ids
      * 
      * @var string
      */
     private $vocabsNamespace;
-    
+
     /**
      * SPARQL client object
      * @var SparqlClient
      */
     private $sparqlClient;
-    
+
     /**
      * Fully qualified URI of the RDF property used to denote relation of being
      * a collection part
@@ -148,14 +152,14 @@ class Fedora {
      * @param \zozlak\util\Config $cfg configuration object
      */
     public function __construct(Config $cfg) {
-        $this->apiUrl = preg_replace('|/$|', '', $cfg->get('fedoraApiUrl'));
-        $this->idProp = $cfg->get('fedoraIdProp');
-        $this->relProp = $cfg->get('fedoraRelProp');
-        $this->idNamespace = $cfg->get('fedoraIdNamespace');
+        $this->apiUrl          = preg_replace('|/$|', '', $cfg->get('fedoraApiUrl'));
+        $this->idProp          = $cfg->get('fedoraIdProp');
+        $this->relProp         = $cfg->get('fedoraRelProp');
+        $this->idNamespace     = $cfg->get('fedoraIdNamespace');
         $this->vocabsNamespace = $cfg->get('fedoraVocabsNamespace');
-        $authHeader = 'Basic ' . base64_encode($cfg->get('fedoraUser') . ':' . $cfg->get('fedoraPswd'));
-        $this->client = new Client(['verify' => false, 'headers' => ['Authorization' => $authHeader]]);
-        $this->sparqlClient = new SparqlClient($cfg->get('sparqlUrl'), $cfg->get('fedoraUser'), $cfg->get('fedoraPswd'));
+        $authHeader            = 'Basic ' . base64_encode($cfg->get('fedoraUser') . ':' . $cfg->get('fedoraPswd'));
+        $this->client          = new Client(['verify' => false, 'headers' => ['Authorization' => $authHeader]]);
+        $this->sparqlClient    = new SparqlClient($cfg->get('sparqlUrl'), $cfg->get('fedoraUser'), $cfg->get('fedoraPswd'));
     }
 
     /**
@@ -173,7 +177,7 @@ class Fedora {
     public function getIdNamespace(): string {
         return $this->idNamespace;
     }
-    
+
     /**
      * Returns URI of the namespace used by ontology entities' ids.
      * @return string
@@ -193,7 +197,7 @@ class Fedora {
     public function isAcdhId(string $uri): bool {
         return strpos($uri, $this->idNamespace) === 0 || strpos($uri, $this->vocabsNamespace) === 0;
     }
-    
+
     /**
      * Creates a resource in the Fedora and returns corresponding Resource object
      * 
@@ -206,34 +210,22 @@ class Fedora {
      * @return \acdhOeaw\rms\FedoraResource
      * @throws \BadMethodCallException
      */
-    public function createResource(Resource $metadata, $data = '', string $path = '', string $method = 'POST'): FedoraResource {
+    public function createResource(Resource $metadata, $data = '',
+                                   string $path = '', string $method = 'POST'): FedoraResource {
         if (!in_array($method, array('POST', 'PUT'))) {
             throw new BadMethodCallException('method must be PUT or POST');
         }
         $baseUrl = $this->txUrl ? $this->txUrl : $this->apiUrl;
-        $path = $path ? $baseUrl . '/' . preg_replace('|^/|', '', $path) : $baseUrl;
+        $path    = $path ? $baseUrl . '/' . preg_replace('|^/|', '', $path) : $baseUrl;
         $request = new Request($method, $path);
         $request = self::attachData($request, $data);
-        $resp = $this->sendRequest($request);
-        $uri = $resp->getHeader('Location')[0];
-        $res = new FedoraResource($this, $uri);
+        $resp    = $this->sendRequest($request);
+        $uri     = $resp->getHeader('Location')[0];
+        $res     = new FedoraResource($this, $uri);
 
         // merge the metadata created by Fedora (and Doorkeeper) upon resource creation
         // with the ones provided by user
-        $curMetadata = $res->getMetadata();
-        foreach ($metadata->propertyUris() as $prop) {
-            $prop = $prop;
-            if ($curMetadata->hasProperty($prop)) {
-                $curMetadata->delete($prop);
-            }
-            foreach ($metadata->allLiterals($prop) as $i) {
-                $curMetadata->addLiteral($prop, $i->getValue());
-            }
-            foreach ($metadata->allResources($prop) as $i) {
-                $curMetadata->addResource($prop, $i->getUri());
-            }
-        }
-
+        $curMetadata = $res->getMetadata()->merge($metadata, array($this->idProp));
         $res->setMetadata($curMetadata);
         $res->updateMetadata();
 
@@ -344,7 +336,8 @@ class Fedora {
      * @return array
      * @see begin()
      */
-    public function getResourcesByPropertyRegEx(string $property, string $regEx, string $flags = 'i'): array {
+    public function getResourcesByPropertyRegEx(string $property, string $regEx,
+                                                string $flags = 'i'): array {
         $query = new Query();
         $query->addParameter(new MatchesRegEx($property, $regEx, $flags));
         return $this->getResourcesByQuery($query);
@@ -363,12 +356,12 @@ class Fedora {
      * @see begin()
      */
     public function getResourcesByQuery(Query $query, string $resVar = '?res'): array {
-        $resVar = preg_replace('|^[?]|', '', $resVar);
-        $results = $this->runQuery($query);
+        $resVar    = preg_replace('|^[?]|', '', $resVar);
+        $results   = $this->runQuery($query);
         $resources = array();
         foreach ($results as $i) {
-            $uri = $i->$resVar;
-            $uri = $this->sanitizeUri($uri);
+            $uri         = $i->$resVar;
+            $uri         = $this->sanitizeUri($uri);
             $resources[] = new FedoraResource($this, $uri);
         }
         return $resources;
@@ -399,7 +392,7 @@ class Fedora {
     public function runSparql(string $query): Result {
         return $this->sparqlClient->query($query);
     }
-    
+
     /**
      * Adjusts URI to the current object state by setting up the proper base
      * URL and the transaction id.
@@ -409,8 +402,8 @@ class Fedora {
      */
     public function sanitizeUri(string $uri): string {
         $baseUrl = !$this->txUrl ? $this->apiUrl : $this->txUrl;
-        $uri = preg_replace('|^https?://[^/]+/rest/?(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
-        $uri = $baseUrl . '/' . $uri;
+        $uri     = preg_replace('|^https?://[^/]+/rest/?(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
+        $uri     = $baseUrl . '/' . $uri;
         return $uri;
     }
 
@@ -426,7 +419,7 @@ class Fedora {
         $uri = $this->apiUrl . '/' . $uri;
         return $uri;
     }
-    
+
     /**
      * Starts new Fedora transaction.
      * 
@@ -442,7 +435,7 @@ class Fedora {
      */
     public function begin() {
         $resp = $this->client->post($this->apiUrl . '/fcr:tx');
-        $loc = $resp->getHeader('Location');
+        $loc  = $resp->getHeader('Location');
         if (count($loc) == 0) {
             throw new RuntimeException('wrong response from fedora');
         }

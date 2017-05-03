@@ -27,7 +27,7 @@
 require_once 'vendor/autoload.php';
 
 use acdhOeaw\fedora\Fedora;
-use acdhOeaw\storage\Indexer;
+use acdhOeaw\util\Indexer;
 use acdhOeaw\schema\Object;
 use acdhOeaw\schema\redmine\Redmine;
 use zozlak\util\Config;

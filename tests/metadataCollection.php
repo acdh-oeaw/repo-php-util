@@ -26,7 +26,7 @@
 
 require_once 'init.php';
 
-use acdhOeaw\schema\MetadataCollection;
+use acdhOeaw\util\MetadataCollection;
 use EasyRdf\Resource;
 
 $verbose = true;
