@@ -25,29 +25,16 @@
  */
 
 use zozlak\util\ProgressBar;
-use acdhOeaw\redmine\Issue;
-use acdhOeaw\redmine\Project;
-use acdhOeaw\redmine\User;
+use acdhOeaw\schema\redmine\Issue;
+use acdhOeaw\schema\redmine\Project;
+use acdhOeaw\schema\redmine\User;
 
 require_once 'init.php';
 
 $fedora->begin();
-$meta = (new EasyRdf\Graph())->resource('.');
-$meta->addLiteral('http://purl.org/dc/elements/1.1/title', 'sample CMDI record');
-$res = $fedora->createResource($meta, '/home/zozlak/Pulpit/tmp.xml');
-$id = $res->getId();
-$res = $fedora->getResourceByUri('https://fedora.localhost/rest/32/53/df/e2/3253dfe2-01e3-4386-be1e-70760b3b4c4f');
-$meta = $res->getMetadata();
-$meta->addResource('https://vocabs.acdh.ac.at/#hasCMDIcollection', $id);
-$res->setMetadata($meta);
-$res->updateMetadata();
-$fedora->commit();
-exit();
-
-$fedora->begin();
 
 echo "\nUsers:\n";
-$users = User::fetchAll(true);
+$users = User::fetchAll($fedora, true);
 echo "\n\tsaving:\n";
 $pb = new ProgressBar(count($users), 5);
 foreach ($users as $i) {
@@ -61,7 +48,7 @@ foreach ($users as $i) {
 $pb->finish();
 
 echo "\nProjects:\n";
-$projects = Project::fetchAll(true);
+$projects = Project::fetchAll($fedora, true);
 echo "\n\tsaving:\n";
 $pb = new ProgressBar(count($projects), 5);
 foreach ($projects as $i) {
@@ -75,7 +62,7 @@ foreach ($projects as $i) {
 $pb->finish();
 
 echo "\nIssues:\n";
-$issues = Issue::fetchAll(true, ['tracker_id' => 5]);
+$issues = Issue::fetchAll($fedora, true, ['tracker_id' => 5]);
 echo "\n\tsaving:\n";
 $pb = new ProgressBar(count($issues), 5);
 foreach ($issues as $i) {

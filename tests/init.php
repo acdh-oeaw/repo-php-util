@@ -26,10 +26,10 @@
 
 require_once 'vendor/autoload.php';
 
-use acdhOeaw\redmine\Redmine;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\storage\Indexer;
 use acdhOeaw\schema\Object;
+use acdhOeaw\schema\redmine\Redmine;
 use zozlak\util\Config;
 use zozlak\util\ClassLoader;
 
@@ -38,6 +38,6 @@ $loader = new ClassLoader('src');
 $conf = new Config('tests/config.ini');
 
 $fedora = new Fedora($conf);
-Redmine::init($conf, $fedora);
 Indexer::init($conf);
 Object::init($conf);
+Redmine::init($conf);

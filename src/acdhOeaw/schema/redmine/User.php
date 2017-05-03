@@ -24,10 +24,9 @@
  * THE SOFTWARE.
  */
 
-namespace acdhOeaw\redmine;
+namespace acdhOeaw\schema\redmine;
 
-use EasyRdf\Resource;
-use acdhOeaw\schema\MetadataCollection;
+use acdhOeaw\fedora\Fedora;
 
 /**
  * Represents a Redmine user
@@ -38,67 +37,28 @@ use acdhOeaw\schema\MetadataCollection;
 class User extends Redmine {
 
     /**
-     * Stores all instances of the class identyfing them by their Redmine IDs
-     * @var array
-     * @see getById()
-     */
-    static protected $cache = [];
-
-    /**
-     * Fetches an User object from cache based on its Redmine ID.
-     * 
-     * If object does not exist in cache, it will be created and added to the cache.
-     * 
-     * @param int $id Redmine's issue ID
-     * @return \acdhOeaw\redmine\Redmine
-     */
-    static public function getById(int $id): Redmine {
-//echo 'get user ' . $id . "\n";
-        if (!isset(self::$cache[$id])) {
-            $url = self::$apiUrl . '/users/' . urlencode($id) . '.json?key=' . urlencode(self::$apiKey);
-            $data = json_decode(file_get_contents($url));
-            self::$cache[$id] = new User($data->user);
-        }
-        return self::$cache[$id];
-    }
-
-    /**
      * Returns array of all User objects which can be fetched from the Redmine.
      * 
      * See the Redmine::fetchAll() description for details;
      * 
+     * @param \acdhOeaw\fedora\Fedora $fedora Fedora connection
      * @param bool $progressBar should progress bar be displayed 
      *   (makes sense only if the standard output is a console)
      * @return array
      * @see Redmine::fetchAll()
      */
-    static public function fetchAll(bool $progressBar): array {
+    static public function fetchAll(Fedora $fedora, bool $progressBar): array {
         $param = 'limit=100000&key=' . urlencode(self::$apiKey);
-        return self::redmineFetchLoop($progressBar, 'users', $param);
+        return self::redmineFetchLoop($fedora, $progressBar, 'users', $param);
     }
 
     /**
      * Maps Redmine's User ID to the Redmine's User URI
+     * @param int $id Redmine ID
      * @return string
      */
-    protected function getIdValue(): string {
-        return self::$apiUrl . '/users/' . $this->id;
+    static public function redmineId2repoId(int $id): string {
+        return self::$apiUrl . '/users/' . $id;
     }
 
-    /**
-     * Maps Redmine's object properties to and RDF graph.
-     * 
-     * Extends mapping provided by the base Redmine class with mappings
-     * specific to the Redmine users.
-     * 
-     * @param array $data associative array with Redmine's resource properties
-     *   fetched from the Redmine REST API
-     * @return \EasyRdf\Resource
-     * @see \acdhOeaw\redmine\Redmine::mapProperties()
-     */
-    protected function mapProperties(array $data): Resource {
-        $res = parent::mapProperties($data);
-        $res = MetadataCollection::makeAgent($res);     
-        return $res;
-    }
 }

@@ -1,6 +1,6 @@
 {
     "annotation":    {"uri": "https://vocabs.acdh.oeaw.ac.at/#annotation",    "class": "dataProperty",   "template": "",               "redmineClass": ""},
-    "assigned_to":   {"uri": "http://purl.org/dc/terms/contributor",          "class": "objectProperty", "template": "",               "redmineClass": "acdhOeaw\\redmine\\User"},
+    "assigned_to":   {"uri": "http://purl.org/dc/terms/contributor",          "class": "objectProperty", "template": "",               "redmineClass": "acdhOeaw\\schema\\redmine\\User"},
     "description":   {"uri": "http://purl.org/dc/terms/description",          "class": "dataProperty",   "template": "",               "redmineClass": ""},
     "endpoint":      {"uri": "https://vocabs.acdh.oeaw.ac.at/#locationpath",  "class": "dataProperty",   "template": "",               "redmineClass": ""},
     "firstname":     {"uri": "http://xmlns.com/foaf/0.1/givenName",           "class": "dataProperty",   "template": "",               "redmineClass": ""},
@@ -11,7 +11,7 @@
     "name":          {"uri": "http://purl.org/dc/elements/1.1/title",         "class": "dataProperty",   "template": "",               "redmineClass": ""},
     "parent":        {"uri": "http://purl.org/dc/terms/isPartOf",             "class": "objectProperty", "template": "",               "redmineClass": "self"},
     "pid":           {"uri": "https://vocabs.acdh.oeaw.ac.at/#pid",           "class": "objectProperty", "template": "",               "redmineClass": ""},
-    "project":       {"uri": "http://purl.org/dc/terms/isPartOf",             "class": "objectProperty", "template": "",               "redmineClass": "acdhOeaw\\redmine\\Project"},
+    "project":       {"uri": "http://purl.org/dc/terms/isPartOf",             "class": "objectProperty", "template": "",               "redmineClass": "acdhOeaw\\schema\\redmine\\Project"},
     "size":          {"uri": "http://purl.org/dc/terms/extent",               "class": "dataProperty",   "template": "",               "redmineClass": ""},
     "subject":       {"uri": "http://purl.org/dc/elements/1.1/title",         "class": "dataProperty",   "template": "",               "redmineClass": ""}
 }

@@ -24,46 +24,24 @@
  * THE SOFTWARE.
  */
 
-namespace acdhOeaw\redmine;
+namespace acdhOeaw\schema\redmine;
+
+use acdhOeaw\fedora\Fedora;
 
 /**
- * Represents a Redmine issue
- * and provides mapping to ACDH repository resource representing a resource.
+ * Represents a Redmine project
+ * and provides mapping to ACDH repository resource representing a project.
  *
  * @author zozlak
  */
-class Issue extends Redmine {
+class Project extends Redmine {
 
     /**
-     * Stores all instances of the class identifying them by their Redmine IDs
-     * @var array
-     * @see getById()
-     */
-    static protected $cache = [];
-
-    /**
-     * Fetches an Issue object from cache based on its Redmine ID.
-     * 
-     * If object does not exist in cache, it will be created and added to the cache.
-     * 
-     * @param int $id Redmine's issue ID
-     * @return \acdhOeaw\redmine\Redmine
-     */
-    static public function getById(int $id): Redmine {
-//echo 'get issue ' . $id . "\n";
-        if (!isset(self::$cache[$id])) {
-            $url = self::$apiUrl . '/issues/' . urlencode($id) . '.json?key=' . urlencode(self::$apiKey);
-            $data = json_decode(file_get_contents($url));
-            self::$cache[$id] = new Issue($data->issue);
-        }
-        return self::$cache[$id];
-    }
-
-    /**
-     * Returns array of all Issue objects which can be fetched from the Redmine.
+     * Returns array of all Project objects which can be fetched from the Redmine.
      * 
      * See the Redmine::fetchAll() description for details;
      * 
+     * @param \acdhOeaw\fedora\Fedora $fedora Fedora connection
      * @param bool $progressBar should progress bar be displayed 
      *   (makes sense only if the standard output is a console)
      * @param array $filters filters to be passed to the Redmine's issue REST API
@@ -71,22 +49,24 @@ class Issue extends Redmine {
      * @return array
      * @see Redmine::fetchAll()
      */
-    static public function fetchAll(bool $progressBar, array $filters = array()): array {
+    static public function fetchAll(Fedora $fedora, bool $progressBar,
+                                    array $filters = array('project_id' => 34)): array {
         $param = ['key=' . urlencode(self::$apiKey), 'limit' => 1000000];
         foreach ($filters as $k => $v) {
             $param[] = urlencode($k) . '=' . urlencode($v);
         }
         $param = implode('&', $param);
 
-        return self::redmineFetchLoop($progressBar, 'issues', $param);
+        return self::redmineFetchLoop($fedora, $progressBar, 'projects', $param);
     }
 
     /**
-     * Maps Redmine's Issue ID to the Redmine's Issue URI
+     * Maps Redmine's Project ID to the Redmine's Project URI
+     * @param int $id Redmine ID
      * @return string
      */
-    public function getIdValue(): string {
-        return self::$apiUrl . '/issues/' . $this->id;
+    static public function redmineId2repoId(int $id): string {
+        return self::$apiUrl . '/projects/' . $id;
     }
 
 }

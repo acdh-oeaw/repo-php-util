@@ -27,6 +27,7 @@
 namespace acdhOeaw\schema;
 
 use RuntimeException;
+use DomainException;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
@@ -40,7 +41,16 @@ use zozlak\util\Config;
  */
 abstract class Object {
 
-    static public $debug = false;
+    /**
+     *
+     * @var boolean 
+     */
+    static public $debug  = false;
+
+    /**
+     *
+     * @var array
+     */
     static private $cache = array();
 
     /**
@@ -49,8 +59,19 @@ abstract class Object {
      */
     static protected $config;
 
+    /**
+     * 
+     * @param \zozlak\util\Config $cfg
+     */
     static public function init(Config $cfg) {
         self::$config = $cfg;
+    }
+
+    /**
+     * 
+     */
+    static public function clearCache() {
+        self::$cache = array();
     }
 
     /**
@@ -58,6 +79,11 @@ abstract class Object {
      * @var \acdhOeaw\fedora\FedoraResource
      */
     private $res;
+
+    /**
+     *
+     * @var string
+     */
     private $id;
 
     /**
@@ -66,61 +92,115 @@ abstract class Object {
      */
     protected $fedora;
 
+    /**
+     * 
+     * @param Fedora $fedora
+     * @param string $id
+     */
     public function __construct(Fedora $fedora, string $id) {
         $this->fedora = $fedora;
-        $this->id = $id;
+        $this->id     = $id;
     }
 
+    /**
+     * 
+     */
     abstract public function getMetadata(): Resource;
 
-    public function getResource(): FedoraResource {
+    /**
+     * 
+     * @param bool $create
+     * @param bool $uploadBinary
+     * @return FedoraResource
+     */
+    public function getResource(bool $create = true, bool $uploadBinary = true): FedoraResource {
         if ($this->res === null) {
-            $this->updateRms();
+            $this->updateRms($create, $uploadBinary);
         }
         return $this->res;
     }
 
+    /**
+     * 
+     * @return string
+     */
     public function getId(): string {
         return $this->id;
     }
 
-    public function updateRms() {
-        $this->findResource();
+    /**
+     * 
+     * @param bool $create
+     * @param bool $uploadBinary
+     * @return FedoraResource
+     */
+    public function updateRms(bool $create = true, bool $uploadBinary = true): FedoraResource {
+        $created = $this->findResource($create, $uploadBinary);
 
-        $current = $this->res->getMetadata();
-        $idProp = array($this->fedora->getIdProp());
+        // if it has just been created it would be a waste of time to update it
+        if (!$created) {
+            $current = $this->res->getMetadata();
+            $idProp  = array($this->fedora->getIdProp());
 
-        $meta = EasyRdfUtil::mergePreserve($current, $this->getMetadata(), $idProp);
-        $this->res->setMetadata($meta);
-        $this->res->updateMetadata();
+            $meta = EasyRdfUtil::mergePreserve($current, $this->getMetadata(), $idProp);
+            $this->res->setMetadata($meta);
+            $this->res->updateMetadata();
+
+            $binaryContent = $this->getBinaryData();
+            if ($create && $binaryContent !== '') {
+                $this->res->updateContent($binaryContent, true);
+            }
+        }
+
+        return $this->res;
     }
 
-    private function findResource() {
-        if (self::$debug) {
-            echo "searching for " . $this->id . "\n";
-        }
-        $res = '';
-        
+    /**
+     * 
+     * @param bool $create
+     * @param bool $uploadBinary
+     * @return boolean
+     * @throws RuntimeException
+     */
+    protected function findResource(bool $create = true,
+                                    bool $uploadBinary = true): bool {
+        echo self::$debug ? "searching for " . $this->id . "\n" : "";
+        $result = '';
+
         if (isset(self::$cache[$this->id])) {
-            $this->res = self::$cache[$this->id];
-            $res = 'found in cache';
+            $res    = self::$cache[$this->id];
+            $result = 'found in cache';
         } else {
             $matches = $this->fedora->getResourcesById($this->id);
             if (count($matches) == 0) {
-                $this->res = $this->fedora->createResource($this->getMetadata());
-                $res = 'not found - created';
+                if ($create) {
+                    $binary = $uploadBinary ? $this->getBinaryData() : '';
+                    $res    = $this->fedora->createResource($this->getMetadata(), $binary);
+                    $result = 'not found - created';
+                } else {
+                    throw new DomainException('resource not found');
+                }
             } elseif (count($matches) == 1) {
-                $this->res = $matches[0];
-                $res = 'found';
+                $res    = $matches[0];
+                $result = 'found';
             } else {
                 throw new RuntimeException('many matching resources');
             }
-            self::$cache[$this->id] = $this->res;
+            self::$cache[$this->id] = $res;
         }
-        
-        if (self::$debug) {
-            echo "\t" . $res . " - " . $this->res->getUri(true) . "\n";
-        }
+
+        echo self::$debug ? "\t" . $result . " - " . $this->res->getUri(true) . "\n" : "";
+
+        $this->res = $res;
+        return $result == 'not found - created';
+    }
+
+    /**
+     * Provides resource's binary data.
+     * @return type
+     */
+    protected function getBinaryData(): string {
+        return '';
     }
 
 }
