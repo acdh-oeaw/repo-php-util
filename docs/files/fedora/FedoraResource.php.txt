@@ -3,7 +3,7 @@
 /**
  * The MIT License
  *
- * Copyright 2016 zozlak.
+ * Copyright 2016 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
 namespace acdhOeaw\fedora;
@@ -31,7 +35,6 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use InvalidArgumentException;
 use RuntimeException;
-use acdhOeaw\util\EasyRdfUtil;
 use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\QueryParameter;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
@@ -263,7 +266,7 @@ class FedoraResource {
                     $delete = '<> ?prop ?value .';
                     $where  = '<> ?prop ?value . FILTER (!regex(str(?prop), "^http://fedora[.]info")';
                     foreach (self::$skipProp as $i) {
-                        $where .= ' && str(?prop) != str(' . EasyRdfUtil::escapeUri($i) . ')';
+                        $where .= ' && str(?prop) != str(' . QueryParameter::escapeUri($i) . ')';
                     }
                     $where .= ')';
                     break;
@@ -299,7 +302,7 @@ class FedoraResource {
      */
     public function getMetadata(bool $force = false): Resource {
         $this->loadMetadata($force);
-        return EasyRdfUtil::cloneResource($this->metadata);
+        return $this->metadata->copy();
     }
 
     /**
@@ -322,7 +325,7 @@ class FedoraResource {
                 throw new RuntimeException('No resource metadata. Please check a value of the fedoraApiUrl configuration property.');
             }
 
-            $this->metadataOld = EasyRdfUtil::cloneResource($this->metadata);
+            $this->metadataOld = $this->metadata->copy();
         }
     }
 
@@ -346,6 +349,9 @@ class FedoraResource {
      * @see init()
      */
     public function updateContent($data, bool $convert = false) {
+        if (empty($data)) {
+            return;
+        }
         $this->loadMetadata();
         if ($this->isA('http://www.w3.org/ns/ldp#NonRDFSource')) {
             $request = new Request('PUT', $this->getUri());
@@ -460,9 +466,9 @@ class FedoraResource {
      */
     private function getSparqlTriples(Resource $metadata): string {
         $uri = $this->fedora->sanitizeUri($this->uri);
-        $res = EasyRdfUtil::cloneResource($metadata, self::$skipProp, self::$skipPropRegExp, $uri);
+        $res = $metadata->copy(self::$skipProp, self::$skipPropRegExp, $uri);
 
-        $rdf = EasyRdfUtil::serialiseResource($res);
+        $rdf = $res->getGraph()->serialise('ntriples');
         return $rdf;
     }
 

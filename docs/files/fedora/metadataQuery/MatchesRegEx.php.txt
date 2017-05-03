@@ -1,9 +1,9 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,13 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
 namespace acdhOeaw\fedora\metadataQuery;
-
-use acdhOeaw\util\EasyRdfUtil;
-use BadMethodCallException;
 
 /**
  * Description of MatchesRegEx
@@ -49,8 +50,8 @@ class MatchesRegEx extends HasValue {
     }
 
     public function getFilter(): string {
-        $val = EasyRdfUtil::escapeLiteral($this->value);
-        $flags = EasyRdfUtil::escapeLiteral($this->flags);
+        $val   = self::escapeLiteral($this->value);
+        $flags = self::escapeLiteral($this->flags);
         return sprintf("regex(str(%s), %s, %s)", $this->objVar, $val, $flags);
     }
 

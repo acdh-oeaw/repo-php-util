@@ -1,9 +1,9 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,15 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
 namespace acdhOeaw\fedora\metadataQuery;
 
 use BadMethodCallException;
-use acdhOeaw\util\EasyRdfUtil;
 
 /**
  * Description of hasParameter
@@ -41,16 +44,16 @@ class HasProperty extends QueryParameter {
     public function __construct($property) {
         parent::__construct();
         if (!is_array($property)) {
-            if (EasyRdfUtil::isVariable($property)) {
+            if (self::isVariable($property)) {
                 $this->property = $property;
             } else {
-                $this->property = EasyRdfUtil::escapeUri($property);
+                $this->property = self::escapeUri($property);
             }
         } else {
             foreach ($property as &$i) {
-                if (EasyRdfUtil::isUri($i)) {
-                    $i = EasyRdfUtil::escapeUri($i);
-                } elseif (!EasyRdfUtil::isPathOp($i)) {
+                if (self::isUri($i)) {
+                    $i = self::escapeUri($i);
+                } elseif (!self::isPathOp($i)) {
                     throw new BadMethodCallException('property does not describe a valid sparql property path');
                 }
             }

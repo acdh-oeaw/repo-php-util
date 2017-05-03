@@ -1,9 +1,9 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
 namespace acdhOeaw\schema\cirilo;
@@ -43,6 +47,12 @@ use acdhOeaw\schema\dissemination\Service as DissService;
  */
 class Service extends Object {
 
+    /**
+     * 
+     * @param Fedora $fedora
+     * @param string $sdepFile
+     * @return type
+     */
     static public function fromSdepFile(Fedora $fedora, string $sdepFile) {
         $dom = simplexml_load_file($sdepFile);
         $dom->registerXPathNamespace('fmm', 'http://fedora.comm.nsdlib.org/service/methodmap');
@@ -58,6 +68,13 @@ class Service extends Object {
         return $services;
     }
 
+    /**
+     * 
+     * @param Fedora $fedora
+     * @param SimpleXMLElement $service
+     * @param SimpleXMLElement $sdep
+     * @return DissService
+     */
     static public function parseService(Fedora $fedora, SimpleXMLElement $service, SimpleXMLElement $sdep): DissService {
         $service->registerXPathNamespace('fmm', 'http://fedora.comm.nsdlib.org/service/methodmap');
         $sdep->registerXPathNamespace('dc', 'http://purl.org/dc/elements/1.1/');
@@ -91,6 +108,11 @@ class Service extends Object {
         return $obj;
     }
 
+    /**
+     * 
+     * @param DissService $service
+     * @param SimpleXMLElement $p
+     */
     static private function parseParameter(DissService $service, SimpleXMLElement $p) {
         $name = (string) $p['parmName'];
         $byValue = (string) $p['passBy'] == 'VALUE';
@@ -101,6 +123,9 @@ class Service extends Object {
         $service->addParameter($name, $byValue, $required, $defaultValue, $rdfProperty);
     }
 
+    /**
+     * 
+     */
     public function getMetadata(): Resource {
         
     }

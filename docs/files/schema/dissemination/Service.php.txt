@@ -1,9 +1,9 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
 namespace acdhOeaw\schema\dissemination;
@@ -54,10 +58,11 @@ class Service extends Object {
 
     private $location;
     private $retMime;
-    private $params = array();
+    private $params   = array();
     private $supports = array();
 
-    public function __construct(Fedora $fedora, string $id, string $location, string $retMime, array $supports) {
+    public function __construct(Fedora $fedora, string $id, string $location,
+                                string $retMime, array $supports) {
         parent::__construct($fedora, $id);
 
         if ($id == '' || $location == '' || $retMime == '' || count($supports) == 0) {
@@ -65,14 +70,18 @@ class Service extends Object {
         }
 
         $this->location = $location;
-        $this->retMime = $retMime;
+        $this->retMime  = $retMime;
         $this->supports = $supports;
-        $this->fedora = $fedora;
+        $this->fedora   = $fedora;
     }
 
-    public function addParameter(string $name, bool $byValue, bool $required, string $defaultValue = '', string $rdfProperty = '_') {
-        $id = $this->getId() . '/' . $name;
-        $this->params[] = new Parameter($this->fedora, $id, $this, $byValue, $required, $defaultValue, $rdfProperty);
+    public function addParameter(string $name, bool $byValue, bool $required,
+                                 string $defaultValue = '',
+                                 string $rdfProperty = '_') {
+        $id             = $this->getId() . '/' . $name;
+        $this->params[] = new Parameter(
+            $this->fedora, $id, $this, $name, $byValue, $required, $defaultValue, $rdfProperty
+        );
     }
 
     public function getMetadata(): Resource {

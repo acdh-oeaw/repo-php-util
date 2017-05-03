@@ -1,9 +1,9 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,13 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
 namespace acdhOeaw\fedora\metadataQuery;
-
-use acdhOeaw\util\EasyRdfUtil;
 
 /**
  * Description of HasValue
@@ -43,15 +45,15 @@ class HasValue extends HasProperty {
     }
 
     public function getWhere(): string {
-        $valIsUri = EasyRdfUtil::isUri($this->value);
-        $val = $valIsUri ? EasyRdfUtil::escapeUri($this->value) : EasyRdfUtil::escapeLiteral($this->value);
+        $valIsUri = self::isUri($this->value);
+        $val      = $valIsUri ? self::escapeUri($this->value) : self::escapeLiteral($this->value);
 
-        $type = '';
+        $type  = '';
         /*
-        if (!is_numeric($this->value) && !$valIsUri) {
-            $type = '^^xsd:string';
-        }
-        */
+          if (!is_numeric($this->value) && !$valIsUri) {
+          $type = '^^xsd:string';
+          }
+         */
         $query = $this->subVar . ' ' . $this->property . ' ' . $val . $type . ' .';
         return $this->applyOptional($query);
     }
