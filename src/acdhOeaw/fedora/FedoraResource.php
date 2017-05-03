@@ -60,7 +60,8 @@ class FedoraResource {
         'http://www.loc.gov/premis/rdf/v1#hasSize',
         'http://www.loc.gov/premis/rdf/v1#hasMessageDigest',
         'http://www.iana.org/assignments/relation/describedby',
-        'http://purl.org/dc/terms/extent'
+        'http://purl.org/dc/terms/extent',
+        'http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename', // must be set in a Content-Disposition header
     );
 
     /**

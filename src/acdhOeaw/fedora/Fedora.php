@@ -65,11 +65,14 @@ class Fedora {
     static public function attachData(Request $request, string $body): Request {
         $headers = $request->getHeaders();
         if (file_exists($body)) {
-            $headers['Content-Type'] = mime_content_type($body);
-            $body                    = fopen($body, 'rb');
-        } elseif (is_array($body) && isset($body['contentType']) && isset($body['data'])) {
-            $headers['Content-Type'] = $body['contentType'];
-            $body                    = file_exists($body['data']) ? fopen($body, 'rb') : $body['data'];
+            $filename                       = rawurldecode(basename($body)); // lucky guess - unfortunately it is not clear how to escape header values
+            $headers['Content-Type']        = mime_content_type($body);
+            $headers['Content-Disposition'] = 'attachment; filename="' . $filename . '"';
+            $body                           = fopen($body, 'rb');
+        } elseif (is_array($body) && isset($body['contentType']) && isset($body['data']) && isset($body['filename'])) {
+            $headers['Content-Type']        = $body['contentType'];
+            $headers['Content-Disposition'] = 'attachment; filename="' . rawurldecode($body['filename']) . '"';
+            $body                           = file_exists($body['data']) ? fopen($body, 'rb') : $body['data'];
         } elseif (preg_match('|^[a-z0-9]+://|i', $body)) {
             $headers['Content-Type'] = 'message/external-body; access-type=URL; URL="' . $body . '"';
             $body                    = null;

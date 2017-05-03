@@ -32,7 +32,7 @@ namespace acdhOeaw\util;
 
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\util\SparqlEndpoint;
-use acdhOeaw\schema\File;
+use acdhOeaw\schema\file\File;
 use acdhOeaw\fedora\metadataQuery\QueryParameter;
 use DirectoryIterator;
 use DomainException;

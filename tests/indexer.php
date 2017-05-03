@@ -25,13 +25,13 @@
  */
 
 use EasyRdf\Graph;
-use acdhOeaw\storage\Indexer;
+use acdhOeaw\util\Indexer;
 
 require_once 'init.php';
 
 $fedora->begin();
 
-$id = $conf->get('fedoraIdNamespace') . 'test1';
+$id = 'http://my.test/id';
 try{
     $res = $fedora->getResourceById($id);
 } catch (Exception $ex) {
@@ -47,6 +47,6 @@ $ind->setDepth(10);
 $ind->setFlatStructure(false);
 $indRes = $ind->index(true);
 foreach ($indRes as $i) {
-    echo $i->getUri() . "\n";
+    echo $i->getUri(true) . "\n";
 }
 $fedora->commit();
