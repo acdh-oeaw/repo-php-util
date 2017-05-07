@@ -35,7 +35,7 @@ use DomainException;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
-use zozlak\util\Config;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * Basic class for representing real-world entities to be imported into 
@@ -56,20 +56,6 @@ abstract class Object {
      * @var array
      */
     static private $cache = array();
-
-    /**
-     * Configuration properties.
-     * @var \zozlak\util\Config
-     */
-    static protected $config;
-
-    /**
-     * Initializes config.
-     * @param \zozlak\util\Config $cfg
-     */
-    static public function init(Config $cfg) {
-        self::$config = $cfg;
-    }
 
     /**
      * Clears repository resources cache.
@@ -160,7 +146,7 @@ abstract class Object {
         // if it has just been created it would be a waste of time to update it
         if (!$created) {
             $current = $this->res->getMetadata();
-            $idProp  = $this->fedora->getIdProp();
+            $idProp  = RC::idProp();
 
             $meta = $current->merge($this->getMetadata(), array($idProp));
             $this->res->setMetadata($meta);

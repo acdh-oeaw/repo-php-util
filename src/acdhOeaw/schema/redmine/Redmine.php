@@ -37,7 +37,7 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\schema\Object;
-use zozlak\util\Config;
+use acdhOeaw\util\RepoConfig as RC;
 use zozlak\util\ProgressBar;
 
 /**
@@ -54,29 +54,19 @@ abstract class Redmine extends Object {
     static protected $seeAlsoProp = 'http://www.w3.org/2000/01/rdf-schema#seeAlso';
 
     /**
-     * Redmine API base URL
-     * @var string
-     */
-    static protected $apiUrl;
-
-    /**
-     * Redmine REST API key
-     * @var string
-     */
-    static protected $apiKey;
-
-    /**
      * Array of objects defining Redmine property to RDF property mappings
      * @var array
      */
     static private $propMap;
 
     /**
-     * Mappings of derived PHP class names to RDF class names
-     * @var array
+     * 
+     * @return string
      */
-    static private $classes = array();
-
+    static protected function apiUrl(): string {
+        return preg_replace('|/$|', '', RC::get('redmineApiUrl'));
+    }
+    
     /**
      * Returns array of all objects of a given kind which can be fetched from the Redmine.
      * 
@@ -109,31 +99,6 @@ abstract class Redmine extends Object {
     static public abstract function redmineId2repoId(int $id): string;
 
     /**
-     * Initializes class with configuration settings.
-     * 
-     * Required configuration parameters include:
-     * 
-     * - mappingsFile - path to a JSON file describing mappings between Redmine
-     *     objects properties and RDF properties
-     * - redmineApiUrl - base URL of the Redmine REST API
-     * - redmineApiKey - Redmine's REST API access key
-     * - redmineIdProp - URI of the RDF property used to store Redmine's object
-     *     URI
-     * - redmineClasses[] - associative table providing mappings between PHP 
-     *     derived from this class and RDF classes
-     * 
-     * @param \zozlak\util\Config $cfg configuration to be used
-     * @param Fedora $fedora a Fedora object instance
-     */
-    static public function init(Config $cfg) {
-        parent::init($cfg);
-        self::$propMap = (array) json_decode(file_get_contents($cfg->get('mappingsFile')));
-        self::$apiUrl  = $cfg->get('redmineApiUrl');
-        self::$apiKey  = $cfg->get('redmineApiKey');
-        self::$classes = $cfg->get('redmineClasses');
-    }
-
-    /**
      * 
      * @param bool $progressBar
      * @param string $endpoint
@@ -151,7 +116,7 @@ abstract class Redmine extends Object {
         $offset  = 0;
         do {
             $flag = false;
-            $url  = self::$apiUrl . '/' . $endpoint . '.json?offset=' . $offset . '&' . $param;
+            $url  = RC::get('redmineApiUrl') . '/' . $endpoint . '.json?offset=' . $offset . '&' . $param;
             $data = file_get_contents($url);
             if ($data) {
                 $data = json_decode($data);
@@ -172,7 +137,7 @@ abstract class Redmine extends Object {
     }
 
     static protected function fetchData(string $url): array {
-        $url .= '.json?key=' . urlencode(self::$apiKey);
+        $url  .= '.json?key=' . urlencode(RC::get('redmineApiKey'));
         $data = file_get_contents($url);
         if ($data) {
             $data = (array) json_decode($data);
@@ -204,7 +169,10 @@ abstract class Redmine extends Object {
      */
     public function __construct(Fedora $fedora, string $id, array $data = null) {
         parent::__construct($fedora, $id);
-//echo 'New ' . get_class($this) . ' ' . $id . "\n";
+
+        if (self::$propMap === null) {
+            self::$propMap = (array) json_decode(file_get_contents(RC::get('redmineMappingsFile')));
+        }
 
         if ($data === null) {
             $data = self::fetchData($id);
@@ -229,10 +197,11 @@ abstract class Redmine extends Object {
         $graph = new Graph();
         $res   = $graph->resource('.');
 
-        $res->addResource($this->fedora->getIdProp(), $this->getId());
+        $res->addResource(RC::idProp(), $this->getId());
         $res->addResource(self::$seeAlsoProp, $this->getId());
 
-        $res->addResource('rdf:type', self::$classes[get_called_class()]);
+        $classes = RC::get('redmineClasses');
+        $res->addResource('rdf:type', $classes[get_called_class()]);
 
         foreach (self::$propMap as $redmineProp => $rdfProp) {
             $value = null;
@@ -256,7 +225,7 @@ abstract class Redmine extends Object {
                     try {
                         $this->addValue($res, $rdfProp, $v);
                     } catch (RuntimeException $e) {
-                        echo "\n" . 'Adding value for the ' . $redmineProp . ' of the ' . $this->getIdValue() . ' failed: ' . $e->getMessage() . "\n";
+                        echo "\n" . 'Adding value for the ' . $redmineProp . ' of the ' . $this->redmineId2repoId() . ' failed: ' . $e->getMessage() . "\n";
                         throw $e;
                     }
                 }
@@ -280,12 +249,12 @@ abstract class Redmine extends Object {
 
         $value = str_replace('\\', '/', $value); // ugly workaround for windows-like paths; should be applied only to location_path property
         if ($prop->template !== '') {
-            $value = str_replace(['%REDMINE_URL%', '%VALUE%'], [self::$apiUrl, $value], $prop->template);
+            $value = str_replace(['%REDMINE_URL%', '%VALUE%'], [RC::get('redmineApiUrl'), $value], $prop->template);
         }
 
         if ($prop->redmineClass) {
             $class = $prop->redmineClass === 'self' ? get_class($this) : $prop->redmineClass;
-            $obj = new $class($this->fedora, $class::redmineId2repoId($value));
+            $obj   = new $class($this->fedora, $class::redmineId2repoId($value));
             $value = $obj->getResource(true)->getId();
         }
 

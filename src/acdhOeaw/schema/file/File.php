@@ -36,6 +36,7 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\schema\Object;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * Description of File
@@ -97,7 +98,7 @@ class File extends Object {
      * @param string $fullPath
      */
     static public function getRelPath(string $fullPath): string {
-        $contDir = self::$config->get('containerDir');
+        $contDir = RC::get('containerDir');
         if (!strpos($fullPath, $contDir) === 0) {
             throw new InvalidArgumentException('path is outside the container');
         }
@@ -118,7 +119,7 @@ class File extends Object {
     public function __construct(Fedora $fedora, string $id) {
         $this->path = $id;
 
-        $prefix = self::$config->get('containerToUriPrefix');
+        $prefix = RC::get('containerToUriPrefix');
         $id     = self::sanitizePath($id);
         $id     = self::getRelPath($id);
         $id     = str_replace('%2F', '/', rawurlencode($id));
@@ -135,23 +136,23 @@ class File extends Object {
         $graph = new Graph();
         $meta  = $graph->resource('.');
         
-        $meta->addResource(self::$config->get('fedoraIdProp'), $this->getId());
+        $meta->addResource(RC::idProp(), $this->getId());
         
         if ($class != '') {
             $meta->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', $class);
         }
         
         if ($parent) {
-            $meta->addResource(self::$config->get('fedoraRelProp'), $parent);
+            $meta->addResource(RC::locProp(), $parent);
         }
         
-        $meta->addLiteral(self::$config->get('fedoraLocProp'), self::getRelPath($this->path));
+        $meta->addLiteral(RC::locProp(), self::getRelPath($this->path));
         
-        $meta->addLiteral(self::$config->get('fedoraTitleProp'), basename($this->path));
+        $meta->addLiteral(RC::titleProp(), basename($this->path));
         $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename', basename($this->path));
         $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType', mime_content_type($this->path));
         if (is_file($this->path)) {
-            $meta->addLiteral(self::$config->get('fedoraSizeProp'), filesize($this->path));
+            $meta->addLiteral(RC::get('fedoraSizeProp'), filesize($this->path));
         }
 
         return $meta;

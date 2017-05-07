@@ -27,17 +27,10 @@
 require_once 'vendor/autoload.php';
 
 use acdhOeaw\fedora\Fedora;
-use acdhOeaw\util\Indexer;
-use acdhOeaw\schema\Object;
-use acdhOeaw\schema\redmine\Redmine;
-use zozlak\util\Config;
+use acdhOeaw\util\RepoConfig;
 use zozlak\util\ClassLoader;
 
 $loader = new ClassLoader('src');
 
-$conf = new Config('tests/config.ini');
-
-$fedora = new Fedora($conf);
-Indexer::init($conf);
-Object::init($conf);
-Redmine::init($conf);
+RepoConfig::init('tests/config.ini');
+$fedora = new Fedora();

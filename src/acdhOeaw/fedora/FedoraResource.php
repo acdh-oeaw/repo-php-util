@@ -40,6 +40,7 @@ use acdhOeaw\fedora\metadataQuery\QueryParameter;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\fedora\metadataQuery\HasValue;
 use acdhOeaw\fedora\metadataQuery\MatchesRegEx;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * Represents an already existing Fedora resource.
@@ -153,8 +154,8 @@ class FedoraResource {
         }
         $acdhId = null;
         foreach ($ids as $id) {
-            $inIdNmsp     = strpos($id, $this->fedora->getIdNamespace()) === 0;
-            $inVocabsNmsp = strpos($id, $this->fedora->getVocabsNamespace()) === 0;
+            $inIdNmsp     = strpos($id, RC::idNmsp()) === 0;
+            $inVocabsNmsp = strpos($id, RC::vocabsNmsp()) === 0;
             if ($inIdNmsp || $inVocabsNmsp) {
                 if ($acdhId !== null) {
                     throw new RuntimeException('Many ACDH ids for ' . $this->getUri());
@@ -179,7 +180,7 @@ class FedoraResource {
     public function getIds(): array {
         $this->loadMetadata();
         $ids = array();
-        foreach ($this->metadata->allResources($this->fedora->getIdProp()) as $i) {
+        foreach ($this->metadata->allResources(RC::idProp()) as $i) {
             $ids[] = $i->getUri();
         }
         return $ids;
@@ -406,7 +407,7 @@ class FedoraResource {
      * @return QueryParameter
      */
     public function getChildrenQueryParameter(): QueryParameter {
-        return new HasValue($this->fedora->getRelProp(), $this->getId());
+        return new HasValue(RC::relProp(), $this->getId());
     }
 
     /**

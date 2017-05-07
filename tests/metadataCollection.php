@@ -26,17 +26,18 @@
 
 require_once 'init.php';
 
-use acdhOeaw\util\MetadataCollection;
 use EasyRdf\Resource;
+use acdhOeaw\util\MetadataCollection;
+use acdhOeaw\util\RepoConfig as RC;
 
 $verbose = true;
 
 echo "\n######################################################\n\n";
 
-$graph = new MetadataCollection($conf, $fedora, 'tests/graph-small.ttl');
+$graph = new MetadataCollection($fedora, 'tests/graph-small.ttl');
 $toDel = new Resource('https://id.acdh.oeaw.ac.at/tunico/someId', $graph);
-$res   = $graph->resourcesMatching('http://purl.org/dc/terms/isPartOf', $toDel)[0];
-$res->delete('http://purl.org/dc/terms/isPartOf', $toDel);
+$res   = $graph->resourcesMatching(RC::relProp(), $toDel)[0];
+$res->delete(RC::relProp(), $toDel);
 
 $fedora->begin();
 $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
@@ -45,7 +46,7 @@ $fedora->commit();
 echo "\n######################################################\n\n";
 sleep(5);
 
-$graph = new MetadataCollection($conf, $fedora, 'tests/graph-small.ttl');
+$graph = new MetadataCollection($fedora, 'tests/graph-small.ttl');
 
 $fedora->begin();
 $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
@@ -54,7 +55,7 @@ $fedora->commit();
 echo "\n######################################################\n\n";
 sleep(5);
 
-$graph = new MetadataCollection($conf, $fedora, 'tests/graph-large.ttl');
+$graph = new MetadataCollection($fedora, 'tests/graph-large.ttl');
 
 $fedora->begin();
 $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
@@ -63,7 +64,7 @@ $fedora->commit();
 echo "\n######################################################\n\n";
 sleep(5);
 
-$graph = new MetadataCollection($conf, $fedora, 'tests/graph-cycle.ttl');
+$graph = new MetadataCollection($fedora, 'tests/graph-cycle.ttl');
 
 $fedora->begin();
 try {

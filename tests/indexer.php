@@ -26,6 +26,7 @@
 
 use EasyRdf\Graph;
 use acdhOeaw\util\Indexer;
+use acdhOeaw\util\RepoConfig as RC;
 
 require_once 'init.php';
 
@@ -36,9 +37,9 @@ try{
     $res = $fedora->getResourceById($id);
 } catch (Exception $ex) {
     $meta = (new Graph())->resource('.');
-    $meta->addLiteral($conf->get('fedoraTitleProp'), 'test parent');
-    $meta->addLiteral($conf->get('fedoraLocProp'), 'aaa');
-    $meta->addResource($conf->get('fedoraIdProp'), $id);
+    $meta->addLiteral(RC::titleProp(), 'test parent');
+    $meta->addLiteral(RC::locProp(), 'aaa');
+    $meta->addResource(RC::idProp(), $id);
     $res = $fedora->createResource($meta);
 }
 $ind = new Indexer($res);

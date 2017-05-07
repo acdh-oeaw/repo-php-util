@@ -39,7 +39,7 @@ use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
-use zozlak\util\Config;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * Class for importing whole metadata graph into the repository.
@@ -88,25 +88,17 @@ class MetadataCollection extends Graph {
     private $acdhIds;
 
     /**
-     * RDF property for storing a resource title
-     * @var string
-     */
-    private $titleProp;
-
-    /**
      * Creates a new metadata parser.
      * 
-     * @param Config $cfg
      * @param Fedora $fedora
      * @param string $file
      * @param string $format
      */
-    public function __construct(Config $cfg, Fedora $fedora, string $file,
+    public function __construct(Fedora $fedora, string $file,
                                 string $format = null) {
         parent::__construct();
         $this->parseFile($file, $format);
 
-        $this->titleProp = $cfg->get('fedoraTitleProp');
         $this->fedora    = $fedora;
     }
 
@@ -220,7 +212,7 @@ class MetadataCollection extends Graph {
      */
     private function importResource(Resource $res, string $namespace,
                                     int $onlyIdsOutNmsp, bool $verbose): FedoraResource {
-        $idProp = $this->fedora->getIdProp();
+        $idProp = RC::idProp();
 
         if (count($res->allResources($idProp)) == 0) {
             // it does not make sense to process resource without ids 
@@ -244,7 +236,7 @@ class MetadataCollection extends Graph {
                 throw new DomainException("only ids (" . $inNmsp . " namespace) - skipping");
             } elseif (count($matches) == 0 && $action == self::CREATE) {
                 // add title
-                $res->addLiteral($this->titleProp, $res->getResource($idProp));
+                $res->addLiteral(RC::titleProp(), $res->getResource($idProp));
             }
         }
 
@@ -275,7 +267,7 @@ class MetadataCollection extends Graph {
      * @return bool
      */
     private function isIdElseWhere(Resource $res): bool {
-        $idProp = $this->fedora->getIdProp();
+        $idProp = RC::idProp();
 
         $revMatches = $this->reversePropertyUris($res);
         foreach ($revMatches as $prop) {
@@ -301,7 +293,7 @@ class MetadataCollection extends Graph {
      * @return boolean
      */
     private function containsWrongRefs(Resource $res, string $namespace): bool {
-        $idProp = $this->fedora->getIdProp();
+        $idProp = RC::idProp();
         foreach ($res->propertyUris() as $prop) {
             if ($prop == $idProp) {
                 continue;
@@ -327,7 +319,7 @@ class MetadataCollection extends Graph {
      * @throws RuntimeException
      */
     private function mapUris(string $namespace, bool $force, bool $verbose) {
-        $idProp = $this->fedora->getIdProp();
+        $idProp = RC::idProp();
 
         echo $verbose ? "Mapping URIs to ACDH ids...\n" : "";
         $nothingToDo = true;
@@ -380,7 +372,7 @@ class MetadataCollection extends Graph {
      * @return type
      */
     private function findMatches(Resource $res, string $namespace) {
-        $idProp = $this->fedora->getIdProp();
+        $idProp = RC::idProp();
 
         $matches = array();
         $inNmsp  = false;
@@ -402,7 +394,7 @@ class MetadataCollection extends Graph {
      * Promotes subjects being fully qualified URLs to ids.
      */
     private function promoteUrisToIds() {
-        $idProp = $this->fedora->getIdProp();
+        $idProp = RC::idProp();
 
         foreach ($this->resources() as $i) {
             if (!$i->isBNode()) {
@@ -418,14 +410,14 @@ class MetadataCollection extends Graph {
      * @see findMatches()
      */
     private function buildIndex() {
-        $idProp = $this->fedora->getIdProp();
-        $idNmsp = $this->fedora->getIdNamespace();
+        $idProp = RC::idProp();
+        $idNmsp = RC::idNmsp();
 
         $this->ids     = array();
         $this->acdhIds = array();
 
         $query = new Query();
-        $param = (new HasProperty($this->fedora->getIdProp()))->
+        $param = (new HasProperty(RC::idProp()))->
             setSubVar('?res')->
             setObjVar('?id');
         $query->addParameter($param);
@@ -489,7 +481,7 @@ class MetadataCollection extends Graph {
         }
 
         if ($this->resource !== null) {
-            $res->addResource($this->fedora->getRelProp(), $this->resource->getId());
+            $res->addResource(RC::relProp(), $this->resource->getId());
         }
 
         return $res;
@@ -503,7 +495,7 @@ class MetadataCollection extends Graph {
     private function removeLiteralIds(bool $verbose = true) {
         echo $verbose ? "Removing literal ids...\n" : "";
 
-        $idProp = $this->fedora->getIdProp();
+        $idProp = RC::idProp();
         foreach ($this->resources() as $i) {
             foreach ($i->allLiterals($idProp) as $j) {
                 $i->delete($idProp, $j);

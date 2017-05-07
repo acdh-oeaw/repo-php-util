@@ -35,6 +35,7 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\schema\Object;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * ACDH dessimination service is modeled as a Fedora resource described by
@@ -87,19 +88,16 @@ class Service extends Object {
     public function getMetadata(): Resource {
         $meta = (new Graph())->resource('.');
 
-        $idProp = $this->fedora->getIdProp();
-        $meta->addResource($idProp, $this->getId());
+        $meta->addResource(RC::idProp(), $this->getId());
 
-        $titleProp = self::$config->get('fedoraTitleProp');
-        $meta->addLiteral($titleProp, $this->getId());
+        $meta->addLiteral(RC::titleProp(), $this->getId());
 
-        $locProp = self::$config->get('fedoraServiceLocProp');
-        $meta->addLiteral($locProp, $this->location);
+        $meta->addLiteral(RC::locProp(), $this->location);
 
-        $retProp = self::$config->get('fedoraServiceRetMimeProp');
+        $retProp = RC::get('fedoraServiceRetMimeProp');
         $meta->addLiteral($retProp, $this->retMime);
 
-        $supProp = self::$config->get('fedoraServiceSupportsProp');
+        $supProp = RC::get('fedoraServiceSupportsProp');
         foreach ($this->supports as $i) {
             $meta->addResource($supProp, $i);
         }

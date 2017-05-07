@@ -34,6 +34,7 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\schema\Object;
 use acdhOeaw\fedora\Fedora;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * Each parameter is described by RDF properties:
@@ -84,25 +85,23 @@ class Parameter extends Object {
     public function getMetadata(): Resource {
         $meta = (new Graph())->resource('.');
 
-        $relProp = self::$config->get('fedoraRelProp');
-        $meta->addResource($relProp, $this->serviceId);
+        $meta->addResource(RC::relProp(), $this->serviceId);
+        
+        $meta->addResource(RC::idProp(), $this->getId());
 
-        $idProp = $this->fedora->getIdProp();
-        $meta->addResource($idProp, $this->getId());
-
-        $titleProp = self::$config->get('fedoraTitleProp');
+        $titleProp = RC::get('fedoraTitleProp');
         $meta->addLiteral($titleProp, $this->name);
 
-        $byValueProp = self::$config->get('fedoraServiceParamByValueProp');
+        $byValueProp = RC::get('fedoraServiceParamByValueProp');
         $meta->addLiteral($byValueProp, $this->byValue);
 
-        $requiredProp = self::$config->get('fedoraServiceParamRequiredProp');
+        $requiredProp = RC::get('fedoraServiceParamRequiredProp');
         $meta->addLiteral($requiredProp, $this->required);
 
-        $defaultValueProp = self::$config->get('fedoraServiceParamDefaultValueProp');
+        $defaultValueProp = RC::get('fedoraServiceParamDefaultValueProp');
         $meta->addLiteral($defaultValueProp, $this->defaultValue);
 
-        $redPropertyProp = self::$config->get('fedoraServiceParamRdfPropertyProp');
+        $redPropertyProp = RC::get('fedoraServiceParamRdfPropertyProp');
         $meta->addLiteral($redPropertyProp, $this->rdfProperty);
 
         return $meta;

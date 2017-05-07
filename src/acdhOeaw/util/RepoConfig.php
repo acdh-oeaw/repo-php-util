@@ -3,7 +3,7 @@
 /**
  * The MIT License
  *
- * Copyright 2016 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,42 +28,62 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace acdhOeaw\schema\redmine;
+namespace acdhOeaw\util;
 
-use acdhOeaw\fedora\Fedora;
-use acdhOeaw\util\RepoConfig as RC;
+use zozlak\util\Config;
+use InvalidArgumentException;
 
 /**
- * Represents a Redmine user
- * and provides mapping to ACDH repository resource representing a person.
+ * Description of RepoConfig
  *
  * @author zozlak
  */
-class User extends Redmine {
+class RepoConfig {
 
     /**
-     * Returns array of all User objects which can be fetched from the Redmine.
-     * 
-     * See the Redmine::fetchAll() description for details;
-     * 
-     * @param \acdhOeaw\fedora\Fedora $fedora Fedora connection
-     * @param bool $progressBar should progress bar be displayed 
-     *   (makes sense only if the standard output is a console)
-     * @return array
-     * @see Redmine::fetchAll()
+     *
+     * @var \zozlak\util\Config
      */
-    static public function fetchAll(Fedora $fedora, bool $progressBar): array {
-        $param = 'limit=100000&key=' . urlencode(RC::get('redmineApiKey'));
-        return self::redmineFetchLoop($fedora, $progressBar, 'users', $param);
+    static private $config;
+
+    static public function init(string $configFile) {
+        self::$config = new Config($configFile);
     }
 
-    /**
-     * Maps Redmine's User ID to the Redmine's User URI
-     * @param int $id Redmine ID
-     * @return string
-     */
-    static public function redmineId2repoId(int $id): string {
-        return self::apiUrl() . '/users/' . $id;
+    static public function get(string $property) {
+        $value = @self::$config->get($property);
+        if ($value === null) {
+            throw new InvalidArgumentException('configuration property ' . $property . ' does not exist');
+        }
+        return $value;
+    }
+
+    static public function set(string $property, $value) {
+        self::$config->set($property, $value);
+    }
+
+    static public function idProp() {
+        return self::get('fedoraIdProp');
+    }
+
+    static public function idNmsp() {
+        return self::get('fedoraIdNamespace');
+    }
+
+    static public function titleProp() {
+        return self::get('fedoraTitleProp');
+    }
+
+    static public function locProp() {
+        return self::get('fedoraLocProp');
+    }
+
+    static public function relProp() {
+        return self::get('fedoraRelProp');
+    }
+
+    static public function vocabsNmsp() {
+        return self::get('fedoraVocabsNamespace');
     }
 
 }
