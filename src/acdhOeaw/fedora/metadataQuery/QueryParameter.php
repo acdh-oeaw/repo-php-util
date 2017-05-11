@@ -30,6 +30,7 @@
 
 namespace acdhOeaw\fedora\metadataQuery;
 
+use EasyRdf\Literal;
 use EasyRdf\Resource;
 use EasyRdf\Serialiser\Ntriples;
 
