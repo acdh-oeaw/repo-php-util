@@ -62,7 +62,7 @@ class Indexer {
      * File system paths where resource children are located
      * 
      * It is a concatenation of the container root path coming from the
-     * class settings (set by calling init()) and the location path
+     * class settings and the location path
      * properties of the FedoraResource.
      * 
      * They can be also set manually using the `setPaths()` method
@@ -202,7 +202,6 @@ class Indexer {
      * Sets a class assigned to ingested resources.
      * @param string $class class URI
      * @see $defaultClass
-     * @see init()
      */
     public function setRdfClass(string $class) {
         $this->class = $class;

@@ -102,6 +102,7 @@ class File extends Object {
         if (!strpos($fullPath, $contDir) === 0) {
             throw new InvalidArgumentException('path is outside the container');
         }
+        $contDir = preg_replace('|/$|', '', $contDir);
         return substr($fullPath, strlen($contDir) + 1);
     }
 
