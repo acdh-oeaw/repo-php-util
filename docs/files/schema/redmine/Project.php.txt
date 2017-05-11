@@ -31,6 +31,7 @@
 namespace acdhOeaw\schema\redmine;
 
 use acdhOeaw\fedora\Fedora;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * Represents a Redmine project
@@ -55,7 +56,7 @@ class Project extends Redmine {
      */
     static public function fetchAll(Fedora $fedora, bool $progressBar,
                                     array $filters = array('project_id' => 34)): array {
-        $param = ['key=' . urlencode(self::$apiKey), 'limit' => 1000000];
+        $param = ['key=' . urlencode(RC::get('redmineApiKey')), 'limit' => 1000000];
         foreach ($filters as $k => $v) {
             $param[] = urlencode($k) . '=' . urlencode($v);
         }
@@ -70,7 +71,7 @@ class Project extends Redmine {
      * @return string
      */
     static public function redmineId2repoId(int $id): string {
-        return self::$apiUrl . '/projects/' . $id;
+        return self::apiUrl() . '/projects/' . $id;
     }
 
 }

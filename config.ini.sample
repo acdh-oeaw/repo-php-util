@@ -17,7 +17,7 @@ sparqlUrl="https://fedora.localhost/blazegraph/sparql"
 
 containerDir="/mnt/acdh_resources/container/"
 
-mappingsFile="property_mappings.json"
-redmineClasses[acdhOeaw\redmine\Project]="https://vocabs.acdh.oeaw.ac.at/#Project"
-redmineClasses[acdhOeaw\redmine\User]="http://xmlns.com/foaf/0.1/Agent"
-redmineClasses[acdhOeaw\redmine\Issue]="https://vocabs.acdh.oeaw.ac.at/#DigitalResource"
+redmineMappingsFile="property_mappings.json"
+redmineClasses[acdhOeaw\schema\redmine\Project]="https://vocabs.acdh.oeaw.ac.at/#Project"
+redmineClasses[acdhOeaw\schema\redmine\User]="http://xmlns.com/foaf/0.1/Agent"
+redmineClasses[acdhOeaw\schema\redmine\Issue]="https://vocabs.acdh.oeaw.ac.at/#DigitalResource"

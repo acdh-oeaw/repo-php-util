@@ -31,17 +31,11 @@
 namespace acdhOeaw\util;
 
 use acdhOeaw\fedora\FedoraResource;
-use acdhOeaw\util\SparqlEndpoint;
-use acdhOeaw\schema\File;
-use acdhOeaw\fedora\metadataQuery\QueryParameter;
+use acdhOeaw\schema\file\File;
+use acdhOeaw\util\RepoConfig as RC;
 use DirectoryIterator;
 use DomainException;
-use EasyRdf\Graph;
-use EasyRdf\Resource;
-use EasyRdf\Sparql\Result;
-use EasyRdf\Literal;
 use RuntimeException;
-use zozlak\util\Config;
 
 /**
  * Indexes children of a given FedoraResource in a file system
@@ -51,76 +45,13 @@ use zozlak\util\Config;
 class Indexer {
 
     /**
-     * URI of the RDF property denoting ACDH ID
-     * @var string
+     * Returns standardized value of the containerDir configuration property.
+     * @return string
      */
-    static private $idProp;
-
-    /**
-     * URI of the RDF property denoting relation of being a child resource
-     * @var string
-     */
-    static private $relProp;
-
-    /**
-     * URI of the RDF property denoting resource location 
-     * @var string
-     */
-    static private $locProp;
-
-    /**
-     * URI of the RDF property denoting resource size
-     * @var string 
-     */
-    static private $sizeProp;
-
-    /**
-     * URI of the RDF property denoting resource title
-     * @var string 
-     */
-    static private $titleProp;
-
-    /**
-     * URI of the default RDF class assigned to indexed resources
-     * @var string
-     * @see setRdfClass()
-     * @see init()
-     */
-    static private $defaultClass;
-
-    /**
-     * Path to the container root
-     * @var string
-     */
-    static private $containerDir;
-
-    /**
-     * Initializes class with configuration settings.
-     * 
-     * Required configuration parameters include:
-     * 
-     * - fedoraIdProp - URI of the RDF property denoting resource ACDH ID
-     * - fedoraRelProp - URI of the RDF property denoting relation of being a child
-     * - fedoraLocProp - URI of the RDF property denoting resource location
-     * - fedoraSizeProp - URI of the RDF property denoting resource size
-     * - fedoraTitleProp - URI of the RDF property denoting resource title
-     * - indexerDefaultClass - URI of the default class to be assigned to each 
-     *     indexed resource (can be empty)
-     * - containerDir - path to the container root (the "fedoraLocProp" property
-     *     values are relative to this path)
-     * 
-     * @param Config $cfg
-     */
-    static public function init(Config $cfg) {
-        self::$idProp       = $cfg->get('fedoraIdProp');
-        self::$relProp      = $cfg->get('fedoraRelProp');
-        self::$locProp      = $cfg->get('fedoraLocProp');
-        self::$sizeProp     = $cfg->get('fedoraSizeProp');
-        self::$titleProp    = $cfg->get('fedoraTitleProp');
-        self::$defaultClass = $cfg->get('indexerDefaultClass');
-        self::$containerDir = preg_replace('|/$|', '', $cfg->get('containerDir')) . '/';
+    static public function containerDir():string {
+        return preg_replace('|/$|', '', RC::get('containerDir')) . '/';
     }
-
+    
     /**
      * FedoraResource which children are created by the Indexer
      * @var FedoraResource
@@ -197,15 +128,15 @@ class Indexer {
      */
     public function __construct(FedoraResource $resource) {
         $this->resource = $resource;
-        $this->class    = self::$defaultClass;
+        $this->class    = RC::get('indexerDefaultClass');
 
         $metadata  = $this->resource->getMetadata();
-        $locations = $metadata->allLiterals(self::$locProp);
+        $locations = $metadata->allLiterals(RC::locProp());
         if (count($locations) === 0) {
             throw new RuntimeException('Resource lacks locationpath property');
         }
         foreach ($locations as $i) {
-            $loc = preg_replace('|/$|', '', self::$containerDir . $i->getValue());
+            $loc = preg_replace('|/$|', '', self::containerDir() . $i->getValue());
             /*
               if (!file_exists($loc)) {
               throw new RuntimeException('Locationpath does not exist: ' . $loc);
@@ -300,7 +231,7 @@ class Indexer {
         $indexedRes = array();
 
         foreach ($this->paths as $path) {
-            foreach (new DirectoryIterator(self::$containerDir . $path) as $i) {
+            foreach (new DirectoryIterator(self::containerDir() . $path) as $i) {
                 $newRes     = $this->indexEntry($i, $verbose);
                 $indexedRes = array_merge($indexedRes, $newRes);
             }
@@ -334,7 +265,7 @@ class Indexer {
                 $res = $file->getResource(false, false);
                 echo $verbose ? "update " : "";
 
-                $meta = $res->getMetadata()->merge($meta, array(self::$idProp));
+                $meta = $res->getMetadata()->merge($meta, array(RC::idProp()));
                 $res->setMetadata($meta);
                 $res->updateMetadata();
 
@@ -398,89 +329,6 @@ class Indexer {
         $skipFile = !preg_match($this->filter, $i->getFilename());
         return $i->isDir() && $skipDir || !$i->isDir() && $skipFile;
     }
-
-    /**
-     * Creates metadata for an indexed file system node
-     * 
-     * @param string $path node location base directory relatively to the container
-     * @param DirectoryIterator $i file system node
-     * @return EasyRdf\Resource
-     */
-    private function createMetadata(string $path, DirectoryIterator $i): Resource {
-        $graph    = new Graph();
-        $metadata = $graph->resource('newResource');
-        if ($this->class != '') {
-            $metadata->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', $this->class);
-        }
-        $path = str_replace('\\', '/', $path . '/' . $i->getFilename());
-        $metadata->addLiteral(self::$locProp, $path);
-        $metadata->addLiteral(self::$titleProp, $i->getFilename());
-        $metadata->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename', $i->getFilename());
-        $metadata->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType', mime_content_type($i->getPathname()));
-        $metadata->addResource(self::$relProp, $this->resource->getId());
-        if ($i->isFile()) {
-            $metadata->addLiteral(self::$sizeProp, $i->getSize());
-        }
-        return $metadata;
-    }
-
-    /**
-     * Returns an array of locations listed in Fedora resources
-     * location path properties which don't exist in the filesystem.
-     * 
-     * An array of MissingLocation objects is returned.
-     * 
-     * Only location paths with literal values are taken into account.
-     * Support for location paths being URIs may be added in the future.
-     * 
-     * The location path property is defined by the "fedoraLocProp" 
-     * configuration option (see init()).
-     * 
-     * @return array 
-     * @throws RuntimeException
-     */
-    public function getMissingLocations(): array {
-        $missing = array();
-        foreach ($this->getLocations() as $i) {
-            if (!$i->path instanceof Literal) {
-                continue; // skip locations being URIs
-            }
-
-            $fullPath = self::$containerDir . (string) $i->path;
-            if (!file_exists($fullPath)) {
-                $missing[] = new Location($fullPath, (string) $i->path, (string) $i->uri);
-            }
-        }
-        return $missing;
-    }
-
-    /**
-     * Fetches all child resource locations.
-     * 
-     * @return \EasyRdf\Sparql\Result
-     * @throws \RuntimeException
-     */
-    private function getLocations(): Result {
-        if (FedoraResource::inTransaction()) {
-            throw new RuntimeException('Fedora transaction is active');
-        }
-
-        $query   = '
-            SELECT DISTINCT ?uri ?path
-            WHERE { 
-                ?uri %s ?path .
-                ?uri (%s / ^%s)+ %s
-            }
-        ';
-        $locProp = QueryParameter::escapeUri(self::$locProp);
-        $relProp = QueryParameter::escapeUri(self::$relProp);
-        $idProp  = QueryParameter::escapeUri(self::$idProp);
-        $thisUri = QueryParameter::escapeUri($this->resource->getUri());
-        $query   = sprintf($query, $locProp, $relProp, $idProp, $thisUri);
-
-        $locations = SparqlEndpoint::query($query);
-        return $locations;
-    }
-
+    
 }
 

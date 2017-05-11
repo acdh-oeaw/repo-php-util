@@ -49,6 +49,7 @@ use zozlak\util\ProgressBar;
 abstract class Redmine extends Object {
 
     /**
+     * RDF property used to store Redmine entity URI
      * @var string
      */
     static protected $seeAlsoProp = 'http://www.w3.org/2000/01/rdf-schema#seeAlso';
@@ -60,7 +61,7 @@ abstract class Redmine extends Object {
     static private $propMap;
 
     /**
-     * 
+     * Returns a standardized value of the redmineApiUrl configuration property.
      * @return string
      */
     static protected function apiUrl(): string {
@@ -99,7 +100,11 @@ abstract class Redmine extends Object {
     static public abstract function redmineId2repoId(int $id): string;
 
     /**
+     * Fetches all objects from a given Redmine API endpoint.
      * 
+     * Redmine limits number of results returned by one API call to 100
+     * therefore it may be needed to call the API many times.
+     * @param Fedora $fedora
      * @param bool $progressBar
      * @param string $endpoint
      * @param string $param
@@ -136,6 +141,12 @@ abstract class Redmine extends Object {
         return $objects;
     }
 
+    /**
+     * Fetches given Redmine entity description from the Redmine API URI.
+     * @param string $url
+     * @return array
+     * @throws RuntimeException
+     */
     static protected function fetchData(string $url): array {
         $url  .= '.json?key=' . urlencode(RC::get('redmineApiKey'));
         $data = file_get_contents($url);

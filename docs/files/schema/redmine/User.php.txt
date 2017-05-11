@@ -31,6 +31,7 @@
 namespace acdhOeaw\schema\redmine;
 
 use acdhOeaw\fedora\Fedora;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * Represents a Redmine user
@@ -52,7 +53,7 @@ class User extends Redmine {
      * @see Redmine::fetchAll()
      */
     static public function fetchAll(Fedora $fedora, bool $progressBar): array {
-        $param = 'limit=100000&key=' . urlencode(self::$apiKey);
+        $param = 'limit=100000&key=' . urlencode(RC::get('redmineApiKey'));
         return self::redmineFetchLoop($fedora, $progressBar, 'users', $param);
     }
 
@@ -62,7 +63,7 @@ class User extends Redmine {
      * @return string
      */
     static public function redmineId2repoId(int $id): string {
-        return self::$apiUrl . '/users/' . $id;
+        return self::apiUrl() . '/users/' . $id;
     }
 
 }

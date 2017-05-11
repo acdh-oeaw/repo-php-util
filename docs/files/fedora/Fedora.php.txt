@@ -41,7 +41,7 @@ use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\fedora\metadataQuery\HasValue;
 use acdhOeaw\fedora\metadataQuery\MatchesRegEx;
-use zozlak\util\Config;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * Represents a Fedora connection.
@@ -65,11 +65,14 @@ class Fedora {
     static public function attachData(Request $request, string $body): Request {
         $headers = $request->getHeaders();
         if (file_exists($body)) {
-            $headers['Content-Type'] = mime_content_type($body);
-            $body                    = fopen($body, 'rb');
-        } elseif (is_array($body) && isset($body['contentType']) && isset($body['data'])) {
-            $headers['Content-Type'] = $body['contentType'];
-            $body                    = file_exists($body['data']) ? fopen($body, 'rb') : $body['data'];
+            $filename                       = rawurldecode(basename($body)); // lucky guess - unfortunately it is not clear how to escape header values
+            $headers['Content-Type']        = mime_content_type($body);
+            $headers['Content-Disposition'] = 'attachment; filename="' . $filename . '"';
+            $body                           = fopen($body, 'rb');
+        } elseif (is_array($body) && isset($body['contentType']) && isset($body['data']) && isset($body['filename'])) {
+            $headers['Content-Type']        = $body['contentType'];
+            $headers['Content-Disposition'] = 'attachment; filename="' . rawurldecode($body['filename']) . '"';
+            $body                           = file_exists($body['data']) ? fopen($body, 'rb') : $body['data'];
         } elseif (preg_match('|^[a-z0-9]+://|i', $body)) {
             $headers['Content-Type'] = 'message/external-body; access-type=URL; URL="' . $body . '"';
             $body                    = null;
@@ -99,103 +102,23 @@ class Fedora {
     private $client;
 
     /**
-     * Fully qualified URI of the RDF property used to identify resources
-     * 
-     * @var string 
-     * @see getId()
-     * @see getIds()
-     * @see updateContent()
-     */
-    private $idProp;
-
-    /**
-     * Namespace used by ACDH ids
-     * 
-     * @var string
-     */
-    private $idNamespace;
-
-    /**
-     * Namespace used by ontology entities' ids
-     * 
-     * @var string
-     */
-    private $vocabsNamespace;
-
-    /**
      * SPARQL client object
      * @var SparqlClient
      */
     private $sparqlClient;
 
     /**
-     * Fully qualified URI of the RDF property used to denote relation of being
-     * a collection part
-     * 
-     * @var string
-     */
-    private $relProp;
-
-    /**
      * Creates Fedora connection object from a given configuration.
-     * 
-     * Required configuration parameters include:
-     * 
-     * - fedoraApiUrl - base URL of the Fedora REST API
-     * - fedoraIdProp - URI of the RDF property denoting resource ACDH ID
-     * - fedoraUser - login required to connect to the Fedora REST API
-     * - fedoraPswd - password required to connect to the Fedora REST API
-     * - sparqlUrl - SPARQL endpoint URL
-     * - fedoraIdNamespace - namespace used for primary ids
-     * - fedoraVocabsNamespace - id namespace used by ontology entities
-     * 
-     * @param \zozlak\util\Config $cfg configuration object
      */
-    public function __construct(Config $cfg) {
-        $this->apiUrl          = preg_replace('|/$|', '', $cfg->get('fedoraApiUrl'));
-        $this->idProp          = $cfg->get('fedoraIdProp');
-        $this->relProp         = $cfg->get('fedoraRelProp');
-        $this->idNamespace     = $cfg->get('fedoraIdNamespace');
-        $this->vocabsNamespace = $cfg->get('fedoraVocabsNamespace');
-        $authHeader            = 'Basic ' . base64_encode($cfg->get('fedoraUser') . ':' . $cfg->get('fedoraPswd'));
+    public function __construct() {
+        $this->apiUrl          = preg_replace('|/$|', '', RC::get('fedoraApiUrl'));
+        $authHeader            = 'Basic ' . base64_encode(RC::get('fedoraUser') . ':' . RC::get('fedoraPswd'));
         $this->client          = new Client(['verify' => false, 'headers' => ['Authorization' => $authHeader]]);
-        $this->sparqlClient    = new SparqlClient($cfg->get('sparqlUrl'), $cfg->get('fedoraUser'), $cfg->get('fedoraPswd'));
-    }
-
-    /**
-     * Returns URI of the RDF property denoting ACDH ID as set upon object creation.
-     * @return string
-     */
-    public function getIdProp(): string {
-        return $this->idProp;
-    }
-
-    /**
-     * Returns URI of the namespace used by ACDH ids.
-     * @return string
-     */
-    public function getIdNamespace(): string {
-        return $this->idNamespace;
-    }
-
-    /**
-     * Returns URI of the namespace used by ontology entities' ids.
-     * @return string
-     */
-    public function getVocabsNamespace(): string {
-        return $this->vocabsNamespace;
-    }
-
-    /**
-     * Returns URI of the RDF property denoting relation of being a collection part.
-     * @return string
-     */
-    public function getRelProp(): string {
-        return $this->relProp;
+        $this->sparqlClient    = new SparqlClient(RC::get('sparqlUrl'), RC::get('fedoraUser'), RC::get('fedoraPswd'));
     }
 
     public function isAcdhId(string $uri): bool {
-        return strpos($uri, $this->idNamespace) === 0 || strpos($uri, $this->vocabsNamespace) === 0;
+        return strpos($uri, RC::idNmsp()) === 0 || strpos($uri, RC::vocabsNmsp()) === 0;
     }
 
     /**
@@ -225,7 +148,7 @@ class Fedora {
 
         // merge the metadata created by Fedora (and Doorkeeper) upon resource creation
         // with the ones provided by user
-        $curMetadata = $res->getMetadata()->merge($metadata, array($this->idProp));
+        $curMetadata = $res->getMetadata()->merge($metadata, array(RC::idProp()));
         $res->setMetadata($curMetadata);
         $res->updateMetadata();
 
@@ -274,7 +197,7 @@ class Fedora {
      * @see getResourcesById()
      */
     public function getResourceById(string $value): FedoraResource {
-        $res = $this->getResourcesByProperty($this->idProp, $value);
+        $res = $this->getResourcesByProperty(RC::idProp(), $value);
         if (count($res) !== 1) {
             throw new RuntimeException((count($res) == 0 ? "No" : "Many") . " resources found");
         }
@@ -296,7 +219,7 @@ class Fedora {
      * @see getResourceById()
      */
     public function getResourcesById(string $value): array {
-        return $this->getResourcesByProperty($this->idProp, $value);
+        return $this->getResourcesByProperty(RC::idProp(), $value);
     }
 
     /**

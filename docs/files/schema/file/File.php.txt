@@ -35,6 +35,8 @@ use InvalidArgumentException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
+use acdhOeaw\schema\Object;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * Description of File
@@ -43,8 +45,17 @@ use acdhOeaw\fedora\Fedora;
  */
 class File extends Object {
 
+    /**
+     * Detected operating system path enconding.
+     * @var string
+     */
     static private $pathEncoding;
 
+    /**
+     * Tries to detect path encoding used in the operating system by looking
+     * into locale settings.
+     * @throws RuntimeException
+     */
     static private function detectPathEncoding() {
         if (self::$pathEncoding) {
             return;
@@ -67,7 +78,7 @@ class File extends Object {
     }
 
     /**
-     * 
+     * Sanitizes file path - turns all \ into / and assures it is UTF-8 encoded.
      * @param string $path
      * @param string $pathEncoding
      * @return string
@@ -87,45 +98,71 @@ class File extends Object {
      * @param string $fullPath
      */
     static public function getRelPath(string $fullPath): string {
-        $contDir = self::$config->get('containerDir');
+        $contDir = RC::get('containerDir');
         if (!strpos($fullPath, $contDir) === 0) {
             throw new InvalidArgumentException('path is outside the container');
         }
         return substr($fullPath, strlen($contDir) + 1);
     }
 
+    /**
+     *
+     * @var string 
+     */
     private $path;
 
+    /**
+     * 
+     * @param Fedora $fedora
+     * @param type $id
+     */
     public function __construct(Fedora $fedora, string $id) {
         $this->path = $id;
 
-        $prefix = self::$config->get('containerToUriPrefix');
+        $prefix = RC::get('containerToUriPrefix');
         $id     = self::sanitizePath($id);
         $id     = self::getRelPath($id);
-        $id     = rawurlencode($id);
+        $id     = str_replace('%2F', '/', rawurlencode($id));
         parent::__construct($fedora, $prefix . $id);
     }
 
+    /**
+     * 
+     * @param string $class
+     * @param string $parent
+     * @return Resource
+     */
     public function getMetadata(string $class = null, string $parent = null): Resource {
         $graph = new Graph();
         $meta  = $graph->resource('.');
+        
+        $meta->addResource(RC::idProp(), $this->getId());
+        
         if ($class != '') {
             $meta->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', $class);
         }
+        
         if ($parent) {
-            $meta->addResource(self::$config->get('fedoraRelProp'), $parent);
+            $meta->addResource(RC::locProp(), $parent);
         }
-        $meta->addLiteral(self::$config->get('fedoraLocProp'), self::getRelPath($this->path));
-        $meta->addLiteral(self::$config->get('fedoraTitleProp'), basename($this->path));
+        
+        $meta->addLiteral(RC::locProp(), self::getRelPath($this->path));
+        
+        $meta->addLiteral(RC::titleProp(), basename($this->path));
         $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename', basename($this->path));
         $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType', mime_content_type($this->path));
         if (is_file($this->path)) {
-            $meta->addLiteral(self::$config->get('fedoraSizeProp'), filesize($this->path));
+            $meta->addLiteral(RC::get('fedoraSizeProp'), filesize($this->path));
         }
+
         return $meta;
     }
 
-    protected function getBinaryData() {
+    /**
+     * Returns file path (cause path is supported by the `Fedora->create()`). 
+     * @return string
+     */
+    protected function getBinaryData(): string {
         return $this->path;
     }
 

@@ -44,7 +44,11 @@ use RuntimeException;
  */
 class Indexer {
 
-    static public function containerDir() {
+    /**
+     * Returns standardized value of the containerDir configuration property.
+     * @return string
+     */
+    static public function containerDir():string {
         return preg_replace('|/$|', '', RC::get('containerDir')) . '/';
     }
     
