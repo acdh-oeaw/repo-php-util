@@ -47,7 +47,7 @@ class RepoConfig {
     static private $config;
 
     static public function init(string $configFile) {
-        self::$config = new Config($configFile);
+        self::$config = new Config($configFile, true);
     }
 
     static public function get(string $property) {
