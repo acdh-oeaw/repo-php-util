@@ -198,7 +198,7 @@ abstract class Object {
             self::$cache[$this->id] = $res;
         }
 
-        echo self::$debug ? "\t" . $result . " - " . $this->res->getUri(true) . "\n" : "";
+        echo self::$debug ? "\t" . $result . " - " . $res->getUri(true) . "\n" : "";
 
         $this->res = $res;
         return $result == 'not found - created';
