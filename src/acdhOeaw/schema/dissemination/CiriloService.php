@@ -28,11 +28,10 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace acdhOeaw\schema\cirilo;
+namespace acdhOeaw\schema\dissemination;
 
 use SimpleXMLElement;
 use Exception;
-use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\schema\dissemination\Service as DissService;
 use acdhOeaw\util\RepoConfig as RC;
@@ -93,19 +92,19 @@ class CiriloService extends Service {
             $supports[] = (string) $i;
         }
 
-        $service = new DissService($fedora, $id, $location, $retMime, $supports);
+        $obj = new DissService($fedora, $id, $location, $retMime, $supports);
 
         foreach ($service->xpath('./fmm:DatastreamInputParm') as $i) {
-            self::parseParameter($service, $i);
+            self::parseParameter($obj, $i);
         }
         foreach ($service->xpath('./fmm:UserInputParm') as $i) {
-            self::parseParameter($service, $i);
+            self::parseParameter($obj, $i);
         }
         foreach ($service->xpath('./fmm:DefaultInputParm') as $i) {
-            self::parseParameter($service, $i);
+            self::parseParameter($obj, $i);
         }
         
-        return $service;
+        return $obj;
     }
 
     /**
