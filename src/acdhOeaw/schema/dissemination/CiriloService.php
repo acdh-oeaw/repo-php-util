@@ -34,8 +34,8 @@ use SimpleXMLElement;
 use Exception;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
-use acdhOeaw\schema\Object;
 use acdhOeaw\schema\dissemination\Service as DissService;
+use acdhOeaw\util\RepoConfig as RC;
 
 /**
  * Transforms Fedora 3 service deployment resource
@@ -45,7 +45,7 @@ use acdhOeaw\schema\dissemination\Service as DissService;
  * 
  * @author zozlak
  */
-class Service extends Object {
+class CiriloService extends Service {
 
     /**
      * 
@@ -83,9 +83,9 @@ class Service extends Object {
         $sdep->registerXPathNamespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
         $sdep->registerXPathNamespace('wsdl', 'http://schemas.xmlsoap.org/wsdl/');
 
-        $id = self::$config->get('fedoraServiceIdNamespace') . str_replace(':', '/', $sdep->xpath('//dc:identifier')[0]) . '/' . $service['operationName'];
+        $id = RC::get('fedoraServiceIdNamespace') . str_replace(':', '/', $sdep->xpath('//dc:identifier')[0]) . '/' . $service['operationName'];
         $location = (string) $sdep->xpath('//wsdl:binding/wsdl:operation[@name="' . $service['operationName'] . '"]/http:operation')[0]['location'];
-        $location = preg_replace('#https?://[^/]+/#i', self::$config->get('ciriloLocationBase'), $location);
+        $location = preg_replace('#https?://[^/]+/#i', RC::get('ciriloLocationBase'), $location);
         $retMime = (string) $service->xpath('./fmm:MethodReturnType')[0]['wsdlMsgTOMIME'];
 
         $supports = array();
@@ -93,19 +93,19 @@ class Service extends Object {
             $supports[] = (string) $i;
         }
 
-        $obj = new DissService($fedora, $id, $location, $retMime, $supports);
+        $service = new DissService($fedora, $id, $location, $retMime, $supports);
 
         foreach ($service->xpath('./fmm:DatastreamInputParm') as $i) {
-            self::parseParameter($obj, $i);
+            self::parseParameter($service, $i);
         }
         foreach ($service->xpath('./fmm:UserInputParm') as $i) {
-            self::parseParameter($obj, $i);
+            self::parseParameter($service, $i);
         }
         foreach ($service->xpath('./fmm:DefaultInputParm') as $i) {
-            self::parseParameter($obj, $i);
+            self::parseParameter($service, $i);
         }
         
-        return $obj;
+        return $service;
     }
 
     /**
@@ -118,16 +118,9 @@ class Service extends Object {
         $byValue = (string) $p['passBy'] == 'VALUE';
         $required = ((string) $p['required']) === 'true';
         $defaultValue = (string) $p['defaultValue'];
-        $rdfProperty = self::$config->get('ciriloServiceParamRdfPrefix') . (string) $p['parmName'];
+        $rdfProperty = RC::get('ciriloServiceParamRdfPrefix') . (string) $p['parmName'];
 
         $service->addParameter($name, $byValue, $required, $defaultValue, $rdfProperty);
-    }
-
-    /**
-     * 
-     */
-    public function getMetadata(): Resource {
-        
     }
 
 }
