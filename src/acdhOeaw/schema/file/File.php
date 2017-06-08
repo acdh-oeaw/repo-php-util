@@ -144,10 +144,10 @@ class File extends Object {
         }
         
         if ($parent) {
-            $meta->addResource(RC::locProp(), $parent);
+            $meta->addResource(RC::relProp(), $parent);
         }
         
-        $meta->addLiteral(RC::locProp(), self::getRelPath($this->path));
+        $meta->addLiteral(RC::locProp(), self::getRelPath(self::sanitizePath($this->path)));
         
         $meta->addLiteral(RC::titleProp(), basename($this->path));
         $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename', basename($this->path));
