@@ -138,10 +138,15 @@ abstract class Object {
      *   exist?
      * @param bool $uploadBinary should binary data of the real-world entity
      *   be uploaded uppon repository resource creation?
+     * @param string $path where to create a resource (if it does not exist).
+     *   If it it ends with a "/", the resource will be created as a child of
+     *   a given collection). All the parents in the Fedora resource tree have
+     *   to exist (you can not create "/foo/bar" if "/foo" does not exist already).
      * @return FedoraResource
      */
-    public function updateRms(bool $create = true, bool $uploadBinary = true): FedoraResource {
-        $created = $this->findResource($create, $uploadBinary);
+    public function updateRms(bool $create = true, bool $uploadBinary = true,
+                              string $path = '/'): FedoraResource {
+        $created = $this->findResource($create, $uploadBinary, $path);
 
         // if it has just been created it would be a waste of time to update it
         if (!$created) {
@@ -168,11 +173,16 @@ abstract class Object {
      *   found?
      * @param bool $uploadBinary should binary data of the real-world entity
      *   be uploaded uppon repository resource creation?
+     * @param string $path where to create a resource (if it does not exist).
+     *   If it it ends with a "/", the resource will be created as a child of
+     *   a given collection). All the parents in the Fedora resource tree have
+     *   to exist (you can not create "/foo/bar" if "/foo" does not exist already).
      * @return boolean if a repository resource was found
      * @throws RuntimeException
      */
     protected function findResource(bool $create = true,
-                                    bool $uploadBinary = true): bool {
+                                    bool $uploadBinary = true,
+                                    string $path = '/'): bool {
         echo self::$debug ? "searching for " . $this->id . "\n" : "";
         $result = '';
 
@@ -184,7 +194,8 @@ abstract class Object {
             if (count($matches) == 0) {
                 if ($create) {
                     $binary = $uploadBinary ? $this->getBinaryData() : '';
-                    $res    = $this->fedora->createResource($this->getMetadata(), $binary);
+                    $method = substr($path, -1) == '/' ? 'POST' : 'PUT';
+                    $res    = $this->fedora->createResource($this->getMetadata(), $binary, $path, $method);
                     $result = 'not found - created';
                 } else {
                     throw new DomainException('resource not found');

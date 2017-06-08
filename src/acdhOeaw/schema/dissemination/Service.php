@@ -106,13 +106,14 @@ class Service extends Object {
         return $meta;
     }
 
-    public function updateRms(bool $create = true, bool $uploadBinary = true): FedoraResource {
-        parent::updateRms();
+    public function updateRms(bool $create = true, bool $uploadBinary = true,
+                              string $path = '/'): FedoraResource {
+        parent::updateRms($create, $uploadBinary, $path);
 
         foreach ($this->params as $i) {
-            $i->updateRms();
+            $i->updateRms($create, $uploadBinary, $path);
         }
-        
+
         return $this->getResource(false, false);
     }
 
