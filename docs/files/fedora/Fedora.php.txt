@@ -111,10 +111,10 @@ class Fedora {
      * Creates Fedora connection object from a given configuration.
      */
     public function __construct() {
-        $this->apiUrl          = preg_replace('|/$|', '', RC::get('fedoraApiUrl'));
-        $authHeader            = 'Basic ' . base64_encode(RC::get('fedoraUser') . ':' . RC::get('fedoraPswd'));
-        $this->client          = new Client(['verify' => false, 'headers' => ['Authorization' => $authHeader]]);
-        $this->sparqlClient    = new SparqlClient(RC::get('sparqlUrl'), RC::get('fedoraUser'), RC::get('fedoraPswd'));
+        $this->apiUrl       = preg_replace('|/$|', '', RC::get('fedoraApiUrl'));
+        $authHeader         = 'Basic ' . base64_encode(RC::get('fedoraUser') . ':' . RC::get('fedoraPswd'));
+        $this->client       = new Client(['verify' => false, 'headers' => ['Authorization' => $authHeader]]);
+        $this->sparqlClient = new SparqlClient(RC::get('sparqlUrl'), RC::get('fedoraUser'), RC::get('fedoraPswd'));
     }
 
     public function isAcdhId(string $uri): bool {
@@ -325,6 +325,7 @@ class Fedora {
      */
     public function sanitizeUri(string $uri): string {
         $baseUrl = !$this->txUrl ? $this->apiUrl : $this->txUrl;
+        $uri     = preg_replace('|^/|', '', $uri);
         $uri     = preg_replace('|^https?://[^/]+/rest/?(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
         $uri     = $baseUrl . '/' . $uri;
         return $uri;

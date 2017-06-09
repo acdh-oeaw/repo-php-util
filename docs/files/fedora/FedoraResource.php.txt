@@ -63,6 +63,7 @@ class FedoraResource {
         'http://www.iana.org/assignments/relation/describedby',
         'http://purl.org/dc/terms/extent',
         'http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename', // must be set in a Content-Disposition header
+        'http://www.w3.org/ns/ldp#contains',
     );
 
     /**

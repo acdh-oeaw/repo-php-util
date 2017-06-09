@@ -34,6 +34,7 @@ use InvalidArgumentException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
+use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\schema\Object;
 use acdhOeaw\util\RepoConfig as RC;
 
@@ -105,12 +106,15 @@ class Service extends Object {
         return $meta;
     }
 
-    public function updateRms() {
-        parent::updateRms();
+    public function updateRms(bool $create = true, bool $uploadBinary = true,
+                              string $path = '/'): FedoraResource {
+        parent::updateRms($create, $uploadBinary, $path);
 
         foreach ($this->params as $i) {
-            $i->updateRms();
+            $i->updateRms($create, $uploadBinary, $path);
         }
+
+        return $this->getResource(false, false);
     }
 
 }

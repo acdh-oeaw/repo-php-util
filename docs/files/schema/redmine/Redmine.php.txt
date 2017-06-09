@@ -236,7 +236,7 @@ abstract class Redmine extends Object {
                     try {
                         $this->addValue($res, $rdfProp, $v);
                     } catch (RuntimeException $e) {
-                        echo "\n" . 'Adding value for the ' . $redmineProp . ' of the ' . $this->redmineId2repoId() . ' failed: ' . $e->getMessage() . "\n";
+                        echo "\n" . 'Adding value for the ' . $redmineProp . ' of the ' . $this->data['id'] . ' failed: ' . $e->getMessage() . "\n";
                         throw $e;
                     }
                 }

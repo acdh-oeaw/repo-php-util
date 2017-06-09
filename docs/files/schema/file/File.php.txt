@@ -102,6 +102,7 @@ class File extends Object {
         if (!strpos($fullPath, $contDir) === 0) {
             throw new InvalidArgumentException('path is outside the container');
         }
+        $contDir = preg_replace('|/$|', '', $contDir);
         return substr($fullPath, strlen($contDir) + 1);
     }
 
@@ -143,10 +144,10 @@ class File extends Object {
         }
         
         if ($parent) {
-            $meta->addResource(RC::locProp(), $parent);
+            $meta->addResource(RC::relProp(), $parent);
         }
         
-        $meta->addLiteral(RC::locProp(), self::getRelPath($this->path));
+        $meta->addLiteral(RC::locProp(), self::getRelPath(self::sanitizePath($this->path)));
         
         $meta->addLiteral(RC::titleProp(), basename($this->path));
         $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename', basename($this->path));
