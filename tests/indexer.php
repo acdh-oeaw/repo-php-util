@@ -27,6 +27,7 @@
 use EasyRdf\Graph;
 use acdhOeaw\util\Indexer;
 use acdhOeaw\util\metaLookup\MetaLookupFile;
+use acdhOeaw\util\metaLookup\MetaLookupGraph;
 use acdhOeaw\util\RepoConfig as RC;
 
 require_once 'init.php';
@@ -44,10 +45,9 @@ try{
 }
 $fedora->commit();
 $res = $fedora->getResourceByUri($res->getUri(true));
-
+/*
 echo "simple indexing\n";
 $fedora->begin();
-
 $ind = new Indexer($res);
 $ind->setUploadSizeLimit(10000000);
 $ind->setDepth(10);
@@ -60,9 +60,29 @@ $fedora->commit();
 
 echo "\n-----\n";
 
-echo "automatic metadata fetching\n";
+echo "automatic metadata fetching from file\n";
+$fedora->begin();
 MetaLookupFile::$debug = true;
 $metaLookup = new MetaLookupFile(array('.'), '.ttl');
+$fedora->begin();
+$ind = new Indexer($res);
+$ind->setPaths(array('/'));
+$ind->setMetaLookup($metaLookup);
+$ind->setFilter('/xml$/');
+$indRes = $ind->index(true);
+foreach ($indRes as $i) {
+    echo $i->getUri(true) . "\n";
+}
+$fedora->commit();
+
+echo "\n-----\n";
+*/
+echo "automatic metadata fetching from graph\n";
+$fedora->begin();
+MetaLookupGraph::$debug = true;
+$graph = new Graph();
+$graph->parseFile('tests/sample.xml.ttl');
+$metaLookup = new MetaLookupGraph($graph);
 $fedora->begin();
 $ind = new Indexer($res);
 $ind->setPaths(array('/'));

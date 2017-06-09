@@ -40,7 +40,7 @@ use acdhOeaw\util\RepoConfig as RC;
  *
  * @author zozlak
  */
-class MetaLookupGraph {
+class MetaLookupGraph implements MetaLookupInterface{
 
     /**
      * Debug flag - setting it to true causes loggin messages to be displayed.

@@ -40,6 +40,7 @@ use EasyRdf\Resource;
  * @author zozlak
  */
 interface MetaLookupInterface {
+
     /**
      * Returns metadata coupled with a file.
      * @param string $path path to the data file
