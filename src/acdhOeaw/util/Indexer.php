@@ -272,12 +272,11 @@ class Indexer {
 
         if (!$skip) {
             $file = new File($this->resource->getFedora(), $i->getPathname());
-            $meta = $file->getMetadata($this->class, $this->resource->getId());
-
             if ($this->metaLookup) {
-                $addMeta = $this->metaLookup->getMetadata($i->getPathname(), $meta);
-                $meta    = $meta->merge($addMeta, $meta->propertyUris());
+                $file->setMetaLookup($this->metaLookup);
             }
+            
+            $meta = $file->getMetadata($this->class, $this->resource->getId());
 
             try {
                 // resource already exists and should be updated
