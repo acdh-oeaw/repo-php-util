@@ -117,6 +117,11 @@ class Fedora {
         $this->sparqlClient = new SparqlClient(RC::get('sparqlUrl'), RC::get('fedoraUser'), RC::get('fedoraPswd'));
     }
 
+    /**
+     * Checks if a given URI belongs to ACDH id namespace(s)
+     * @param string $uri uri
+     * @return bool
+     */
     public function isAcdhId(string $uri): bool {
         return strpos($uri, RC::idNmsp()) === 0 || strpos($uri, RC::vocabsNmsp()) === 0;
     }
