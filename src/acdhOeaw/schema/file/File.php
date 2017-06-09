@@ -37,6 +37,7 @@ use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\schema\Object;
 use acdhOeaw\util\RepoConfig as RC;
+use acdhOeaw\util\metaLookup\MetaLookupInterface;
 
 /**
  * Description of File
@@ -83,7 +84,8 @@ class File extends Object {
      * @param string $pathEncoding
      * @return string
      */
-    static public function sanitizePath(string $path, string $pathEncoding = null): string {
+    static public function sanitizePath(string $path,
+                                        string $pathEncoding = null): string {
         if ($pathEncoding === null) {
             self::detectPathEncoding();
             $pathEncoding = self::$pathEncoding;
@@ -113,6 +115,12 @@ class File extends Object {
     private $path;
 
     /**
+     *
+     * @var \acdhOeaw\util\metaLookup\metaLookupInterface
+     */
+    private $metaLookup;
+
+    /**
      * 
      * @param Fedora $fedora
      * @param type $id
@@ -136,19 +144,19 @@ class File extends Object {
     public function getMetadata(string $class = null, string $parent = null): Resource {
         $graph = new Graph();
         $meta  = $graph->resource('.');
-        
+
         $meta->addResource(RC::idProp(), $this->getId());
-        
+
         if ($class != '') {
             $meta->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', $class);
         }
-        
+
         if ($parent) {
             $meta->addResource(RC::relProp(), $parent);
         }
-        
+
         $meta->addLiteral(RC::locProp(), self::getRelPath(self::sanitizePath($this->path)));
-        
+
         $meta->addLiteral(RC::titleProp(), basename($this->path));
         $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename', basename($this->path));
         $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType', mime_content_type($this->path));
@@ -156,7 +164,16 @@ class File extends Object {
             $meta->addLiteral(RC::get('fedoraSizeProp'), filesize($this->path));
         }
 
+        if ($this->metaLookup) {
+            $addMeta = $this->metaLookup->getMetadata($this->path);
+            $meta    = $addMeta->merge($meta, array(RC::idProp()));
+        }
+
         return $meta;
+    }
+
+    public function setMetaLookup(MetaLookupInterface $metaLookup) {
+        $this->metaLookup = $metaLookup;
     }
 
     /**
