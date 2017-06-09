@@ -254,6 +254,11 @@ public function getPaths() {
     private function indexEntry(DirectoryIterator $i, bool $verbose): array {
         $indexedRes = array();
 
+$path = substr($i->getPath(), 0, strlen($i->getPath())-1);
+echo "\nprocessing file: ".$i->getFilename()."\n";
+echo "\nprocessing path: ".$path."\n";
+
+
         if ($i->isDot()) {
             return $indexedRes;
         }
