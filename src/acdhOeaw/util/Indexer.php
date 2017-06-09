@@ -33,6 +33,7 @@ namespace acdhOeaw\util;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\schema\file\File;
 use acdhOeaw\util\RepoConfig as RC;
+use EasyRdf\Graph;
 use DirectoryIterator;
 use DomainException;
 use RuntimeException;
@@ -157,6 +158,11 @@ class Indexer {
         $this->paths = $paths;
     }
 
+public function getPaths() {
+        return $this->paths;
+    }
+
+
     /**
      * Sets file name filter for child resources.
      * 
@@ -258,7 +264,43 @@ class Indexer {
         if (!$skip) {
             $file = new File($this->resource->getFedora(), $i->getPathname());
             $meta = $file->getMetadata($this->class, $this->resource->getId());
-
+				
+				// try to locate a metadata file and add metadata if available;
+				$path = substr($i->getPath(), 0, strlen($i->getPath())-1);
+				//echo "\nprocessing file: ".$i->getFilename()."\n";
+				//echo "\nprocessing path: ".$path."\n";
+				$metafile = $path.str_replace($i->getExtension(), RC::get('acdhMetaDataExtension') , $i->getFilename());
+				
+				try {
+					
+					if (!file_exists($metafile)) {
+							echo $verbose ? "\nCould not retrieve the metadata file: ".$metafile : "";
+					} else {
+					
+						$mdf = new MetadataCollection($this->resource->getFedora(), $metafile);
+					
+						if (count($mdf->resources())==0) {
+							echo $verbose ? "\No resources in the metadata file: ".$metafile : "";
+						} else {
+							echo $verbose ? "\nMetadata file found: ".$metafile : "";
+						// assuming single resource described in the file. and hoping it will pop up in the graph as the first one.
+							$mdres = reset($mdf->resources());
+							echo "\nmdres:".$mdres;
+							$props = $mdres->properties();
+							echo $verbose ? "\nAdding properties: \n" : "";
+							  foreach ($props as $p)
+								{ 
+									echo $verbose ? $p.", " : "";
+									$meta->add($p, $mdres->get($p));
+								}
+							echo $verbose ? "\n\n" : "";
+						}			            
+          }
+  			} catch (Exception $e) {
+                // no metadata file found. (or some other problem?)                
+                echo $verbose ? "Error trying to retrieve the metadata file: ".$e->getMessage() : "";
+            }
+  					
             try {
                 // resource already exists and should be updated
                 $res = $file->getResource(false, false);
