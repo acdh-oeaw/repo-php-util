@@ -21,3 +21,5 @@ redmineMappingsFile="property_mappings.json"
 redmineClasses[acdhOeaw\schema\redmine\Project]="https://vocabs.acdh.oeaw.ac.at/#Project"
 redmineClasses[acdhOeaw\schema\redmine\User]="http://xmlns.com/foaf/0.1/Agent"
 redmineClasses[acdhOeaw\schema\redmine\Issue]="https://vocabs.acdh.oeaw.ac.at/#DigitalResource"
+
+acdhMetaDataExtension="ttl"
