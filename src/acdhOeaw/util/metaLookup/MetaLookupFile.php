@@ -125,6 +125,8 @@ class MetaLookupFile implements MetaLookupInterface {
                 } else{
                     echo self::$debug ? "      but no metadata inside\n" : '';
                 }
+            } else {
+                echo self::$debug ? "    NOT found\n" : '';
             }
         }
 
