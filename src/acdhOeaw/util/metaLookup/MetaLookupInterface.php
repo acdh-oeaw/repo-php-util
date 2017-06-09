@@ -43,6 +43,8 @@ interface MetaLookupInterface {
     /**
      * Returns metadata coupled with a file.
      * @param string $path path to the data file
+     * @param \EasyRdf\Resource meta existing data file metadata
+     * @return \EasyRdf\Resource fetched metadata
      */
-    public function getMetadata(string $path): Resource;
+    public function getMetadata(string $path, Resource $meta = null): Resource;
 }

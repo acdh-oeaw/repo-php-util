@@ -85,11 +85,14 @@ class MetaLookupFile implements MetaLookupInterface {
 
     /**
      * Searches for metadata of a given file.
-     * @param string $path
-     * @return Resource
-     * @throws InvalidArgumentException
+     * @param string $path path to the file
+     * @param \EasyRdf\Resource $meta file's metadata (just for conformance with
+     *   the interface, they are not used)
+     * @return \EasyRdf\Resource fetched metadata
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
-    public function getMetadata(string $path): Resource {
+    public function getMetadata(string $path, Resource $meta = null): Resource {
         if (!file_exists($path)) {
             throw new InvalidArgumentException('no such file');
         }
