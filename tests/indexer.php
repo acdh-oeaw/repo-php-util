@@ -26,12 +26,12 @@
 
 use EasyRdf\Graph;
 use acdhOeaw\util\Indexer;
+use acdhOeaw\util\metaLookup\MetaLookupFile;
 use acdhOeaw\util\RepoConfig as RC;
 
 require_once 'init.php';
 
 $fedora->begin();
-
 $id = 'http://my.test/id';
 try{
     $res = $fedora->getResourceById($id);
@@ -42,10 +42,32 @@ try{
     $meta->addResource(RC::idProp(), $id);
     $res = $fedora->createResource($meta);
 }
+$fedora->commit();
+$res = $fedora->getResourceByUri($res->getUri(true));
+
+echo "simple indexing\n";
+$fedora->begin();
+
 $ind = new Indexer($res);
 $ind->setUploadSizeLimit(10000000);
 $ind->setDepth(10);
 $ind->setFlatStructure(false);
+$indRes = $ind->index(true);
+foreach ($indRes as $i) {
+    echo $i->getUri(true) . "\n";
+}
+$fedora->commit();
+
+echo "\n-----\n";
+
+echo "automatic metadata fetching\n";
+MetaLookupFile::$debug = true;
+$metaLookup = new MetaLookupFile(array('.'), '.ttl');
+$fedora->begin();
+$ind = new Indexer($res);
+$ind->setPaths(array('/'));
+$ind->setMetaLookup($metaLookup);
+$ind->setFilter('/xml$/');
 $indRes = $ind->index(true);
 foreach ($indRes as $i) {
     echo $i->getUri(true) . "\n";

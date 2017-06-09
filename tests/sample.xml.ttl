@@ -1,0 +1,2 @@
+<.> <https://some.sample/property> "sample value" .
+<.> <https://some.sample/property> <https://some.sample/uri> .

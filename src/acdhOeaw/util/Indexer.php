@@ -33,6 +33,7 @@ namespace acdhOeaw\util;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\schema\file\File;
 use acdhOeaw\util\RepoConfig as RC;
+use acdhOeaw\util\metaLookup\MetaLookupInterface;
 use DirectoryIterator;
 use DomainException;
 use RuntimeException;
@@ -48,10 +49,10 @@ class Indexer {
      * Returns standardized value of the containerDir configuration property.
      * @return string
      */
-    static public function containerDir():string {
+    static public function containerDir(): string {
         return preg_replace('|/$|', '', RC::get('containerDir')) . '/';
     }
-    
+
     /**
      * FedoraResource which children are created by the Indexer
      * @var FedoraResource
@@ -117,6 +118,12 @@ class Indexer {
      * @var bool 
      */
     private $includeEmpty = false;
+
+    /**
+     * An object providing metadata when given a resource file path
+     * @var \acdhOeaw\util\metaLookup\MetaLookupInterface
+     */
+    private $metaLookup;
 
     /**
      * Creates an indexer object for a given Fedora resource.
@@ -220,6 +227,14 @@ class Indexer {
     }
 
     /**
+     * Sets a class providing metadata for indexed files.
+     * @param MetaLookupInterface $metaLookup
+     */
+    public function setMetaLookup(MetaLookupInterface $metaLookup) {
+        $this->metaLookup = $metaLookup;
+    }
+
+    /**
      * Does the indexing.
      * 
      * @param bool $verbose should be verbose
@@ -258,6 +273,11 @@ class Indexer {
         if (!$skip) {
             $file = new File($this->resource->getFedora(), $i->getPathname());
             $meta = $file->getMetadata($this->class, $this->resource->getId());
+            
+            if ($this->metaLookup) {
+                $addMeta = $this->metaLookup->getMetadata($i->getPathname());
+                $meta = $meta->merge($addMeta, $meta->propertyUris());
+            }
 
             try {
                 // resource already exists and should be updated
@@ -328,5 +348,5 @@ class Indexer {
         $skipFile = !preg_match($this->filter, $i->getFilename());
         return $i->isDir() && $skipDir || !$i->isDir() && $skipFile;
     }
-    
+
 }
