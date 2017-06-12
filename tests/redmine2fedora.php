@@ -24,14 +24,29 @@
  * THE SOFTWARE.
  */
 
-use zozlak\util\ProgressBar;
+use EasyRdf\Graph;
 use acdhOeaw\schema\redmine\Issue;
 use acdhOeaw\schema\redmine\Project;
 use acdhOeaw\schema\redmine\User;
-
+use acdhOeaw\fedora\Fedora;
+use acdhOeaw\fedora\exceptions\NotFound;
+use acdhOeaw\util\RepoConfig as RC;
+use zozlak\util\ProgressBar;
 require_once 'init.php';
+$fedora = new Fedora();
+//\acdhOeaw\schema\Object::$debug = true;
 
 $fedora->begin();
+
+// create a collection for users
+try {
+    $fedora->getResourceByUri('/agent')->getMetadata();
+} catch (NotFound $e) {
+    $meta = (new Graph())->resource('.');
+    $meta->addLiteral(RC::titleProp(), 'Collection of users, groups and institutions');
+    $meta->addResource(RC::idProp(), 'http://id.acdh.oeaw.ac.at/agentsCollection');
+    $fedora->createResource($meta, '', '/agent', 'PUT');
+}
 
 echo "\nUsers:\n";
 $users = User::fetchAll($fedora, true);
@@ -42,7 +57,8 @@ foreach ($users as $i) {
     try {
         $i->updateRms();
     } catch (Exception $e) {
-        
+        $fedora->rollback();
+        throw $e;
     }
 }
 $pb->finish();
@@ -55,8 +71,9 @@ foreach ($projects as $i) {
     $pb->next();
     try {
         $i->updateRms();
-    } catch (Exception $ex) {
-        
+    } catch (Exception $e) {
+        $fedora->rollback();
+        throw $e;
     }
 }
 $pb->finish();
@@ -70,7 +87,8 @@ foreach ($issues as $i) {
     try {
         $i->updateRms();
     } catch (Exception $e) {
-        
+        $fedora->rollback();
+        throw $e;
     }
 }
 $pb->finish();

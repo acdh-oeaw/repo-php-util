@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2017 zozlak.
@@ -24,12 +24,28 @@
  * THE SOFTWARE.
  */
 
-require_once 'vendor/autoload.php';
-
+use EasyRdf\Graph;
+use acdhOeaw\fedora\exceptions\Deleted;
+use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\fedora\Fedora;
-use acdhOeaw\util\RepoConfig;
-use zozlak\util\ClassLoader;
+require_once 'init.php';
+$fedora = new Fedora();
 
-$loader = new ClassLoader('src');
-
-RepoConfig::init('tests/config.ini');
+echo "\n-------------------------------------------------------------------\n";
+echo "handles thumbstone resources\n";
+$fedora->begin();
+$uri = 'test' . rand();
+try {
+    $meta = (new Graph())->resource('.');
+    $meta->addLiteral(RC::titleProp(), 'test parent');
+    $meta->addResource(RC::idProp(), 'https://some.id/#' . rand());
+    $res = $fedora->createResource($meta, '', $uri, 'PUT');
+    $res->delete();
+    try {
+        $res = $fedora->createResource($meta, '', $uri, 'PUT');    
+    } catch (Deleted $e) {
+        
+    }
+} finally {
+    $fedora->rollback();
+}

@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2017 zozlak.
@@ -24,12 +24,21 @@
  * THE SOFTWARE.
  */
 
-require_once 'vendor/autoload.php';
+/*
+ * Tests for \acdhOeaw\fedora\FedoraCache
+ */
 
+use EasyRdf\Graph;
+use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\fedora\Fedora;
-use acdhOeaw\util\RepoConfig;
-use zozlak\util\ClassLoader;
+require_once 'init.php';
+$fedora = new Fedora();
 
-$loader = new ClassLoader('src');
+$p1 = 'http://some.property/#p1';
+$p2 = 'http://some.property/#p2';
 
-RepoConfig::init('tests/config.ini');
+try {
+    $fedora->begin();
+} finally {
+    $fedora->rollback();
+}

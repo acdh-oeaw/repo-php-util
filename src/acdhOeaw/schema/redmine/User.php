@@ -68,7 +68,7 @@ class User extends Redmine {
     }
 
     public function updateRms(bool $create = true, bool $uploadBinary = true,
-                              string $path = '/agent'): FedoraResource {
+                              string $path = '/agent/'): FedoraResource {
         return parent::updateRms($create, $uploadBinary, $path);
     }
 }

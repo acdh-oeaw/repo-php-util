@@ -1,9 +1,9 @@
 <?php
 
-/* 
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2016 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,27 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
-require_once 'vendor/autoload.php';
+namespace acdhOeaw\fedora\exceptions;
 
-use acdhOeaw\fedora\Fedora;
-use acdhOeaw\util\RepoConfig;
-use zozlak\util\ClassLoader;
+use Exception;
+use Throwable;
 
-$loader = new ClassLoader('src');
+/**
+ * Description of FedoraCacheInconsistent
+ *
+ * @author zozlak
+ */
+class NotFound extends Exception {
 
-RepoConfig::init('tests/config.ini');
+    public function __construct(string $message = "not found", int $code = 3,
+                                Throwable $previous = null) {
+        parent::__construct($message, $code, $previous);
+    }
+
+}

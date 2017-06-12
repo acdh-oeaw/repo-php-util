@@ -33,10 +33,16 @@ namespace acdhOeaw\fedora;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Exception\ClientException;
 use EasyRdf\Resource;
 use EasyRdf\Sparql\Result;
 use RuntimeException;
 use BadMethodCallException;
+use acdhOeaw\fedora\FedoraCache;
+use acdhOeaw\fedora\exceptions\Deleted;
+use acdhOeaw\fedora\exceptions\NotInCache;
+use acdhOeaw\fedora\exceptions\NotFound;
+use acdhOeaw\fedora\exceptions\AmbiguousMatch;
 use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\fedora\metadataQuery\HasValue;
@@ -52,6 +58,18 @@ use acdhOeaw\util\RepoConfig as RC;
  * @author zozlak
  */
 class Fedora {
+
+    /**
+     * Should debug messages be generated when searching for resources
+     * @var bool
+     */
+    static public $debugGetRes = false;
+
+    /**
+     * Should debug messages be generated when running SPARQL queries
+     * @var bool
+     */
+    static public $debugSparql = false;
 
     /**
      * Attaches binary content to a given Guzzle HTTP request
@@ -108,6 +126,12 @@ class Fedora {
     private $sparqlClient;
 
     /**
+     * Resources cache
+     * @var \acdhOeaw\fedora\FedoraCache
+     */
+    private $cache;
+
+    /**
      * Creates Fedora connection object from a given configuration.
      */
     public function __construct() {
@@ -115,6 +139,7 @@ class Fedora {
         $authHeader         = 'Basic ' . base64_encode(RC::get('fedoraUser') . ':' . RC::get('fedoraPswd'));
         $this->client       = new Client(['verify' => false, 'headers' => ['Authorization' => $authHeader]]);
         $this->sparqlClient = new SparqlClient(RC::get('sparqlUrl'), RC::get('fedoraUser'), RC::get('fedoraPswd'));
+        $this->cache        = new FedoraCache();
     }
 
     /**
@@ -124,6 +149,14 @@ class Fedora {
      */
     public function isAcdhId(string $uri): bool {
         return strpos($uri, RC::idNmsp()) === 0 || strpos($uri, RC::vocabsNmsp()) === 0;
+    }
+
+    /**
+     * Returns a FedoraResource objects cache
+     * @return FedoraCache
+     */
+    public function getCache(): FedoraCache {
+        return $this->cache;
     }
 
     /**
@@ -147,9 +180,16 @@ class Fedora {
         $path    = $path ? $baseUrl . '/' . preg_replace('|^/|', '', $path) : $baseUrl;
         $request = new Request($method, $path);
         $request = self::attachData($request, $data);
-        $resp    = $this->sendRequest($request);
+        try {
+            $resp    = $this->sendRequest($request);
+        } catch (ClientException $e) {
+            if (strpos($e->getMessage(), 'tombstone resource') === false) {
+                throw $e;
+            }
+            throw new Deleted();
+        }
         $uri     = $resp->getHeader('Location')[0];
-        $res     = new FedoraResource($this, $uri);
+        $res     = $this->getResourceByUri($uri);
 
         // merge the metadata created by Fedora (and Doorkeeper) upon resource creation
         // with the ones provided by user
@@ -183,8 +223,11 @@ class Fedora {
      * @return \acdhOeaw\fedora\FedoraResource
      */
     public function getResourceByUri(string $uri): FedoraResource {
-        $uri = $this->sanitizeUri($uri);
-        return new FedoraResource($this, $uri);
+        try {
+            return $this->cache->getByUri($uri);
+        } catch (NotInCache $e) {
+            return new FedoraResource($this, $uri);
+        }
     }
 
     /**
@@ -193,38 +236,90 @@ class Fedora {
      * 
      * If there is no or are many such resources, an error is thrown.
      * 
-     * Be aware that only property values at the beginning of the current transaction
-     * are be searched (see documentation of the begin() method).
-     * 
-     * @param string $value
+     * @param string $id
+     * @param bool $checkIfExist should we make sure resource was not deleted
+     *   during the current transaction
      * @return \acdhOeaw\fedora\FedoraResource
      * @throws RuntimeException
-     * @see getResourcesById()
      */
-    public function getResourceById(string $value): FedoraResource {
-        $res = $this->getResourcesByProperty(RC::idProp(), $value);
-        if (count($res) !== 1) {
-            throw new RuntimeException((count($res) == 0 ? "No" : "Many") . " resources found");
+    public function getResourceById(string $id, bool $checkIfExist = true): FedoraResource {
+        $res = $this->getResourcesByProperty(RC::idProp(), $id, false);
+        try {
+            $res[] = $this->cache->getById($id);
+        } catch (NotInCache $e) {
+            
         }
-        return $res[0];
+
+        if ($checkIfExist) {
+            $res = $this->verifyResources($res);
+        }
+
+        switch (count($res)) {
+            case 0:
+                throw new NotFound();
+            case 1:
+                return array_pop($res);
+            default:
+                $res1 = array_pop($res);
+                $res2 = array_pop($res);
+                if ($res1->getUri(true) !== $res2->getUri(true)) {
+                    throw new AmbiguousMatch();
+                }
+                return $res1;
+        }
     }
 
     /**
-     * Finds all Fedora resources with a given id property value
-     * (as it is defined by the "fedoraIdProp" configuration option - see the init() method).
-     * 
-     * If you are sure only one resource with a given id should exist
-     * (but it's RDF, so think about it twice), take a look at the getResourceById() method.
-     * 
-     * Be aware that only property values at the beginning of the current transaction
-     * are be searched (see documentation of the begin() method).
-     * 
-     * @param string $value
-     * @return array
-     * @see getResourceById()
+     * Extracts id properties form metadata based on the "fedoraIdProp" configuration property
+     * and calls `getResourceByIds()`
+     * @param Resource $metadata
+     * @param bool $checkIfExist should we make sure resource was not deleted
+     *   during the current transaction
+     * @return type
+     * @see getResourcesByIds()
      */
-    public function getResourcesById(string $value): array {
-        return $this->getResourcesByProperty(RC::idProp(), $value);
+    public function getResourceByMetadata(Resource $metadata,
+                                          bool $checkIfExist = true) {
+        $ids = array();
+        foreach ($metadata->allResources(RC::idProp()) as $i) {
+            $ids[] = $i->getUri();
+        }
+        return $this->getResourceByIds($ids, $checkIfExist);
+    }
+
+    /**
+     * Finds Fedora resources matching any of provided ids.
+     * @param array $ids
+     * @param bool $checkIfExist should we make sure resource was not deleted
+     *   during the current transaction
+     * @return \acdhOeaw\fedora\FedoraResource
+     * @throws NotFound
+     * @throws AmbiguousMatch
+     */
+    public function getResourceByIds(array $ids, bool $checkIfExist = true): FedoraResource {
+        echo self::$debugGetRes ? "[Fedora] searching for " . implode(', ', $ids) . "\n" : '';
+
+        $matches = array();
+        foreach ($ids as $id) {
+            try {
+                $res                         = $this->getResourceById($id, $checkIfExist);
+                $matches[$res->getUri(true)] = $res;
+            } catch (NotFound $e) {
+                
+            }
+        }
+
+        switch (count($matches)) {
+            case 0:
+                echo self::$debugGetRes ? "  not found\n" : '';
+                throw new NotFound();
+            case 1:
+                echo self::$debugGetRes ? "  found\n" : '';
+                return array_pop($matches);
+            default:
+                echo self::$debugGetRes ? "  ambiguosus match: " . implode(', ', array_keys($matches)) . "\n" : '';
+                throw new AmbiguousMatch();
+        }
     }
 
     /**
@@ -238,10 +333,13 @@ class Fedora {
      * 
      * @param string $property fully qualified property URI
      * @param string $value optional property value
+     * @param bool $checkIfExist should we make sure resource was not deleted
+     *   during the current transaction
      * @return array
      * @see begin()
      */
-    public function getResourcesByProperty(string $property, string $value = ''): array {
+    public function getResourcesByProperty(string $property, string $value = '',
+                                           bool $checkIfExist = true): array {
         $query = new Query();
         if ($value != '') {
             $param = new HasValue($property, $value);
@@ -249,7 +347,7 @@ class Fedora {
             $param = new HasProperty($property);
         }
         $query->addParameter($param);
-        return $this->getResourcesByQuery($query);
+        return $this->getResourcesByQuery($query, '?res', $checkIfExist);
     }
 
     /**
@@ -261,14 +359,17 @@ class Fedora {
      * @param string $property fully qualified property URI
      * @param string $regEx regular expression to match against
      * @param string $flags regular expression flags (by default "i" - case insensitive)
+     * @param bool $checkIfExist should we make sure resource was not deleted
+     *   during the current transaction
      * @return array
      * @see begin()
      */
     public function getResourcesByPropertyRegEx(string $property, string $regEx,
-                                                string $flags = 'i'): array {
+                                                string $flags = 'i',
+                                                bool $checkIfExist = true): array {
         $query = new Query();
         $query->addParameter(new MatchesRegEx($property, $regEx, $flags));
-        return $this->getResourcesByQuery($query);
+        return $this->getResourcesByQuery($query, '?res', $checkIfExist);
     }
 
     /**
@@ -280,19 +381,53 @@ class Fedora {
      * @param Query $query SPARQL query fetching resources from the triplestore
      * @param string $resVar name of the SPARQL variable containing resource 
      *   URIs
+     * @param bool $checkIfExist should we make sure resource was not deleted
+     *   during the current transaction
      * @return array
      * @see begin()
      */
-    public function getResourcesByQuery(Query $query, string $resVar = '?res'): array {
+    public function getResourcesByQuery(Query $query, string $resVar = '?res',
+                                        bool $checkIfExist = true): array {
         $resVar    = preg_replace('|^[?]|', '', $resVar);
         $results   = $this->runQuery($query);
         $resources = array();
         foreach ($results as $i) {
-            $uri         = $i->$resVar;
-            $uri         = $this->sanitizeUri($uri);
-            $resources[] = new FedoraResource($this, $uri);
+            try {
+                $resources[] = $this->getResourceByUri($i->$resVar);
+            } catch (Deleted $e) {
+                
+            }
+        }
+        if ($checkIfExist) {
+            $resources = $this->verifyResources($resources);
         }
         return $resources;
+    }
+
+    /**
+     * Removes from an array resources which do not exist anymore.
+     * @param array $resources
+     * @param bool $force should resource be always checked (true) or maybe it
+     *   is enough if metadata were already fetched during this session (false) 
+     * @return array
+     * @throws \acdhOeaw\fedora\ClientException
+     */
+    private function verifyResources(array $resources, bool $force = false): array {
+        $passed = array();
+        foreach ($resources as $key => $res) {
+            try {
+                $res->getMetadata($force);
+                $passed[$key] = $res;
+            } catch (ClientException $e) {
+                // "410 gone" means the resource was deleted during current transaction
+                if ($e->getCode() !== 410) {
+                    throw $e;
+                } else {
+                    $this->cache->delete($res);
+                }
+            }
+        }
+        return $passed;
     }
 
     /**
@@ -300,14 +435,13 @@ class Fedora {
      * triplestore.
      * 
      * @param Query $query query to run
-     * @param bool $debug should the underlying SPARQL query be displayed
      * @return \EasyRdf\Sparql\Result
      */
-    public function runQuery(Query $query, bool $debug = false): Result {
+    public function runQuery(Query $query): Result {
         $query = $query->getQuery();
-        if ($debug) {
-            echo $query . "\n";
-        }
+
+        echo self::$debugSparql ? $query . "\n" : '';
+
         return $this->runSparql($query);
     }
 
@@ -378,8 +512,10 @@ class Fedora {
      * @see commit()
      */
     public function rollback() {
-        $this->client->post($this->txUrl . '/fcr:tx/fcr:rollback');
-        $this->txUrl = null;
+        if ($this->txUrl) {
+            $this->client->post($this->txUrl . '/fcr:tx/fcr:rollback');
+            $this->txUrl = null;
+        }
     }
 
     /**

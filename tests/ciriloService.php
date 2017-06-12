@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2017 zozlak.
@@ -24,9 +24,13 @@
  * THE SOFTWARE.
  */
 
+//TODO - turn into test
+
 use acdhOeaw\schema\cirilo\Service;
+use acdhOeaw\fedora\Fedora;
 
 require_once 'init.php';
+$fedora = new Fedora();
 
 $fedora->begin();
 $services = Service::fromSdepFile($fedora, '/home/zozlak/roboty/ACDH/repo/userstories/reuse_cirilo_services_7991/models/sdep_tei.xml');
@@ -36,7 +40,7 @@ foreach ($services as $i) {
 $fedora->commit();
 
 $fedora->begin();
-$res = $fedora->getResourceByUri('http://fedora.localhost/rest/ontology/class/f4/33/54/f1/f43354f1-db26-439f-b8fd-aee4e873470e');
+$res  = $fedora->getResourceByUri('http://fedora.localhost/rest/ontology/class/f4/33/54/f1/f43354f1-db26-439f-b8fd-aee4e873470e');
 $meta = $res->getMetadata();
 $meta->addResource('https://vocabs.acdh.oeaw.ac.at/#hasSTYLESHEET', 'https://id.acdh.oeaw.ac.at/7c1c6b18-34e6-e36f-c51c-c841940fc803');
 $res->setMetadata($meta);

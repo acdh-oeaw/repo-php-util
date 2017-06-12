@@ -165,7 +165,7 @@ class File extends Object {
         }
 
         if ($this->metaLookup) {
-            $addMeta = $this->metaLookup->getMetadata($this->path);
+            $addMeta = $this->metaLookup->getMetadata($this->path, $meta);
             $meta    = $addMeta->merge($meta, array(RC::idProp()));
         }
 

@@ -70,11 +70,11 @@ class MetaLookupGraph implements MetaLookupInterface{
      * @return \EasyRdf\Resource fetched metadata
      * @throws \RuntimeException
      */
-    public function getMetadata(string $path, Resource $meta = null): Resource {
+    public function getMetadata(string $path, Resource $meta): Resource {
         if ($meta == null) {
             return(new Graph())->resource('.');
         }
-
+        
         $candidates = array();
         foreach ($meta->allResources(RC::idProp()) as $id) {
             foreach ($this->graph->resourcesMatching(RC::idProp(), $id) as $i) {

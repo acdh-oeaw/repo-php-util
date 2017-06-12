@@ -24,52 +24,85 @@
  * THE SOFTWARE.
  */
 
-require_once 'init.php';
-
 use EasyRdf\Resource;
 use acdhOeaw\util\MetadataCollection;
 use acdhOeaw\util\RepoConfig as RC;
+use acdhOeaw\fedora\Fedora;
+require_once 'init.php';
+$fedora = new Fedora();
 
-$verbose = true;
-
-echo "\n######################################################\n\n";
-
-$graph = new MetadataCollection($fedora, 'tests/graph-small.ttl');
-$toDel = new Resource('https://id.acdh.oeaw.ac.at/tunico/someId', $graph);
-$res   = $graph->resourcesMatching(RC::relProp(), $toDel)[0];
-$res->delete(RC::relProp(), $toDel);
-
-$fedora->begin();
-$resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
-$fedora->commit();
+MetadataCollection::$debug = true;
 
 echo "\n######################################################\n\n";
-sleep(5);
 
-$graph = new MetadataCollection($fedora, 'tests/graph-small.ttl');
+$resources = array();
+try {
+    $graph = new MetadataCollection($fedora, 'tests/data/graph-small.ttl');
+    $toDel = new Resource('https://id.acdh.oeaw.ac.at/tunico/someId', $graph);
+    $res   = $graph->resourcesMatching(RC::relProp(), $toDel)[0];
+    $res->delete(RC::relProp(), $toDel);
 
-$fedora->begin();
-$resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
-$fedora->commit();
-
-echo "\n######################################################\n\n";
-sleep(5);
-
-$graph = new MetadataCollection($fedora, 'tests/graph-large.ttl');
-
-$fedora->begin();
-$resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
-$fedora->commit();
+    $fedora->begin();
+    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true);
+    $fedora->commit();
+} finally {
+    $fedora->rollback();
+    $fedora->begin();
+    foreach ($resources as $i) {
+        $i->delete();
+    }
+    $fedora->commit();
+}
 
 echo "\n######################################################\n\n";
 sleep(5);
 
-$graph = new MetadataCollection($fedora, 'tests/graph-cycle.ttl');
+$resources = array();
+try {
+    $graph = new MetadataCollection($fedora, 'tests/data/graph-small.ttl');
 
+    $fedora->begin();
+    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true);
+    $fedora->commit();
+} finally {
+    $fedora->rollback();
+    $fedora->begin();
+    foreach ($resources as $i) {
+        $i->delete();
+    }
+    $fedora->commit();
+}
+
+
+echo "\n######################################################\n\n";
+sleep(5);
+
+$resources = array();
+try {
+    $graph = new MetadataCollection($fedora, 'tests/data/graph-large.ttl');
+
+    $fedora->begin();
+    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true);
+    $fedora->commit();
+} finally {
+    $fedora->rollback();
+    $fedora->begin();
+    foreach ($resources as $i) {
+        $i->delete();
+    }
+    $fedora->commit();
+}
+
+echo "\n######################################################\n\n";
+sleep(5);
+
+$resources = array();
+
+$graph = new MetadataCollection($fedora, 'tests/data/graph-cycle.ttl');
 $fedora->begin();
 try {
-    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true, $verbose);
-    throw new RuntimeException('no error');
+    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true);
+    throw new Exception('no error');
 } catch (RuntimeException $e) {
     
 }

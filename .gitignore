@@ -3,5 +3,6 @@
 /composer.lock
 /playground.php
 /docs/phpdoc-cache*
+/tests/tmp
 config.ini
 

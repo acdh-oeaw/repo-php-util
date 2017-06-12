@@ -92,7 +92,7 @@ class MetaLookupFile implements MetaLookupInterface {
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public function getMetadata(string $path, Resource $meta = null): Resource {
+    public function getMetadata(string $path, Resource $meta): Resource {
         if (!file_exists($path)) {
             throw new InvalidArgumentException('no such file');
         }

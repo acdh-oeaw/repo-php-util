@@ -37,6 +37,7 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
+use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\util\RepoConfig as RC;
@@ -51,6 +52,8 @@ class MetadataCollection extends Graph {
     const SKIP   = 1;
     const CREATE = 2;
 
+    static public $debug = false;
+    
     /**
      * Makes given resource a proper agent
      * 
@@ -147,21 +150,20 @@ class MetadataCollection extends Graph {
      *   MetadataCollection::CREATE)
      * @param bool $errorOnCycle if error should be thrown if not all resources
      *   were imported due to circular dependencies
-     * @param bool $verbose
      * @return array
      * @throws InvalidArgumentException
      */
     public function import(string $namespace, int $singleOutNmsp,
-                           bool $errorOnCycle = true, bool $verbose = false): array {
+                           bool $errorOnCycle = true): array {
         $dict = array(self::SKIP, self::CREATE);
         if (!in_array($singleOutNmsp, $dict)) {
             throw new InvalidArgumentException('singleOutNmsp parameters must be one of MetadataCollection::SKIP, MetadataCollection::CREATE');
         }
 
-        $this->removeLiteralIds($verbose);
+        $this->removeLiteralIds();
         $this->promoteUrisToIds();
         $this->buildIndex();
-        $this->mapUris($namespace, false, $verbose);
+        $this->mapUris($namespace, false);
 
         $imported     = array();
         $toBeImported = array_values($this->resources());
@@ -171,13 +173,13 @@ class MetadataCollection extends Graph {
             $i = $toBeImported[$n];
 
             if ($this->containsWrongRefs($i, $namespace)) {
-                echo $verbose ? "Skipping " . $i->getUri() . " - contains wrong references\n" : "";
+                echo self::$debug ? "Skipping " . $i->getUri() . " - contains wrong references\n" : "";
                 continue;
             }
 
-            echo $verbose ? "Importing " . $i->getUri() . "\n" : "";
+            echo self::$debug ? "Importing " . $i->getUri() . "\n" : "";
             try {
-                $res = $this->importResource($i, $namespace, $singleOutNmsp, $verbose);
+                $res = $this->importResource($i, $namespace, $singleOutNmsp);
                 $id  = $res->getId();
 
                 $uri                         = $res->getUri(true);
@@ -185,9 +187,9 @@ class MetadataCollection extends Graph {
                 $this->acdhIds[$uri]         = $id;
                 $this->acdhIds[$i->getUri()] = $id;
 
-                $this->mapUris($namespace, false, $verbose);
+                $this->mapUris($namespace, false);
             } catch (DomainException $e) {
-                echo $verbose ? "\t" . $e->getMessage() . "\n" : "";
+                echo self::$debug ? "\t" . $e->getMessage() . "\n" : "";
             } finally {
                 array_splice($toBeImported, $n, 1);
                 $n = count($toBeImported);
@@ -206,12 +208,11 @@ class MetadataCollection extends Graph {
      * @param Resource $res
      * @param string $namespace
      * @param int $onlyIdsOutNmsp
-     * @param bool $verbose
      * @return FedoraResource
      * @throws DomainException
      */
     private function importResource(Resource $res, string $namespace,
-                                    int $onlyIdsOutNmsp, bool $verbose): FedoraResource {
+                                    int $onlyIdsOutNmsp): FedoraResource {
         $idProp = RC::idProp();
 
         if (count($res->allResources($idProp)) == 0) {
@@ -244,7 +245,7 @@ class MetadataCollection extends Graph {
 
         if (count($matches) == 1) {
             $repoRes = array_pop($matches);
-            echo $verbose ? "\tupdating " . $repoRes->getUri(true) . "\n" : "";
+            echo self::$debug ? "\tupdating " . $repoRes->getUri(true) . "\n" : "";
 
             $meta = $repoRes->getMetadata();
             $meta->merge($res, array($idProp));
@@ -252,9 +253,9 @@ class MetadataCollection extends Graph {
             $repoRes->setMetadata($meta);
             $repoRes->updateMetadata();
         } else {
-            echo $verbose ? "\tcreating " : "";
+            echo self::$debug ? "\tcreating " : "";
             $repoRes = $this->fedora->createResource($res);
-            echo $verbose ? $repoRes . "\n" : "";
+            echo self::$debug ? $repoRes . "\n" : "";
         }
         return $repoRes;
     }
@@ -315,13 +316,12 @@ class MetadataCollection extends Graph {
      * 
      * @param string $namespace
      * @param bool $force
-     * @param bool $verbose
      * @throws RuntimeException
      */
-    private function mapUris(string $namespace, bool $force, bool $verbose) {
+    private function mapUris(string $namespace, bool $force) {
         $idProp = RC::idProp();
 
-        echo $verbose ? "Mapping URIs to ACDH ids...\n" : "";
+        echo self::$debug ? "Mapping URIs to ACDH ids...\n" : "";
         $nothingToDo = true;
 
         foreach ($this->resources() as $res) {
@@ -351,17 +351,17 @@ class MetadataCollection extends Graph {
                         $targetId = isset($this->acdhIds[$targetUri]) ? $this->acdhIds[$targetUri] : $this->acdhIds[$uri];
                         $res->delete($prop, $val);
                         $res->addResource($prop, $targetId);
-                        if ($verbose) {
+                        if (self::$debug) {
                             echo "\tswitching " . $val . " into " . $targetId . "\n";
                         }
-                    } elseif ($verbose) {
+                    } elseif (self::$debug) {
                         echo "\t" . $uri . " should be replaced by target resurce's ACDH id but it is not yet known (" . $targetUri . ")\n";
                     }
                     $nothingToDo = false;
                 }
             }
         }
-        echo $verbose && $nothingToDo ? "\t...nothing to map\n" : "";
+        echo self::$debug && $nothingToDo ? "\t...nothing to map\n" : "";
     }
 
     /**
@@ -438,17 +438,14 @@ class MetadataCollection extends Graph {
             foreach ($i->allResources($idProp) as $j) {
                 $j = $j->getUri();
 
-                $matches = $this->fedora->getResourcesById($j);
-                if (count($matches) > 1) {
-                    throw new RuntimeException('repository inconsitent');
-                } elseif (count($matches) == 1) {
-                    $res                     = $matches[0];
+                try{
+                    $res = $this->fedora->getResourceById($j);
                     $matched[$res->getUri()] = '';
 
                     $this->ids[$j]                     = $res->getUri();
                     $this->acdhIds[$res->getUri(true)] = $res->getId();
                     $this->acdhIds[$i->getUri()]       = $res->getId();
-                } else {
+                } catch (NotFound $e){
                     $this->ids[$j] = '_';
                 }
             }
@@ -489,17 +486,15 @@ class MetadataCollection extends Graph {
 
     /**
      * Removes literal ids from the graph.
-     * 
-     * @param bool $verbose
      */
-    private function removeLiteralIds(bool $verbose = true) {
-        echo $verbose ? "Removing literal ids...\n" : "";
+    private function removeLiteralIds() {
+        echo self::$debug ? "Removing literal ids...\n" : "";
 
         $idProp = RC::idProp();
         foreach ($this->resources() as $i) {
             foreach ($i->allLiterals($idProp) as $j) {
                 $i->delete($idProp, $j);
-                if ($verbose) {
+                if (self::$debug) {
                     echo "\tremoved " . $j . " from " . $i->getUri() . "\n";
                 }
             }
