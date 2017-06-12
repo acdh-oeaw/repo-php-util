@@ -31,6 +31,7 @@
 namespace acdhOeaw\schema\redmine;
 
 use acdhOeaw\fedora\Fedora;
+use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -66,5 +67,9 @@ class User extends Redmine {
         return self::apiUrl() . '/users/' . $id;
     }
 
+    public function updateRms(bool $create = true, bool $uploadBinary = true,
+                              string $path = '/agent/'): FedoraResource {
+        return parent::updateRms($create, $uploadBinary, $path);
+    }
 }
 

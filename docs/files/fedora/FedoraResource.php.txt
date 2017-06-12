@@ -31,10 +31,12 @@
 namespace acdhOeaw\fedora;
 
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Exception\RequestException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
 use InvalidArgumentException;
 use RuntimeException;
+use acdhOeaw\fedora\exceptions\Deleted;
 use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\QueryParameter;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
@@ -92,17 +94,6 @@ class FedoraResource {
     private $metadata;
 
     /**
-     * Resource metadata lastly fetched from the Fedora
-     * enabling us to perform triples update.
-     * 
-     * @var \EasyRdf\Resource 
-     * @see getMetadata()
-     * @see setMetadata()
-     * @see updateMetadata()
-     */
-    private $metadataOld;
-
-    /**
      * Fedora connection object used by this resource
      * @var \acdhOeaw\fedora\Fedora
      */
@@ -125,7 +116,9 @@ class FedoraResource {
      */
     public function __construct(Fedora $fedora, string $uri) {
         $this->fedora = $fedora;
-        $this->uri    = $uri;
+        $this->uri    = $fedora->sanitizeUri($uri);
+
+        $fedora->getCache()->add($this);
     }
 
     /**
@@ -136,7 +129,11 @@ class FedoraResource {
      * @return string
      */
     public function getUri(bool $standardized = false): string {
-        return $standardized ? $this->fedora->standardizeUri($this->uri) : $this->uri;
+        if ($standardized) {
+            return $this->fedora->standardizeUri($this->uri);
+        } else {
+            return $this->fedora->sanitizeUri($this->uri);
+        }
     }
 
     /**
@@ -202,6 +199,7 @@ class FedoraResource {
     public function delete() {
         $request = new Request('DELETE', $this->fedora->sanitizeUri($this->getUri()));
         $this->fedora->sendRequest($request);
+        $this->fedora->getCache()->delete($this);
     }
 
     /**
@@ -216,6 +214,8 @@ class FedoraResource {
     public function setMetadata(Resource $metadata) {
         $this->metadata = $metadata;
         $this->updated  = false;
+
+        $this->fedora->getCache()->reload($this);
     }
 
     /**
@@ -244,6 +244,8 @@ class FedoraResource {
      */
     public function updateMetadata(string $mode = 'UPDATE') {
         if (!$this->updated) {
+            $this->uri = $this->fedora->sanitizeUri($this->uri);
+
             if (!in_array($mode, array('ADD', 'UPDATE', 'OVERWRITE'))) {
                 throw new InvalidArgumentException('Mode should be one of ADD, UPDATE or OVERWITE');
             }
@@ -251,40 +253,35 @@ class FedoraResource {
                 throw new RuntimeException('Get or set metadata first with getMetadata() or setMetadata()');
             }
 
+            $delete = '';
             switch ($mode) {
                 case 'ADD':
-                    $delete = '';
-                    $where  = '';
                     break;
                 case 'UPDATE':
-                    if (!$this->metadataOld) {
-                        $metadataTmp    = $this->metadata;
-                        $this->loadMetadata(true);
-                        $this->metadata = $metadataTmp;
+                    $curProp = $this->metadata->propertyUris();
+                    $oldMeta = $this->getMetadataFromFedora();
+                    foreach (array_diff($oldMeta->propertyUris(), $curProp) as $prop) {
+                        $oldMeta->delete($prop);
                     }
-                    $delete = self::getSparqlTriples($this->metadataOld);
-                    $where  = '';
+                    $delete  = self::getSparqlTriples($oldMeta);
                     break;
                 case 'OVERWRITE':
-                    $delete = '<> ?prop ?value .';
-                    $where  = '<> ?prop ?value . FILTER (!regex(str(?prop), "^http://fedora[.]info")';
-                    foreach (self::$skipProp as $i) {
-                        $where .= ' && str(?prop) != str(' . QueryParameter::escapeUri($i) . ')';
-                    }
-                    $where .= ')';
+                    $oldMeta = $this->getMetadataFromFedora();
+                    $delete  = self::getSparqlTriples($oldMeta);
                     break;
             }
             $insert = self::getSparqlTriples($this->metadata);
-            $body   = sprintf('DELETE {%s} INSERT {%s} WHERE {%s}', $delete, $insert, $where);
+            $body   = sprintf('DELETE {%s} INSERT {%s} WHERE {}', $delete, $insert);
 
             $headers = array('Content-Type' => 'application/sparql-update');
             $request = new Request('PATCH', $this->uri . '/fcr:metadata', $headers, $body);
             $this->fedora->sendRequest($request);
+
+            $this->updated = true;
         }
 
-        // read metadata after the update
+        // reload metadata after the update
         $this->loadMetadata(true);
-        $this->updated = true;
     }
 
     /**
@@ -317,19 +314,38 @@ class FedoraResource {
      */
     private function loadMetadata(bool $force = false) {
         if (!$this->metadata || $force) {
-            $request = new Request('GET', $this->uri . '/fcr:metadata');
-            $resp    = $this->fedora->sendRequest($request);
+            $meta = $this->getMetadataFromFedora();
 
-            $graph          = new Graph();
-            $graph->parse($resp->getBody());
-            $this->metadata = $graph->resource($this->uri);
-
-            if (count($this->metadata->propertyUris()) === 0) {
+            if (count($meta->propertyUris()) === 0) {
                 throw new RuntimeException('No resource metadata. Please check a value of the fedoraApiUrl configuration property.');
             }
 
-            $this->metadataOld = $this->metadata->copy();
+            $this->setMetadata($meta);
         }
+    }
+
+    /**
+     * Fetches metadata from Fedora.
+     * @return Resource
+     * @throws RequestException
+     * @throws Deleted
+     */
+    private function getMetadataFromFedora(): Resource {
+        $request = new Request('GET', $this->uri . '/fcr:metadata');
+        try {
+            $resp    = $this->fedora->sendRequest($request);
+        } catch (RequestException $e) {
+            if ($e->getCode() !== 410) {
+                throw $e;
+            }
+            throw new Deleted();
+        }
+
+        $graph = new Graph();
+        $graph->parse($resp->getBody());
+        $meta  = $graph->resource($this->uri);
+
+        return $meta;
     }
 
     /**
@@ -476,13 +492,12 @@ class FedoraResource {
     }
 
     /**
-     * Debugging helper allowing to take a look at the resource metadata 
-     * in a console-friendly way
-     * 
+     * Returns serialized metadata (primarly for debugging)
      * @return string
      */
-    public function __getSparqlTriples(): string {
-        return self::getSparqlTriples($this->metadata);
+    public function __metaToString(): string {
+        $tmp = $this->metadata->getGraph()->serialise('ntriples');
+        return "\n" . str_replace($this->uri, '', $tmp) . "\n";
     }
 
     /**

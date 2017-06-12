@@ -31,11 +31,11 @@
 namespace acdhOeaw\util;
 
 use acdhOeaw\fedora\FedoraResource;
+use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\schema\file\File;
 use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\util\metaLookup\MetaLookupInterface;
 use DirectoryIterator;
-use DomainException;
 use RuntimeException;
 
 /**
@@ -45,6 +45,8 @@ use RuntimeException;
  */
 class Indexer {
 
+    static public $debug = false;
+    
     /**
      * Returns standardized value of the containerDir configuration property.
      * @return string
@@ -237,16 +239,14 @@ class Indexer {
     /**
      * Does the indexing.
      * 
-     * @param bool $verbose should be verbose
      * @return array a list FedoraResource objects representing indexed resources
      */
-    public function index(bool $verbose = false): array {
-        File::clearCache();
+    public function index(): array {
         $indexedRes = array();
 
         foreach ($this->paths as $path) {
             foreach (new DirectoryIterator(self::containerDir() . $path) as $i) {
-                $newRes     = $this->indexEntry($i, $verbose);
+                $newRes     = $this->indexEntry($i);
                 $indexedRes = array_merge($indexedRes, $newRes);
             }
         }
@@ -257,10 +257,9 @@ class Indexer {
     /**
      * Processes single directory entry
      * @param DirectoryIterator $i
-     * @param bool $verbose
      * @return array
      */
-    private function indexEntry(DirectoryIterator $i, bool $verbose): array {
+    private function indexEntry(DirectoryIterator $i): array {
         $indexedRes = array();
 
         if ($i->isDot()) {
@@ -272,47 +271,46 @@ class Indexer {
 
         if (!$skip) {
             $file = new File($this->resource->getFedora(), $i->getPathname());
-            $meta = $file->getMetadata($this->class, $this->resource->getId());
-            
             if ($this->metaLookup) {
-                $addMeta = $this->metaLookup->getMetadata($i->getPathname());
-                $meta = $meta->merge($addMeta, $meta->propertyUris());
+                $file->setMetaLookup($this->metaLookup);
             }
+            
+            $meta = $file->getMetadata($this->class, $this->resource->getId());
 
             try {
                 // resource already exists and should be updated
                 $res = $file->getResource(false, false);
-                echo $verbose ? "update " : "";
+                echo self::$debug ? "update " : "";
 
                 $meta = $res->getMetadata()->merge($meta, array(RC::idProp()));
                 $res->setMetadata($meta);
                 $res->updateMetadata();
 
                 if ($upload) {
-                    echo $verbose ? "+ upload " : "";
+                    echo self::$debug ? "+ upload " : "";
                     $res->updateContent($i->getPathname(), true);
                 }
 
                 $indexedRes[] = $res;
-            } catch (DomainException $e) {
+            } catch (NotFound $e) {
                 // resource does not exist and must be created
                 $res = $this->resource->getFedora()->createResource(
                     $meta, $upload ? $i->getPathname() : ''
                 );
 
                 $indexedRes[] = $res;
-                echo $verbose ? "create " : "";
+                echo self::$debug ? "create " : "";
             }
         } else {
-            echo $verbose ? "skip " : "";
+            echo self::$debug ? "skip " : "";
         }
 
-        echo $verbose ? $i->getPathname() . "\n" : "";
-        echo $verbose && !$skip ? "\t" . $res->getId() . "\n\t" . $res->getUri() . "\n" : "";
+        echo self::$debug ? $i->getPathname() . "\n" : "";
+        echo self::$debug && !$skip ? "\t" . $res->getId() . "\n\t" . $res->getUri() . "\n" : "";
 
         // recursion
         if ($i->isDir() && (!$skip || $this->flatStructure && $this->depth > 0)) {
-            echo $verbose ? "entering " . $i->getPathname() . "\n" : "";
+            echo self::$debug ? "entering " . $i->getPathname() . "\n" : "";
             $ind = clone($this);
             if (!$this->flatStructure) {
                 $ind->resource = $res;
@@ -320,9 +318,9 @@ class Indexer {
             $ind->setDepth($this->depth - 1);
             $path       = File::getRelPath($i->getPathname());
             $ind->setPaths(array($path));
-            $recRes     = $ind->index($verbose);
+            $recRes     = $ind->index();
             $indexedRes = array_merge($indexedRes, $recRes);
-            echo $verbose ? "going back from " . $path . "\n" : "";
+            echo self::$debug ? "going back from " . $path . "\n" : "";
         }
 
         return $indexedRes;

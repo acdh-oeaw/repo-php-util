@@ -30,11 +30,11 @@
 
 namespace acdhOeaw\schema;
 
-use RuntimeException;
-use DomainException;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
+use acdhOeaw\fedora\exceptions\NotFound;
+use acdhOeaw\fedora\exceptions\NotInCache;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -50,21 +50,6 @@ abstract class Object {
      * @var boolean 
      */
     static public $debug = false;
-
-    /**
-     * Repository resources cache.
-     * @var array
-     */
-    static private $cache = array();
-
-    /**
-     * Clears repository resources cache.
-     * 
-     * Cache should be cleaned after every Fedora session commit/rollback. 
-     */
-    static public function clearCache() {
-        self::$cache = array();
-    }
 
     /**
      * Repository resource representing given entity.
@@ -93,6 +78,13 @@ abstract class Object {
     public function __construct(Fedora $fedora, string $id) {
         $this->fedora = $fedora;
         $this->id     = $id;
+        
+        try {
+            // not so elegant but saves expensive findResource() call
+            $this->res = $fedora->getCache()->getById($this->id);
+        } catch (NotInCache $e) {
+            
+        }
     }
 
     /**
@@ -128,6 +120,21 @@ abstract class Object {
      */
     public function getId(): string {
         return $this->id;
+    }
+
+    /**
+     * Returns all known ids
+     * 
+     * @return array list of all ids
+     */
+    public function getIds(): array {
+        $ids  = array($this->id);
+        $meta = $this->getMetadata();
+        foreach ($meta->allResources(RC::idProp()) as $id) {
+            $ids[] = $id->getUri();
+        }
+        $ids = array_unique($ids);
+        return $ids;
     }
 
     /**
@@ -178,40 +185,29 @@ abstract class Object {
      *   a given collection). All the parents in the Fedora resource tree have
      *   to exist (you can not create "/foo/bar" if "/foo" does not exist already).
      * @return boolean if a repository resource was found
-     * @throws RuntimeException
      */
     protected function findResource(bool $create = true,
                                     bool $uploadBinary = true,
                                     string $path = '/'): bool {
-        echo self::$debug ? "searching for " . $this->id . "\n" : "";
+        $ids    = $this->getIds();
+        echo self::$debug ? "searching for " . implode(', ', $ids) . "\n" : "";
         $result = '';
 
-        if (isset(self::$cache[$this->id])) {
-            $res    = self::$cache[$this->id];
-            $result = 'found in cache';
-        } else {
-            $matches = $this->fedora->getResourcesById($this->id);
-            if (count($matches) == 0) {
-                if ($create) {
-                    $binary = $uploadBinary ? $this->getBinaryData() : '';
-                    $method = substr($path, -1) == '/' ? 'POST' : 'PUT';
-                    $res    = $this->fedora->createResource($this->getMetadata(), $binary, $path, $method);
-                    $result = 'not found - created';
-                } else {
-                    throw new DomainException('resource not found');
-                }
-            } elseif (count($matches) == 1) {
-                $res    = $matches[0];
-                $result = 'found';
-            } else {
-                throw new RuntimeException('many matching resources');
+        try {
+            $this->res = $this->fedora->getResourceByIds($ids);
+            $result    = 'found in cache';
+        } catch (NotFound $e) {
+            if (!$create) {
+                throw $e;
             }
-            self::$cache[$this->id] = $res;
+
+            $binary    = $uploadBinary ? $this->getBinaryData() : '';
+            $method    = substr($path, -1) == '/' ? 'POST' : 'PUT';
+            $this->res = $this->fedora->createResource($this->getMetadata(), $binary, $path, $method);
+            $result    = 'not found - created';
         }
 
-        echo self::$debug ? "\t" . $result . " - " . $res->getUri(true) . "\n" : "";
-
-        $this->res = $res;
+        echo self::$debug ? "\t" . $result . " - " . $this->res->getUri(true) . "\n" : "";
         return $result == 'not found - created';
     }
 
