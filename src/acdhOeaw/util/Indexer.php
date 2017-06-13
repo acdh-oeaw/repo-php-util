@@ -141,16 +141,8 @@ class Indexer {
 
         $metadata  = $this->resource->getMetadata();
         $locations = $metadata->allLiterals(RC::locProp());
-        if (count($locations) === 0) {
-            throw new RuntimeException('Resource lacks locationpath property');
-        }
         foreach ($locations as $i) {
             $loc = preg_replace('|/$|', '', self::containerDir() . $i->getValue());
-            /*
-              if (!file_exists($loc)) {
-              throw new RuntimeException('Locationpath does not exist: ' . $loc);
-              }
-             */
             if (is_dir($loc)) {
                 $this->paths[] = $i->getValue();
             }
@@ -244,6 +236,10 @@ class Indexer {
     public function index(): array {
         $indexedRes = array();
 
+        if (count($this->paths) === 0) {
+            throw new RuntimeException('No paths set');
+        }
+        
         foreach ($this->paths as $path) {
             foreach (new DirectoryIterator(self::containerDir() . $path) as $i) {
                 $newRes     = $this->indexEntry($i);
