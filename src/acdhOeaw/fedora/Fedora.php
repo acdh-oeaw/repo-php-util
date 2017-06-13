@@ -224,7 +224,7 @@ class Fedora {
      */
     public function getResourceByUri(string $uri): FedoraResource {
         try {
-            return $this->cache->getByUri($uri);
+            return $this->cache->getByUri($this->standardizeUri($uri));
         } catch (NotInCache $e) {
             return new FedoraResource($this, $uri);
         }
