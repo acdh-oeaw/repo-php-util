@@ -171,8 +171,10 @@ class MetadataCollection extends Graph {
         while (count($toBeImported) > 0 && $n > 0) {
             $n--;
             $i = $toBeImported[$n];
+            $wrongRefFlag = 0; // for handling a corner case when the last resource contains wrong references
 
             if ($this->containsWrongRefs($i, $namespace)) {
+                $wrongRefFlag = 1;
                 echo self::$debug ? "Skipping " . $i->getUri() . " - contains wrong references\n" : "";
                 continue;
             }
@@ -195,7 +197,7 @@ class MetadataCollection extends Graph {
                 $n = count($toBeImported);
             }
         }
-        if (count($toBeImported) > 0 && $errorOnCycle) {
+        if (count($toBeImported)- $wrongRefFlag > 0 && $errorOnCycle) {
             throw new RuntimeException('graph contains cycles');
         }
 
