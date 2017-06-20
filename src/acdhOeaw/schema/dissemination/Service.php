@@ -89,11 +89,13 @@ class Service extends Object {
     public function getMetadata(): Resource {
         $meta = (new Graph())->resource('.');
 
+        $meta->addType(RC::get('fedoraServiceClass'));
+        
         $meta->addResource(RC::idProp(), $this->getId());
 
         $meta->addLiteral(RC::titleProp(), $this->getId());
 
-        $meta->addLiteral(RC::locProp(), $this->location);
+        $meta->addLiteral(RC::get('fedoraServiceLocProp'), $this->location);
 
         $retProp = RC::get('fedoraServiceRetMimeProp');
         $meta->addLiteral($retProp, $this->retMime);
