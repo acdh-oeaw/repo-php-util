@@ -38,6 +38,7 @@ use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\fedora\exceptions\NotFound;
+use acdhOeaw\fedora\exceptions\NoAcdhId;
 use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\util\RepoConfig as RC;
@@ -448,6 +449,8 @@ class MetadataCollection extends Graph {
                     $this->acdhIds[$res->getUri(true)] = $res->getId();
                     $this->acdhIds[$i->getUri()]       = $res->getId();
                 } catch (NotFound $e){
+                    $this->ids[$j] = '_';
+                } catch (NoAcdhId $e) {
                     $this->ids[$j] = '_';
                 }
             }
