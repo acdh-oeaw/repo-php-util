@@ -278,10 +278,6 @@ class Indexer {
                 $res = $file->getResource(false, false);
                 echo self::$debug ? "update " : "";
 
-                $meta = $res->getMetadata()->merge($meta, array(RC::idProp()));
-                $res->setMetadata($meta);
-                $res->updateMetadata();
-
                 if ($upload) {
                     echo self::$debug ? "+ upload " : "";
                     $res->updateContent($i->getPathname(), true);
