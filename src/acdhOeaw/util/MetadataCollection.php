@@ -54,7 +54,7 @@ class MetadataCollection extends Graph {
     const CREATE = 2;
 
     static public $debug = false;
-    
+
     /**
      * Makes given resource a proper agent
      * 
@@ -103,7 +103,7 @@ class MetadataCollection extends Graph {
         parent::__construct();
         $this->parseFile($file, $format);
 
-        $this->fedora    = $fedora;
+        $this->fedora = $fedora;
     }
 
     /**
@@ -162,16 +162,20 @@ class MetadataCollection extends Graph {
         }
 
         $this->removeLiteralIds();
+        echo "###\n";
         $this->promoteUrisToIds();
+        echo "###\n";
         $this->buildIndex();
+        echo "###\n";
         $this->mapUris($namespace, false);
+        echo "###\n";
 
         $imported     = array();
         $toBeImported = array_values($this->resources());
         $n            = count($toBeImported);
         while (count($toBeImported) > 0 && $n > 0) {
             $n--;
-            $i = $toBeImported[$n];
+            $i            = $toBeImported[$n];
             $wrongRefFlag = 0; // for handling a corner case when the last resource contains wrong references
 
             if ($this->containsWrongRefs($i, $namespace)) {
@@ -198,7 +202,7 @@ class MetadataCollection extends Graph {
                 $n = count($toBeImported);
             }
         }
-        if (count($toBeImported)- $wrongRefFlag > 0 && $errorOnCycle) {
+        if (count($toBeImported) - $wrongRefFlag > 0 && $errorOnCycle) {
             throw new RuntimeException('graph contains cycles');
         }
 
@@ -436,19 +440,22 @@ class MetadataCollection extends Graph {
             }
         }
 
-        foreach ($this->resourcesMatching($idProp) as $i) {
+        $all = $this->resourcesMatching($idProp);
+        foreach ($all as $c => $i) {
+            // echo $c . '/' . count($all) . "\n";
             $matched = array();
             foreach ($i->allResources($idProp) as $j) {
                 $j = $j->getUri();
 
-                try{
+                try {
                     $res = $this->fedora->getResourceById($j);
+
                     $matched[$res->getUri()] = '';
 
                     $this->ids[$j]                     = $res->getUri();
                     $this->acdhIds[$res->getUri(true)] = $res->getId();
                     $this->acdhIds[$i->getUri()]       = $res->getId();
-                } catch (NotFound $e){
+                } catch (NotFound $e) {
                     $this->ids[$j] = '_';
                 } catch (NoAcdhId $e) {
                     $this->ids[$j] = '_';
