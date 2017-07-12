@@ -35,7 +35,6 @@ use InvalidArgumentException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
-use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\schema\Object;
 use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\util\metaLookup\MetaLookupInterface;

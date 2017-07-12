@@ -50,22 +50,29 @@ try {
     $meta->addLiteral(RC::titleProp(), 'test parent');
     $meta->addLiteral(RC::locProp(), 'data');
     $meta->addResource(RC::idProp(), $id);
-    $res  = $fedora->createResource($meta);
+    $res  = $fedora->createResource($meta, '', '/test', 'PUT');
 }
 $fedora->commit();
 $res = $fedora->getResourceByUri($res->getUri(true));
 
 echo "\n-------------------------------------------------------------------\n";
-echo "simple indexing\n";
+echo "simple indexing into a given location\n";
 try {
     $fedora->begin();
     $ind    = new Indexer($res);
     $ind->setUploadSizeLimit(10000000);
     $ind->setFilter('/txt|xml/');
-    $indRes = $ind->index(true);
+    $ind->setFedoraLocation('/test');
+    $indRes = $ind->index();
 
     if (count($indRes) !== 4) {
         throw new Exception("resources count doesn't match " . count($indRes));
+    }
+    foreach ($indRes as $i) {
+        if (!preg_match('|/rest/test/|', $i->getUri(true))) {
+            throw new Exception('Resource created at wrong location: ' . $i->getUri(true));
+        }
+        $i->delete();
     }
     $fedora->commit();
 } finally {
@@ -76,7 +83,7 @@ echo "\n-------------------------------------------------------------------\n";
 echo "simple reindexing\n";
 try {
     $fedora->begin();
-    $indRes = $ind->index(true);
+    $indRes = $ind->index();
     if (count($indRes) !== 4) {
         throw new Exception("resources count doesn't match " . count($indRes));
     }
@@ -91,6 +98,7 @@ try {
 echo "\n-------------------------------------------------------------------\n";
 echo "automatic metadata fetching from file\n";
 try {
+    $fedora->__clearCache();
     $fedora->begin();
     $metaLookup = new MetaLookupFile(array('.'), '.ttl');
     $fedora->begin();
@@ -99,7 +107,7 @@ try {
     $ind->setPaths(array('data'));
     $ind->setMetaLookup($metaLookup);
     $ind->setFilter('/xml$/');
-    $indRes     = $ind->index(true);
+    $indRes     = $ind->index();
     if (count($indRes) !== 1) {
         throw new Exception("resource wasn't indexed");
     }
@@ -117,6 +125,7 @@ try {
 echo "\n-------------------------------------------------------------------\n";
 echo "automatic metadata fetching from graph\n";
 try {
+    $fedora->__clearCache();
     $fedora->begin();
     $graph      = new Graph();
     $graph->parseFile('tests/data/sample.xml.ttl');
@@ -127,7 +136,7 @@ try {
     $ind->setPaths(array('data'));
     $ind->setMetaLookup($metaLookup);
     $ind->setFilter('/xml$/');
-    $indRes     = $ind->index(true);
+    $indRes     = $ind->index();
     if (count($indRes) !== 1) {
         throw new Exception("resource wasn't indexed");
     }
@@ -147,6 +156,7 @@ echo "it is possible to merge resource on externally provided metadata\n";
 $commonId = 'https://my.id.nmsp/' . rand();
 $fileName = rand();
 try {
+    $fedora->__clearCache();
     $fedora->begin();
     $meta = (new Graph())->resource('.');
     $meta->addResource(RC::idProp(), $commonId);
@@ -163,7 +173,7 @@ try {
     $ind->setPaths(array('tmp'));
     $ind->setFilter('/^' . $fileName . '$/');
     $ind->setMetaLookup(new MetaLookupFile(array('.'), '.ttl'));
-    $indRes = $ind->index(true);
+    $indRes = $ind->index();
     if (count($indRes) !== 1) {
         throw new Exception('resource not indexed');
     }
@@ -179,6 +189,7 @@ try {
 echo "\n-------------------------------------------------------------------\n";
 echo "it is possible to merge resource on externally provided metadata and deleted resources are resolved correctly\n";
 try {
+    $fedora->__clearCache();
     $commonId = 'https://my.id.nmsp/' . rand();
     $fileName = rand();
     //first instance of a resource created in a separate transaction
@@ -207,7 +218,7 @@ try {
     $ind->setPaths(array('tmp'));
     $ind->setFilter('/^' . $fileName . '$/');
     $ind->setMetaLookup(new MetaLookupFile(array('.'), '.ttl'));
-    $indRes = $ind->index(true);
+    $indRes = $ind->index();
     // indexed resource should match manually created one
     if (count($indRes) !== 1) {
         throw new Exception('resource not indexed');

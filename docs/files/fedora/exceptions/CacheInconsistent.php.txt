@@ -39,6 +39,12 @@ use Exception;
  */
 class CacheInconsistent extends Exception {
 
+    /**
+     * Thrown when a resources cache is inconsistent
+     * @param string $message error message
+     * @param int $code error code
+     * @param Throwable $previous previous exception (for chaining)
+     */
     public function __construct(string $message = "cache inconsistent", int $code = 2,
                                 Throwable $previous = null) {
         parent::__construct($message, $code, $previous);

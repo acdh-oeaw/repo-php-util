@@ -40,6 +40,12 @@ use Throwable;
  */
 class ManyAcdhIds extends Exception {
 
+    /**
+     * Thrown when a resource has many ACDH IDs
+     * @param string $message error message
+     * @param int $code error code
+     * @param Throwable $previous previous exception (for chaining)
+     */
     public function __construct(string $message = "many ACDH ids", int $code = 8,
                                 Throwable $previous = null) {
         parent::__construct($message, $code, $previous);

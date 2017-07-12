@@ -40,6 +40,12 @@ use Throwable;
  */
 class NotFound extends Exception {
 
+    /**
+     * Thrown when a resource is not found
+     * @param string $message error message
+     * @param int $code error code
+     * @param Throwable $previous previous exception (for chaining)
+     */
     public function __construct(string $message = "not found", int $code = 3,
                                 Throwable $previous = null) {
         parent::__construct($message, $code, $previous);

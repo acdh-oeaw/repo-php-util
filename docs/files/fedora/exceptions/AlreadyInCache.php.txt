@@ -40,6 +40,12 @@ use Throwable;
  */
 class AlreadyInCache extends Exception {
 
+    /**
+     * Thrown when a resource is already in cache
+     * @param string $message error message
+     * @param int $code error code
+     * @param Throwable $previous previous exception (for chaining)
+     */
     public function __construct(string $message = "already in cache", int $code = 6,
                                 Throwable $previous = null) {
         parent::__construct($message, $code, $previous);

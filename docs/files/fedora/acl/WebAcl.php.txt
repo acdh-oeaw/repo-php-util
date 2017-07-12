@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * The MIT License
+ *
+ * Copyright 2016 Austrian Centre for Digital Humanities.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
+ */
+
+namespace acdhOeaw\fedora\acl;
+
+use acdhOeaw\fedora\FedoraResource;
+use acdhOeaw\fedora\metadataQuery\Query;
+use acdhOeaw\fedora\metadataQuery\HasTriple;
+use acdhOeaw\fedora\metadataQuery\HasValue;
+
+/**
+ * Description of WebAC
+ *
+ * @author zozlak
+ */
+class WebAcl {
+
+    static public function grant(FedoraResource $res, string $role, int $rights) {
+        
+    }
+
+    static public function revoke(FedoraResource $res, string $role, int $rights) {
+        
+    }
+
+    private $rules = array();    
+    
+    public function __construct(FedoraResource $res) {
+        $parentProp = 'http://fedora.info/definitions/v4/repository#hasParent';
+        $inheritParam = new HasValue(array('^', $parentProp, '+'), $res->getUri(true));
+        $q = new Query();
+        $q->addParameter($inheritParam->setSubVar('?ruleRes'));
+        $q->addParameter(new HasTriple('?rule', 'http://www.w3.org/ns/auth/acl#accessTo', '?ruleRes'));
+        $q->addParameter(new HasTriple('?rule', 'http://www.w3.org/ns/auth/acl#agent', '?who'));
+        $q->addParameter(new HasTriple('?rule', 'http://www.w3.org/ns/auth/acl#accessTo', '?what'));
+        $inheritedRules = $res->getFedora()->runQuery($q);
+        $this->processSparql($inheritedRules);
+        
+        $q = new Query();
+        $q->addParameter((new HasValue('http://www.w3.org/ns/auth/acl#accessTo', $res->getUri(true)))->setSubVar('?rule'));
+        $q->addParameter(new HasTriple('?rule', 'http://www.w3.org/ns/auth/acl#agent', '?who'));
+        $q->addParameter(new HasTriple('?rule', 'http://www.w3.org/ns/auth/acl#accessTo', '?what'));
+        $directRules = $res->getFedora()->runQuery($q);
+        $this->processSparql($directRules);
+    }
+    
+    private function processSparql($results, FedoraResource) {
+        foreach($inheritedRules as $i) {
+            if (!isset($this->rules[$i->rule])) {
+                $this->rules[$i->rule] = new WebAclRule($i->rul);
+            }
+            $this->rules[$i->rule]->roles[] = $i->who;
+            $this->rules[$i->rule]->
+        }
+    }
+}
+

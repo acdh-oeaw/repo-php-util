@@ -39,6 +39,12 @@ use Exception;
  */
 class AmbiguousMatch extends Exception {
 
+    /**
+     * Thrown when a resource matches more then one already existing resources.
+     * @param string $message error message
+     * @param int $code error code
+     * @param Throwable $previous previous exception (for chaining)
+     */
     public function __construct(string $message = "ambiguous match", int $code = 1,
                                 Throwable $previous = null) {
         parent::__construct($message, $code, $previous);

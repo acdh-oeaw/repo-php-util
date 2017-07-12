@@ -37,6 +37,8 @@ use EasyRdf\Resource;
 use InvalidArgumentException;
 use RuntimeException;
 use acdhOeaw\fedora\exceptions\Deleted;
+use acdhOeaw\fedora\exceptions\NoAcdhId;
+use acdhOeaw\fedora\exceptions\ManyAcdhIds;
 use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\QueryParameter;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
@@ -148,7 +150,7 @@ class FedoraResource {
     public function getId(): string {
         $ids = $this->getIds();
         if (count($ids) === 0) {
-            throw new RuntimeException('No ACDH id for ' . $this->getUri());
+            throw new NoAcdhId();
         }
         $acdhId = null;
         foreach ($ids as $id) {
@@ -156,13 +158,13 @@ class FedoraResource {
             $inVocabsNmsp = strpos($id, RC::vocabsNmsp()) === 0;
             if ($inIdNmsp || $inVocabsNmsp) {
                 if ($acdhId !== null) {
-                    throw new RuntimeException('Many ACDH ids for ' . $this->getUri());
+                    throw new ManyAcdhIds();
                 }
                 $acdhId = $id;
             }
         }
         if ($acdhId === null) {
-            throw new RuntimeException('No ACDH id for ' . $this->getUri());
+            throw new NoAcdhId();
         }
         return $acdhId;
     }

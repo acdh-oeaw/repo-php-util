@@ -40,6 +40,12 @@ use Throwable;
  */
 class NotInCache extends Exception {
 
+    /**
+     * Thrown when a resource is not in cache
+     * @param string $message error message
+     * @param int $code error code
+     * @param Throwable $previous previous exception (for chaining)
+     */
     public function __construct(string $message = "not in cache", int $code = 4,
                                 Throwable $previous = null) {
         parent::__construct($message, $code, $previous);

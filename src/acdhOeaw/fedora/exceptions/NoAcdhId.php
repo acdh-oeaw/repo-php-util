@@ -40,6 +40,12 @@ use Throwable;
  */
 class NoAcdhId extends Exception {
 
+    /**
+     * Thrown when a resource has no ACDH id
+     * @param string $message error message
+     * @param int $code error code
+     * @param Throwable $previous previous exception (for chaining)
+     */
     public function __construct(string $message = "no ACDH id", int $code = 7,
                                 Throwable $previous = null) {
         parent::__construct($message, $code, $previous);

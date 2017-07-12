@@ -40,6 +40,12 @@ use Throwable;
  */
 class Deleted extends Exception {
 
+    /**
+     * Thrown when a resource is already deleted
+     * @param string $message error message
+     * @param int $code error code
+     * @param Throwable $previous previous exception (for chaining)
+     */
     public function __construct(string $message = "deleted", int $code = 5,
                                 Throwable $previous = null) {
         parent::__construct($message, $code, $previous);

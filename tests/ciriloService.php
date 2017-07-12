@@ -26,14 +26,14 @@
 
 //TODO - turn into test
 
-use acdhOeaw\schema\cirilo\Service;
+use acdhOeaw\schema\dissemination\CiriloService;
 use acdhOeaw\fedora\Fedora;
 
 require_once 'init.php';
 $fedora = new Fedora();
 
 $fedora->begin();
-$services = Service::fromSdepFile($fedora, '/home/zozlak/roboty/ACDH/repo/userstories/reuse_cirilo_services_7991/models/sdep_tei.xml');
+$services = CiriloService::fromSdepFile($fedora, '/home/zozlak/roboty/ACDH/repo/userstories/reuse_cirilo_services_7991/models/sdep_tei.xml');
 foreach ($services as $i) {
     $i->updateRms();
 }
