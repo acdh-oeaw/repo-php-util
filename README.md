@@ -20,19 +20,18 @@ Set of classes for working with the ACDH repository stack.
 
 # Initialization
 
+* (optional but very useful) Declare a shortcat for the configuration class
 * Load composer
-* Read config from `config.ini`
+* Initialize configuration using `config.ini` file
 * Create an object of `acdhOeaw\fedora\Fedora` class
-* If you want to use the Indexer and/or the Redmine classes, call their static initialize methods
 
 ```php
+use acdhOeaw\util\RepoConfig as RC;
+
 require_once 'vendor/autoload.php';
 
-$config = new zozlak\util\Config('config.ini');
-
-$fedora = new acdhOeaw\fedora\Fedora($conf);
-acdhOeaw\redmine\Redmine::init($config, $fedora);
-acdhOeaw\storage\Indexer::init($config);
+RC::init('config.ini');
+$fedora = new acdhOeaw\fedora\Fedora();
 ```
 
 # Documentation
@@ -52,7 +51,7 @@ A Fedora resource is represented by the `achdOeaw\fedora\FedoraResource` class.
 This class provides you basic methods to manipulate both resource's metadata and binary content (see examples below).
 
 In general you should not create `FedoraResource` objects directly but always use proper `Fedora` class method (see examples below).  
-If you want to know more, please read the `Fedora` class documentation, especially parts on transactions handling.
+If you want to know more, please read the `Fedora` class documentation, especially parts on transaction handling.
 
 The metadata are represented by the [EasyRdf Resource](http://www.easyrdf.org/docs/api/EasyRdf_Resource.html) object.
 
@@ -66,14 +65,16 @@ Prepare resource metadata and (optionally) its binary content and call the `crea
 
 ```php
 $graph = new EasyRdf\Graph();
-$metadata = $graph->resource('.'); // the resource URI you provide here is irrelevant and can be any string, just it can not be empty; it is an EasyRdf library limitation
+$metadata = $graph->resource('.'); // the resource URI you provide here is irrelevant and can be any string (the EasyRdf library requires it to be non-empty)
 $metadata->addLiteral('http://my.data/#property', 'myDataPropertyValue');
 $metadata->addResource('http://my.object/#property', 'http://my.Object/Property/Value');
 
 $fedora->begin();
-$resource1 = $fedora->createResource($metadata, 'pathToFile'); // with binary data from file
-$resource1 = $fedora->createResource($metadata, 'myResourceData (...)'); // with binary data from string
-$resource2 = $fedora->createResource($metadata); // without binary data
+$resource1 = $fedora->createResource($metadata, 'pathToFile'); // with binary data from file, at the repository root
+$resource2 = $fedora->createResource($metadata, 'myResourceData (...)'); // with binary data from string, at the repository root
+$resource3 = $fedora->createResource($metadata); // without binary data, at the repository root
+$resource4 = $fedora->createResource($metadata, '', '/my/collection'); // without binary data, as a child of a given Fedora collection (the collection has to exist)
+$resource5 = $fedora->createResource($metadata, 'pathToFile', '/my/resource', 'PUT'); // with binary data from file, at a given location (the '/my' collection has to exist)
 $fedora->commit();
 ```
 
@@ -83,7 +84,7 @@ If you know the resource ACDH ID you can use the `getResourceById()` method.
 
 ```php
 $resource = $fedora->getResourceById('https://id.acdh.oeaw.ac.at/ba83b0d6-86cd-4340-bfd7-ab5a2edb345a');
-echo $resource->__getSparqlTriples();
+echo $resource->__metaToString();
 ```
 
 If you know resource's metadata property value, you can search for all resources having such a value with the `getResourcesByProperty()` method.
@@ -91,35 +92,34 @@ If you know resource's metadata property value, you can search for all resources
 ```php
 $resources = $fedora->getResourceByProperty('http://www.w3.org/2000/01/rdf-schema#seeAlso', 'https://redmine.acdh.oeaw.ac.at/issues/5488');
 echo count($resources);
-echo $resources[0]->__getSparqlTriples();
+echo $resources[0]->__metaToString();
 ```
 
 Of course if you know the resource's Fedora URI, you can use it as well (with the `getResourceByUri()` method).
 
 ```php
 $resource = $fedora->getResourceByUri('http://fedora.apollo.arz.oeaw.ac.at/rest/92/35/a8/40/9235a840-5f0e-4f24-971d-c0c557f43d9e');
-echo $resource->__getSparqlTriples();
+echo $resource->__metaToString();
 ```
 
 ### Updating resource metadata
 
 **Updating RDF metadata is a little tricky.**
-The main problem is that an update of a metadata property value is not well defined therefore can not be done automatically for you.
+The main problem is that an update of a metadata property value is not well defined, therefore can not be done automatically for you.
 
-Lets assume we have an existing metadata triple `<ourResource> <ourProperty> "currentValue"` and a new triple `<ourResource> <ourProperty> "currentValue"`.  
-There is no way to outomatically decide if the new triple should replace the old one or be added next to it.  
-This is because RDF triples are uniquely identified by all their components (subject, property and object) and change in any of components (also in the object) 
-alters this unique identifier and makes it unable to match it with a previous value of a triple.
+Lets assume we have an existing metadata triple `<ourResource> <ourProperty> "currentValue"` and a new triple `<ourResource> <ourProperty> "newValue"`.  
+There is no way to automatically decide if the new triple should replace the old one or be added next to it.  
+This is because RDF triples are uniquely identified by all their component values (subject, property and object) and change of any component (also the object) 
+cause the new triple not to match its previous form.
 
-This means the only way to avoid triples multiplication is to always delete all previous metadata and add all current values.  
-It is automatically done by the library but it means you must always provide a full metadata set when calling the `setMetadata()` method 
-if you do not want to loose any metadata triples.
+This means the only way to avoid triples multiplication is to delete previous metadata and add all current triples.  
+It is automatically done by the library but it means you must always provide a full metadata set when calling the `setMetadata()` method if you do not want to loose any metadata triples.
 
 **Remember:**
 
 * Always take current resource metadata as a basis. 
-    * The only exception might be if you are sure the new triples do not exist in the current metadata and do not interfere in any way with current metadata.  
-      In such a case remember to use `updateMetadata('ADD')`.  
+    * The only exception might be if you are sure the new triples do not exist in the current metadata and do not interfere with current metadata (basically there are no common properties between old and new metadata).  
+      In such a case use the `updateMetadata('ADD')` method.  
 * Remember to delete all metadata values before adding current ones (remember, there is no update, just delete and add).
     * If a property can have multiple values, assure you are deleting it only once (do not repeat deletion for the every new value you encounter).
 * Think twice when dealing with `rdfs:identifier` and `rdf:isPartOf` properties (these two are very important).
@@ -131,7 +131,7 @@ $myProperty = 'http://my.new/#property'
 
 $fedora->begin();
 
-$resource = $fedora->getResourcesByProperty($conf->get('redmineIdProp'), 'https://redmine.acdh.oeaw.ac.at/issues/5488')[0];
+$resource = $fedora->getResourcesById('https://redmine.acdh.oeaw.ac.at/issues/5488');
 $metadata = $resource->getMetadata();
 $metadata->delete($myProperty));
 foreach(array('value1', 'value2') as $i){
@@ -215,7 +215,7 @@ $fedora->commit();
 ## Synchronizing Redmine with Fedora
 
 There is a set of classes for syncing various Redmine objects (projects, users and issues) with Fedora: 
-`acdhOeaw\redmine\Project`, `acdhOeaw\redmine\User` and `acdhOeaw\redmine\Issue`
+`acdhOeaw\schema\redmine\Project`, `acdhOeaw\schema\redmine\User` and `acdhOeaw\schema\redmine\Issue`
 
 Using them is very simple - the static `fetchAll()` method creates PHP objects representing Redmine objects of a given kind 
 which can be then saved/updated in the Fedora by calling their `updateRms()` method.
@@ -227,7 +227,7 @@ E.g. synchronization of all the Redmine issues with `tracker_id` equal to `5` ca
 ```php
 $fedora->begin();
 
-$issues = acdhOeaw\redmine\Redmine::fetchAllIssues(true, ['tracker_id' => 5]);
+$issues = acdhOeaw\redmine\Redmine::fetchAllIssues($fedora, true, ['tracker_id' => 5]);
 foreach ($issues as $i) {
     $i->updateRms();
 }
@@ -237,48 +237,97 @@ $fedora->commit();
 
 ## Indexing files in the filesystem
 
-Library providex the `acdhOeaw\storage\Indexer` class which automates the process of ingesting/updating binary content into the Fedora.
+Library providex the `acdhOeaw\util\Indexer` class which automates the process of ingesting/updating binary content into the Fedora.
 
-The `Indexer` class is created on top of the `acdhOeaw\fedora\FedoraResource` object which means you must instanciate a `FedoraResource` object first.
+The `Indexer` class is created on top of the `acdhOeaw\fedora\FedoraResource` object which will be a parent for ingested resources.
+This means you must instanciate such an object first.
 
 The `Indexer` class is highly configurable - see the class documentation for all the details.
 
 Below we will index all xml files in a given directory and its direct subdirectories putting them as a direct children of the `FedoraResouce` 
-(meaning no Fedora collection resource will be created for subdirectories found in the file system). 
+(meaning no collection resource will be created for subdirectories found in the file system). 
 All files smaller then 100 MB will be ingested into the repository and for bigger files pure metadata Fedora resources will be created.
 
 ```php
 $fedora->begin();
 
-$resource = $fedora->getResourcesByProperty($conf->get('redmineIdProp'), 'https://redmine.acdh.oeaw.ac.at/issues/5488')[0];
-$ind = new acdhOeaw\storage\Indexer($resource);
+$resource = $fedora->getResourceById('https://redmine.acdh.oeaw.ac.at/issues/5488');
+$ind = new acdhOeaw\util\Indexer($resource);
 $ind->setFilter('|[.]xml$|i');
 $ind->setPaths(array('directoryToIndex')); // read next chapter
 $ind->setUploadSizeLimit(100000000);
 $ind->setDepth(1);
 $ind->setFlatStructure(true);
-$ind->index(true);
+$ind->index();
 
 $fedora->commit();
 ```
 
 ### How files are matched with repository resources
 
-A file is matched with a repository resource if two conditions are met:
+A file is matched with a repository resource by comparing existing resources' ids with an adjusted file path.  
+The file path is adjusted by:
 
-* the file and the resource have the same parent resource
-* the *relative file path* is the same as resource's `fedoraLocProperty` metadata property value
-    * to make your life easier the `Indexer` class switches all `\` to `/` and character encoding is assured to be UTF-8 before the comparison
+* substituting the `containerDir` configuration property value with the `containerToUriPrefix` configuration property value
+* changing character encoding to UTF-8
+* switching all `\` into `/`
 
-*relative file path* is a full path to the file with the `containerDir` configuration property value skipped. 
+**It is extremely important to assure that your `containerDir` and `containerToUriPrefix` configuration property values are proper!**
+(if they lead to generation of the ids you expect)
 
-E.g. if your `containerDir` is `/mnt/acdh_resources/container/` and full file path is `/mnt/acdh_resources/container/myProject/myFile`,
-the *relative file path* is `myProject/myFile`.
+**If they are not, you risk data duplication on the next import.**
 
-**It is extremely important to assure that your *relative file paths* are proper.**
-If they are not, you risk data duplication on next import.
+#### Example 1
 
-**It is clearly wrong to use empty `containerDir`** configuration property** and pass full path to `Indexer::setPaths()`.**
+* config.ini:
+  ```
+  containerDir=./
+  containerToUriPrefix=acdhContainer://
+  ```
+* file path: `./myProject/myCollection/myFile.xml`  
+
+The file will match a resource having an id `acdhContainer://myProject/myCollection/myFile.xml`
+
+#### Example 2
+
+* config.ini:
+  ```
+  containerDir=C:\my\data\dir\
+  containerToUriPrefix=https://id.acdh.oeaw.ac.at/
+  ```
+* file path: `C:\my\data\dir\myProject\myCollection\myFile.xml`  
+ 
+The file will match a resource having an id `https://id.acdh.oeaw.ac.at/myProject/myCollection/myFile.xml`
+
+### Matching indexed data with their metadata
+
+The `Indexer` object can be provided with a *metadata lookup object*.
+
+A *metadata lookup object* is provided with a file path and the metadata extracted from that file. Given that data it should find and return auxiliary metadata for a given file.
+
+At the moment two *metadata lookup* implementations exist:
+
+* `MetaLookupFile` class which searches for the auxiliary metadata in additional files (matching by file name), e.g.
+  ```
+  // for the file path `/my/file/path.xml` search for metadata in files `/my/file/path.xml.ttl`, `/my/file/path/meta/path.xml.ttl` and `/some/dir/path.xml.ttl`
+  // locations are searched in the given order, first metadata file found is used
+  // such a file must contain only one resource being triples subject (if there are more, an exception is rised)
+  $metaLookup = new acdhOeaw\util\metaLookup\MetaLookupFile(array('.', './meta', '/some/dir'), '.ttl');
+
+  $ind = new Indexer($someResource);
+  $ind->setMetaLookup($metaLookup);
+  $ind->index();
+  ```
+* `MetaLookupGraph` class which searches for the auxiliary metadata in a given RDF graph (matching by id as described in the previous chapter), e.g.
+  ```
+  $graph = new EasyRdf\Graph();
+  $graph->parseFile('pathToMetadataFile.ttl');
+  $metaLookup = new acdhOeaw\util\metaLookup\MetaLookupGraph($graph);
+
+  $ind = new Indexer($someResource);
+  $ind->setMetaLookup($metaLookup);
+  $ind->index();
+  ```
 
 ## Importing set of RDF data
 
