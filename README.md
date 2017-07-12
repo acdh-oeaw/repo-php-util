@@ -280,7 +280,7 @@ The file path is adjusted by:
 #### Example 1
 
 * config.ini:
-  ```
+  ```ini
   containerDir=./
   containerToUriPrefix=acdhContainer://
   ```
@@ -291,7 +291,7 @@ The file will match a resource having an id `acdhContainer://myProject/myCollect
 #### Example 2
 
 * config.ini:
-  ```
+  ```ini
   containerDir=C:\my\data\dir\
   containerToUriPrefix=https://id.acdh.oeaw.ac.at/
   ```
@@ -308,7 +308,7 @@ A *metadata lookup object* is provided with a file path and the metadata extract
 At the moment two *metadata lookup* implementations exist:
 
 * `MetaLookupFile` class which searches for the auxiliary metadata in additional files (matching by file name), e.g.
-  ```
+  ```php
   // for the file path `/my/file/path.xml` search for metadata in files `/my/file/path.xml.ttl`, `/my/file/path/meta/path.xml.ttl` and `/some/dir/path.xml.ttl`
   // locations are searched in the given order, first metadata file found is used
   // such a file must contain only one resource being triples subject (if there are more, an exception is rised)
@@ -319,7 +319,7 @@ At the moment two *metadata lookup* implementations exist:
   $ind->index();
   ```
 * `MetaLookupGraph` class which searches for the auxiliary metadata in a given RDF graph (matching by id as described in the previous chapter), e.g.
-  ```
+  ```php
   $graph = new EasyRdf\Graph();
   $graph->parseFile('pathToMetadataFile.ttl');
   $metaLookup = new acdhOeaw\util\metaLookup\MetaLookupGraph($graph);
