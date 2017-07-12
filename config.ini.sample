@@ -22,6 +22,9 @@ redmineClasses[acdhOeaw\schema\redmine\Project]="https://vocabs.acdh.oeaw.ac.at/
 redmineClasses[acdhOeaw\schema\redmine\User]="http://xmlns.com/foaf/0.1/Agent"
 redmineClasses[acdhOeaw\schema\redmine\Issue]="https://vocabs.acdh.oeaw.ac.at/#DigitalResource"
 
+indexerDefaultCollectionClass=""
+indexerDefaultBinaryClass="https://vocabs.acdh.oeaw.ac.at/#DigitalResource"
+
 ciriloServiceParamRdfPrefix="https://vocabs.acdh.oeaw.ac.at/#has"
 ciriloLocationBase="http://cirilo.minerva.arz.oeaw.ac.at/"
 fedoraServiceClass="https://vocabs.acdh.oeaw.ac.at/schema#DisseminationService"

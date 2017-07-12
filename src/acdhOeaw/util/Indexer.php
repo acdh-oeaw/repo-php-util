@@ -103,7 +103,9 @@ class Indexer {
      * URI of the RDF class assigned to indexed resources
      * @var string
      */
-    private $class;
+    private $collectionClass;
+    
+    private $binaryClass;
 
     /**
      * How many subsequent subdirectories should be indexed.
@@ -137,7 +139,8 @@ class Indexer {
      */
     public function __construct(FedoraResource $resource) {
         $this->resource = $resource;
-        $this->class    = RC::get('indexerDefaultClass');
+        $this->binaryClass     = RC::get('indexerDefaultCollectionClass');
+        $this->collectionClass = RC::get('indexerDefaultBinaryClass');
 
         $metadata  = $this->resource->getMetadata();
         $locations = $metadata->allLiterals(RC::locProp());
@@ -158,6 +161,14 @@ class Indexer {
         $this->paths = $paths;
     }
 
+    public function setCollectionClass(string $class) {
+        $this->collectionClass = $class;
+    }
+
+    public function setBinaryClass(string $class) {
+        $this->binaryClass = $class;
+    }
+    
     /**
      * Sets file name filter for child resources.
      * 
@@ -197,15 +208,6 @@ class Indexer {
      */
     public function setDepth(int $depth) {
         $this->depth = $depth;
-    }
-
-    /**
-     * Sets a class assigned to ingested resources.
-     * @param string $class class URI
-     * @see $defaultClass
-     */
-    public function setRdfClass(string $class) {
-        $this->class = $class;
     }
 
     /**
@@ -271,7 +273,8 @@ class Indexer {
                 $file->setMetaLookup($this->metaLookup);
             }
             
-            $meta = $file->getMetadata($this->class, $this->resource->getId());
+            $class = $i->isDir() ? $this->collectionClass : $this->binaryClass;
+            $meta = $file->getMetadata($class, $this->resource->getId());
 
             try {
                 // resource already exists and should be updated
