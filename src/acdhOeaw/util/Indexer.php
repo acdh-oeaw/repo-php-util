@@ -100,6 +100,12 @@ class Indexer {
     private $uploadSizeLimit = 0;
 
     /**
+     *
+     * @var string
+     */
+    private $fedoraLoc = '/';
+    
+    /**
      * URI of the RDF class assigned to indexed resources
      * @var string
      */
@@ -190,6 +196,23 @@ class Indexer {
     }
 
     /**
+     * Sets a location where the resource will be placed.
+     * 
+     * Can be absolute (but will be sanitized anyway) or relative to the 
+     * repository root.
+     * 
+     * Given location must already exist.
+     * 
+     * Note that this parameter is used ONLY if the resource DOES NOT EXISTS.
+     * If it exists already, its location is not changed.
+     * 
+     * @param string $fedoraLoc fedora location 
+     */
+    public function setFedoraLocation(string $fedoraLoc) {
+        $this->fedoraLoc = $fedoraLoc;
+    }
+    
+    /**
      * Sets size treshold for uploading child resources as binary resources.
      * 
      * For files bigger then this treshold a "pure RDF" Fedora resources will
@@ -232,7 +255,6 @@ class Indexer {
 
     /**
      * Does the indexing.
-     * 
      * @return array a list FedoraResource objects representing indexed resources
      */
     public function index(): array {
@@ -290,7 +312,7 @@ class Indexer {
             } catch (NotFound $e) {
                 // resource does not exist and must be created
                 $res = $this->resource->getFedora()->createResource(
-                    $meta, $upload ? $i->getPathname() : ''
+                    $meta, $upload ? $i->getPathname() : '', $this->fedoraLoc
                 );
 
                 $indexedRes[] = $res;

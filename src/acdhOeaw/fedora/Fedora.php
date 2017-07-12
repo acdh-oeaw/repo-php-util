@@ -160,6 +160,16 @@ class Fedora {
     }
 
     /**
+     * Clears local cache. 
+     * 
+     * In normal usage scenarios should not be used (but can be helpful e.g.
+     * while running tests).
+     */
+    public function __clearCache() {
+        $this->cache = new FedoraCache();
+    }
+    
+    /**
      * Creates a resource in the Fedora and returns corresponding Resource object
      * 
      * @param EasyRdf\Resource $metadata resource metadata

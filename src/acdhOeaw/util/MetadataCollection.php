@@ -92,6 +92,12 @@ class MetadataCollection extends Graph {
     private $acdhIds;
 
     /**
+     *
+     * @var string
+     */
+    private $fedoraLoc = '/';
+    
+    /**
      * Creates a new metadata parser.
      * 
      * @param Fedora $fedora
@@ -117,6 +123,23 @@ class MetadataCollection extends Graph {
         $this->resource = $res;
     }
 
+    /**
+     * Sets a location where the resource will be placed.
+     * 
+     * Can be absolute (but will be sanitized anyway) or relative to the 
+     * repository root.
+     * 
+     * Given location must already exist.
+     * 
+     * Note that this parameter is used ONLY if the resource DOES NOT EXISTS.
+     * If it exists already, its location is not changed.
+     * 
+     * @param string $fedoraLoc fedora location 
+     */
+    public function setFedoraLocation(string $fedoraLoc) {
+        $this->fedoraLoc = $fedoraLoc;
+    }
+    
     /**
      * Imports the whole graph by looping over all resources.
      * 
@@ -261,7 +284,7 @@ class MetadataCollection extends Graph {
             $repoRes->updateMetadata();
         } else {
             echo self::$debug ? "\tcreating " : "";
-            $repoRes = $this->fedora->createResource($res);
+            $repoRes = $this->fedora->createResource($res, '', $this->fedoraLoc);
             echo self::$debug ? $repoRes . "\n" : "";
         }
         return $repoRes;
