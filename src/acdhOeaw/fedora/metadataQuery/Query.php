@@ -95,7 +95,7 @@ class Query {
         return $this->joinClause;
     }
 
-    public function getQuery() {
+    public function getQuery(): string {
         $query = '';
 
         $query .= 'SELECT ' . $this->getSelect() . "\n";

@@ -34,7 +34,6 @@ use acdhOeaw\fedora\Fedora;
 require_once 'init.php';
 $fedora = new Fedora();
 
-
 acdhOeaw\schema\Object::$debug       = true;
 acdhOeaw\fedora\Fedora::$debugGetRes = true;
 MetaLookupFile::$debug               = true;
