@@ -1,9 +1,9 @@
 <?php
 
-/* 
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2016 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +22,33 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
-require_once 'vendor/autoload.php';
+namespace acdhOeaw\fedora\exceptions;
 
-use acdhOeaw\fedora\Fedora;
-use acdhOeaw\util\RepoConfig;
-use zozlak\util\ClassLoader;
+use Exception;
+use Throwable;
 
-$loader = new ClassLoader('src');
+/**
+ * Description of FedoraCacheInconsistent
+ *
+ * @author zozlak
+ */
+class AclException extends Exception {
 
-RepoConfig::init('tests/config.ini');
+    /**
+     * Thrown when a resource is already in cache
+     * @param string $message error message
+     * @param int $code error code
+     * @param Throwable $previous previous exception (for chaining)
+     */
+    public function __construct(string $message = "acl error", int $code = 9,
+                                Throwable $previous = null) {
+        parent::__construct($message, $code, $previous);
+    }
 
-ini_set('assert.exception', 1);
-if (ini_get('zend.assertions') !== '1') {
-    throw new Exception('Enable assertions by setting zend.assertions = 1 in your php.ini');
 }

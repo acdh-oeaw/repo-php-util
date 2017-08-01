@@ -12,6 +12,7 @@ fedoraTitleProp="http://purl.org/dc/elements/1.1/title"
 fedoraApiUrl="https://fedora.localhost/rest"
 fedoraUser="admin"
 fedoraPswd="***"
+fedoraAclUri="https://fedora.localhost/rest/acl"
 
 sparqlUrl="https://fedora.localhost/blazegraph/sparql"
 

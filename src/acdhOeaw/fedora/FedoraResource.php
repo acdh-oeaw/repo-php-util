@@ -44,6 +44,7 @@ use acdhOeaw\fedora\metadataQuery\QueryParameter;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\fedora\metadataQuery\HasValue;
 use acdhOeaw\fedora\metadataQuery\MatchesRegEx;
+use acdhOeaw\fedora\acl\WebAcl;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -56,6 +57,10 @@ use acdhOeaw\util\RepoConfig as RC;
  */
 class FedoraResource {
 
+    const ADD = 'ADD';
+    const UPDATE = 'UPDATE';
+    const OVERWRITE = 'OVERWRITE';
+    
     /**
      * List of metadata properties managed exclusively by the Fedora.
      * @var array
@@ -83,7 +88,7 @@ class FedoraResource {
      * 
      * @var string
      */
-    private $uri;
+    protected $uri;
 
     /**
      * Resource metadata (local copy)
@@ -93,13 +98,13 @@ class FedoraResource {
      * @see setMetadata()
      * @see updateMetadata()
      */
-    private $metadata;
+    protected $metadata;
 
     /**
      * Fedora connection object used by this resource
      * @var \acdhOeaw\fedora\Fedora
      */
-    private $fedora;
+    protected $fedora;
 
     /**
      * Are object's metadata synchronized with the Fedora
@@ -107,6 +112,12 @@ class FedoraResource {
      */
     private $updated = true;
 
+    /**
+     * Object provind ACL support.
+     * @var \acdhOeaw\fedora\acl\WebAcl
+     */
+    private $acl;
+    
     /**
      * Creates new resource based on its Fedora URI.
      * 
@@ -244,12 +255,12 @@ class FedoraResource {
      * @see setMetadata()
      * @see getSparqlTriples()
      */
-    public function updateMetadata(string $mode = 'UPDATE') {
+    public function updateMetadata(string $mode = self::UPDATE) {
         if (!$this->updated) {
             $this->uri = $this->fedora->sanitizeUri($this->uri);
 
-            if (!in_array($mode, array('ADD', 'UPDATE', 'OVERWRITE'))) {
-                throw new InvalidArgumentException('Mode should be one of ADD, UPDATE or OVERWITE');
+            if (!in_array($mode, array(self::ADD, self::UPDATE, self::OVERWRITE))) {
+                throw new InvalidArgumentException('Wrong update mode');
             }
             if (!$this->metadata) {
                 throw new RuntimeException('Get or set metadata first with getMetadata() or setMetadata()');
@@ -257,9 +268,9 @@ class FedoraResource {
 
             $delete = '';
             switch ($mode) {
-                case 'ADD':
+                case self::ADD:
                     break;
-                case 'UPDATE':
+                case self::UPDATE:
                     $curProp = $this->metadata->propertyUris();
                     $oldMeta = $this->getMetadataFromFedora();
                     foreach (array_diff($oldMeta->propertyUris(), $curProp) as $prop) {
@@ -267,7 +278,7 @@ class FedoraResource {
                     }
                     $delete  = self::getSparqlTriples($oldMeta);
                     break;
-                case 'OVERWRITE':
+                case self::OVERWRITE:
                     $oldMeta = $this->getMetadataFromFedora();
                     $delete  = self::getSparqlTriples($oldMeta);
                     break;
@@ -314,7 +325,7 @@ class FedoraResource {
      *   (when you want to make sure metadata are in line with ones in the Fedora 
      *   or e.g. reset them back to their current state in Fedora)
      */
-    private function loadMetadata(bool $force = false) {
+    protected function loadMetadata(bool $force = false) {
         if (!$this->metadata || $force) {
             $meta = $this->getMetadataFromFedora();
 
@@ -335,7 +346,7 @@ class FedoraResource {
     private function getMetadataFromFedora(): Resource {
         $request = new Request('GET', $this->uri . '/fcr:metadata');
         try {
-            $resp    = $this->fedora->sendRequest($request);
+            $resp = $this->fedora->sendRequest($request);
         } catch (RequestException $e) {
             if ($e->getCode() !== 410) {
                 throw $e;
@@ -389,6 +400,19 @@ class FedoraResource {
     }
 
     /**
+     * Returns all RDF types (classes) of a given resource.
+     * @return array
+     */
+    public function getClasses(): array {
+        $this->loadMetadata();
+        $ret = array();
+        foreach ($this->metadata->allResources('http://www.w3.org/1999/02/22-rdf-syntax-ns#type') as $i) {
+            $ret[] = $i->getUri();
+        }
+        return $ret;
+    }
+
+    /**
      * Naivly checks if the resource is of a given class.
      * 
      * Naivly means that a given rdfs:type triple must exist in the resource
@@ -398,14 +422,7 @@ class FedoraResource {
      * @return bool
      */
     public function isA(string $class): bool {
-        $this->loadMetadata();
-        $types = $this->metadata->allResources('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
-        foreach ($types as $i) {
-            if ($i->getUri() === $class) {
-                return true;
-            }
-        }
-        return false;
+        return in_array($class, $this->getClasses());
     }
 
     /**
@@ -471,6 +488,13 @@ class FedoraResource {
         $query = $this->getChildrenQuery();
         $query->addParameter(new MatchesRegEx($property, $regEx, $flags));
         return $this->fedora->getResourcesByQuery($query);
+    }
+
+    public function getAcl(): WebAcl {
+        if (!$this->acl) {
+            $this->acl = new WebAcl($this);
+        }
+        return $this->acl;
     }
 
     /**
