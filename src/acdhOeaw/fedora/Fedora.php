@@ -187,7 +187,7 @@ class Fedora {
             throw new BadMethodCallException('method must be PUT or POST');
         }
         $baseUrl = $this->txUrl ? $this->txUrl : $this->apiUrl;
-        $path    = $path ? $baseUrl . '/' . preg_replace('|^/|', '', $path) : $baseUrl;
+        $path    = $path ? $this->sanitizeUri($path) : $baseUrl;
         $request = new Request($method, $path);
         $request = self::attachData($request, $data);
         try {
