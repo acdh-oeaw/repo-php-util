@@ -42,7 +42,8 @@ try {
     $res = $fedora->createResource($meta, '', $uri, 'PUT');
     $res->delete();
     try {
-        $res = $fedora->createResource($meta, '', $uri, 'PUT');    
+        $res = $fedora->createResource($meta, '', $uri, 'PUT');
+        throw new Exception('no exception');
     } catch (Deleted $e) {
         
     }

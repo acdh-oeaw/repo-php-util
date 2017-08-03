@@ -250,7 +250,8 @@ class Fedora {
      * @param bool $checkIfExist should we make sure resource was not deleted
      *   during the current transaction
      * @return \acdhOeaw\fedora\FedoraResource
-     * @throws RuntimeException
+     * @throws NotFound
+     * @throws AmbiguousMatch
      */
     public function getResourceById(string $id, bool $checkIfExist = true): FedoraResource {
         $res = $this->getResourcesByProperty(RC::idProp(), $id, false);
@@ -473,6 +474,9 @@ class Fedora {
      * @return string 
      */
     public function sanitizeUri(string $uri): string {
+        if ($uri == '') {
+            throw new BadMethodCallException('URI is empty');
+        }
         $baseUrl = !$this->txUrl ? $this->apiUrl : $this->txUrl;
         $uri     = preg_replace('|^/|', '', $uri);
         $uri     = preg_replace('|^https?://[^/]+/rest/?(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
@@ -488,6 +492,9 @@ class Fedora {
      * @return string
      */
     public function standardizeUri(string $uri): string {
+        if ($uri == '') {
+            throw new BadMethodCallException('URI is empty');
+        }
         $uri = preg_replace('|^https?://[^/]+/rest/(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
         $uri = $this->apiUrl . '/' . $uri;
         return $uri;
