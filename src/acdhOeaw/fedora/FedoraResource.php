@@ -490,6 +490,10 @@ class FedoraResource {
         return $this->fedora->getResourcesByQuery($query);
     }
 
+    /**
+     * Returns a WebAcl object for access rules manipulation.
+     * @return WebAcl
+     */
     public function getAcl(): WebAcl {
         if (!$this->acl) {
             $this->acl = new WebAcl($this);

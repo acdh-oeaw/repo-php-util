@@ -30,19 +30,391 @@
 
 namespace acdhOeaw\fedora\acl;
 
+use stdClass;
+use BadMethodCallException;
+use EasyRdf\Graph;
+use EasyRdf\Resource;
+use acdhOeaw\fedora\Fedora;
+use acdhOeaw\fedora\FedoraResource;
+use acdhOeaw\fedora\exceptions\AclException;
+use acdhOeaw\util\RepoConfig as RC;
+
 /**
- * Description of WebAclRule
+ * Represents a FedoraResource containg ACL rules.
  *
  * @author zozlak
  */
-class WebAclRule {
-    public $uri;
-    public $roles = array();
-    public $read = false;
-    public $write = false;
-    
-    public function __construct(string $uri) {
-        $this->uri = $uri;
+class WebAclRule extends FedoraResource {
+
+    const NONE        = 0;
+    const READ        = 1;
+    const WRITE       = 2;
+    const PUBLIC_USER = 'http://xmlns.com/foaf/0.1/Agent';
+    const GROUP       = 'group';
+    const USER        = 'user';
+
+    /**
+     * Checks the user/group enumeration
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @throws AclException
+     */
+    static public function checkRoleType(string $type) {
+        if (!in_array($type, array(self::USER, self::GROUP))) {
+            throw new AclException('wrong role type');
+        }
     }
+
+    /**
+     * Checks the access mode enumaration
+     * @param int $mode WebAclRule::READ or WebAclRule::WRITE
+     * @throws AclException
+     */
+    static public function checkMode(int $mode) {
+        if (!in_array($mode, array(self::NONE, self::READ, self::WRITE))) {
+            throw new AclException('wrong mode');
+        }
+    }
+
+    /**
+     * Collection of FedoraResources denoting all webacl:accessTo resources
+     * @var array 
+     */
+    private $resources = array();
+
+    /**
+     * Collection of RDF class URIs denoting all webacl:acessToClass objects
+     * @var array 
+     */
+    private $classes = array();
+
+    /**
+     * Collection of user/group names (both URIs and literals) denoting all 
+     * webacl:agent and webacl:agentClass objects
+     * @var array 
+     */
+    private $roles = array();
+
+    /**
+     * Access mode WebAclRule::READ, WebAclRule::WRITE or WebAclRule::NONE
+     * @var int 
+     */
+    private $mode = self::NONE;
+
+    /**
+     * Returns an object representing a FedoraResource containg ACL rules.
+     * 
+     * You can (and in fact must) use it to create new ACL rule resources.
+     * A corresponding resource in the Fedora will be created by a call to the
+     * save() method.
+     * @param Fedora $fedora Fedora connection object
+     * @param string $uri (optional) Fedora resource URI
+     */
+    public function __construct(Fedora $fedora, string $uri = '') {
+        $this->roles = array(
+            self::USER  => array(),
+            self::GROUP => array()
+        );
+        // black magic allowing to create rules without represenation in the Fedora
+        try {
+            parent::__construct($fedora, $uri);
+            $this->getMetadata();
+        } catch (BadMethodCallException $e) {
+            $this->uri = '';
+        }
+    }
+
+    /**
+     * Adds additional webacl:accessTo triple to the ACL rule.
+     * @param FedoraResource $res Fedora resource which URI will be added
+     * @return \acdhOeaw\fedora\acl\WebAclRule
+     */
+    public function addResource(FedoraResource $res): WebAclRule {
+        $uri = $res->getUri(true);
+        if (!isset($this->resources[$uri])) {
+            $this->resources[$uri] = $res;
+        }
+        return $this;
+    }
+
+    /**
+     * Checks if a corresponding `webacl:accessTo $uri` triple exists in the
+     * current ACL rule.
+     * @param string $uri URI to be checked
+     * @return bool
+     */
+    public function hasResource(string $uri): bool {
+        return isset($this->resources[$uri]);
+    }
+
+    /**
+     * Adds additional webacl:accessToClass triple to the ACL rule.
+     * @param string $class class URI
+     * @return \acdhOeaw\fedora\acl\WebAclRule
+     */
+    public function addClass(string $class): WebAclRule {
+        $this->classes[$class] = $class;
+        return $this;
+    }
+
+    /**
+     * Checks if a corresponding `webacl:accessToClass $class` triple exists 
+     * in the current ACL rule.
+     * @param string $class class URI
+     * @return bool
+     */
+    public function hasClass(string $class): bool {
+        return isset($this->classes[$class]);
+    }
+
+    /**
+     * Adds additional webacl:agent or webacl:agentClass triple to the ACL rule.
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @param string $name user/group name/URI
+     * @return \acdhOeaw\fedora\acl\WebAclRule
+     */
+    public function addRole(string $type, string $name): WebAclRule {
+        self::checkRoleType($type);
+        $this->roles[$type][$name] = $name;
+        return $this;
+    }
+
+    /**
+     * Removes corresponding `webacl:agent $name` or 
+     * `webacl:agentClass $name` triple form the the current ACL rule.
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @param string $name user/group name/URI
+     * @return \acdhOeaw\fedora\acl\WebAclRule
+     */
+    public function deleteRole(string $type, string $name): WebAclRule {
+        self::checkRoleType($type);
+        unset($this->roles[$type][$name]);
+        return $this;
+    }
+
+    /**
+     * Checks if a corresponding `webacl:agent $name` or 
+     * `webacl:agentClass $name` triple exists in the current ACL rule.
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @param string $name user/group name/URI
+     * @return bool
+     */
+    public function hasRole(string $type, string $name): bool {
+        self::checkRoleType($type);
+        return isset($this->roles[$type][$name]);
+    }
+
+    /**
+     * Returns total number of webacl:accessTo and webacl:accessToClass triples
+     * in the current ACL rule.
+     * @return int
+     */
+    public function getRolesCount(): int {
+        $count = 0;
+        foreach ($this->roles as $i) {
+            $count += count($i);
+        }
+        return $count;
+    }
+
+    /**
+     * Returns value of the webacl:mode triple.
+     * @return int (WebAclRule::READ or WebAclRule::WRITE)
+     */
+    public function getMode(): int {
+        return $this->mode;
+    }
+
+    /**
+     * Sets value of the webacl:mode triple.
+     * @param string $mode WebAclRule::READ or WebAclRule::WRITE
+     * @return \acdhOeaw\fedora\acl\WebAclRule
+     */
+    public function setMode(string $mode): WebAclRule {
+        self::checkMode($mode);
+        $this->mode = (int) $mode;
+        return $this;
+    }
+
+    /**
+     * Checks if the ACL rule describes exactly one resource or class.
+     * @return bool
+     * @see makeValid()
+     */
+    public function isValid(): bool {
+        return count($this->resources) + count($this->classes) <= 1;
+    }
+
+    /**
+     * Returns collection of WebAclRule objects each describing exactly one
+     * resource or class.
+     * @return array
+     * @see isValid()
+     */
+    public function makeValid(): array {
+        if ($this->isValid()) {
+            return array($this);
+        }
+
+        $ret = array();
+        foreach ($this->resources as $uri => $res) {
+            $tmp            = clone($this);
+            $tmp->uri       = '';
+            $tmp->resources = array($uri => $res);
+            $tmp->classes   = array();
+            $ret[]          = $tmp;
+        }
+        foreach ($this->classes as $class) {
+            $tmp            = clone($this);
+            $tmp->uri       = '';
+            $tmp->resources = array();
+            $tmp->classes   = array($class => $class);
+            $ret[]          = $tmp;
+        }
+        return $ret;
+    }
+
+    /**
+     * Returns ACL triples.
+     * @return Resource
+     */
+    public function getAclMetadata(): Resource {
+        $meta = (new Graph())->resource($this->uri ? $this->uri : '.');
+        $meta->addType('http://www.w3.org/ns/auth/acl#Authorization');
+        $meta->addLiteral(RC::titleProp(), 'Fedora WebAC rule');
+        foreach ($this->resources as $i) {
+            $meta->addResource('http://www.w3.org/ns/auth/acl#accessTo', $i->getUri(true));
+        }
+        foreach ($this->classes as $i) {
+            $meta->addResource('http://www.w3.org/ns/auth/acl#accessToClass', $i);
+        }
+        foreach ($this->roles[self::USER] as $i) {
+            if (preg_match('|^https?://.+|', $i)) {
+                $meta->addResource('http://www.w3.org/ns/auth/acl#agent', $i);
+            } else {
+                $meta->addLiteral('http://www.w3.org/ns/auth/acl#agent', $i);
+            }
+        }
+        foreach ($this->roles[self::GROUP] as $i) {
+            if (preg_match('|^https?://.+|', $i)) {
+                $meta->addResource('http://www.w3.org/ns/auth/acl#agentClass', $i);
+            } else {
+                $meta->addLiteral('http://www.w3.org/ns/auth/acl#agentClass', $i);
+            }
+        }
+        if ($this->mode == self::WRITE) {
+            $meta->addResource('http://www.w3.org/ns/auth/acl#mode', 'http://www.w3.org/ns/auth/acl#Write');
+        }
+        if ($this->mode >= self::READ) {
+            $meta->addResource('http://www.w3.org/ns/auth/acl#mode', 'http://www.w3.org/ns/auth/acl#Read');
+        }
+        return $meta;
+    }
+
+    /**
+     * Saves the ACL rule to the corresponding Fedora resource.
+     * 
+     * If the Fedora does not exist yet, it is created automatically.
+     * @return FedoraResource
+     */
+    public function save(): FedoraResource {
+        if ($this->uri != '') {
+            $this->setMetadata($this->getAclMetadata());
+            $this->updateMetadata();
+        } else {
+            $meta      = $this->getAclMetadata();
+            $meta->addResource(RC::idProp(), 'https://id.acdh.oeaw.ac.at/acl/' . microtime(true) . rand(0, 1000));
+            $res       = $this->fedora->createResource($meta, '', RC::get('fedoraAclUri'));
+            $this->uri = $res->getUri();
+            $this->fedora->getCache()->delete($res);
+            $this->fedora->getCache()->add($this);
+        }
+        return $this;
+    }
+
+    /**
+     * Removes the ACL rule from the Fedora
+     */
+    public function delete() {
+        if ($this->uri != '') {
+            parent::delete();
+        }
+        $this->uri       = '';
+        $this->resources = $this->classes   = array();
+        $this->roles     = array(
+            self::USER  => array(),
+            self::GROUP => array()
+        );
+    }
+
+    /**
+     * Pretty prints the object.
+     * @return string
+     */
+    public function __toString() {
+        $ret = $this->uri . ", " . $this->mode . ":\n" .
+            "\tresources: \n\t\t" . implode(array_keys($this->resources), "\n\t\t") . "\n" .
+            "\tclasses: \n\t\t" . implode($this->classes, "\n\t\t") . "\n";
+        foreach ($this->roles as $k => $v) {
+            $ret .= "\t" . $k . ': ' . implode($v, ', ') . "\n";
+        }
+        return $ret;
+    }
+
+    /**
+     * Returns copy of the ACL object with all properties publicly accessible.
+     * 
+     * Changes made to the copy will not affect the original object.
+     * @return stdClass
+     */
+    public function getData(): stdClass {
+        $ret            = new stdClass();
+        $ret->uri       = $this->uri;
+        $ret->mode      = $this->mode;
+        $ret->resources = $this->resources;
+        $ret->classes   = $this->classes;
+        $ret->users     = $this->roles[self::USER];
+        $ret->groups    = $this->roles[self::GROUP];
+        return $ret;
+    }
+
+    /**
+     * Loads current metadata from the Fedora and parses read ACL triples.
+     * 
+     * @param bool $force enforce fetch from Fedora 
+     *   (when you want to make sure metadata are in line with ones in the Fedora 
+     *   or e.g. reset them back to their current state in Fedora)
+     * @throws AclException
+     */
+    protected function loadMetadata(bool $force = false) {
+        $metaEmpty = $this->metadata == null;
+        parent::loadMetadata($force);
+
+        if ($metaEmpty || $force) {
+            foreach ($this->metadata->allResources('http://www.w3.org/ns/auth/acl#mode') as $i) {
+                $mode = preg_replace('#^.*(Read|Write)$#', '\\1', $i->getUri());
+                $dict = array('Read' => self::READ, 'Write' => self::WRITE);
+                if (!isset($dict[$mode])) {
+                    throw new AclException('wrong mode: ' . $mode);
+                }
+                $this->mode = max(array($this->mode, $dict[$mode]));
+            }
+            foreach ($this->metadata->allResources('http://www.w3.org/ns/auth/acl#accessTo') as $i) {
+                $uri                   = $this->fedora->standardizeUri($i->getUri());
+                $this->resources[$uri] = $this->fedora->getResourceByUri($uri);
+            }
+            foreach ($this->metadata->allResources('http://www.w3.org/ns/auth/acl#accessToClass') as $i) {
+                $this->classes[$i->getUri()] = $i->getUri();
+            }
+            foreach ($this->metadata->all('http://www.w3.org/ns/auth/acl#agent') as $i) {
+                $i                           = (string) $i;
+                $this->roles[self::USER][$i] = $i;
+            }
+            foreach ($this->metadata->all('http://www.w3.org/ns/auth/acl#agentClass') as $i) {
+                $i                            = (string) $i;
+                $this->roles[self::GROUP][$i] = $i;
+            }
+        }
+    }
+
 }
 

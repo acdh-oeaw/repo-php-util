@@ -30,55 +30,507 @@
 
 namespace acdhOeaw\fedora\acl;
 
+use EasyRdf\Sparql\Result;
+use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
-use acdhOeaw\fedora\metadataQuery\Query;
-use acdhOeaw\fedora\metadataQuery\HasTriple;
-use acdhOeaw\fedora\metadataQuery\HasValue;
+use acdhOeaw\fedora\metadataQuery\SimpleQuery;
+use acdhOeaw\fedora\exceptions\Deleted;
+use acdhOeaw\fedora\exceptions\AlreadyInCache;
 
 /**
- * Description of WebAC
+ * Provides ACL management.
+ * 
+ * A WebAcl object stores access control rules for a given FedoraResource
+ * object and provides methods to manipulate them.
+ * 
+ * Static methods provide a way to adjust class-oriented access control rules.
+ * 
+ * Keeping ACL rules in order is very troublesome in general.
+ * 
+ * The first problem is that every ACL resource can contain rules for any 
+ * combination of users, groups, classes, resources and access modes.
+ * While the repo-php-util can follow some guidelines on write (e.g. "only one 
+ * resource/class described in a single acl resource"), it must be able to cope 
+ * with any mess on read.
  *
+ * Another big problem is tracking the current set of all rules connected with
+ * a given resource. It requires either inspecting the whole acl collection 
+ * (which is terribly slow but reliable) or quering a triplestore (which is
+ * fast but unreliable as the triplestore is synchronized only at the 
+ * transaction commit).
+ * This problem is not fully addressed by this class. During a transaction it 
+ * provides proper tracking for the rules describing user/group access rights
+ * to particular resources. Tracking is not provided for rules describing access
+ * rights to classes and for rules specyfying access rights to more then one
+ * resource and/or class.
+ * This means you must commit a transaction and call reload() method on all
+ * WebAcl objects after every change made to class ACL rules to keep your
+ * WebAcl objects up to date.
+ * 
+ * When a compound (describing more then one class and/or resource) rule is
+ * encountered, it is automatically splitted into "simple" rules (each
+ * descrining exactly one resource/class). Similarly to class rules,
+ * a transaction commit and reload() calls on WebAcl objects is required to
+ * make WebAcl objects aware of this transformation.
+ * 
  * @author zozlak
  */
 class WebAcl {
 
-    static public function grant(FedoraResource $res, string $role, int $rights) {
-        
-    }
-
-    static public function revoke(FedoraResource $res, string $role, int $rights) {
-        
-    }
-
-    private $rules = array();    
-    
-    public function __construct(FedoraResource $res) {
-        $parentProp = 'http://fedora.info/definitions/v4/repository#hasParent';
-        $inheritParam = new HasValue(array('^', $parentProp, '+'), $res->getUri(true));
-        $q = new Query();
-        $q->addParameter($inheritParam->setSubVar('?ruleRes'));
-        $q->addParameter(new HasTriple('?rule', 'http://www.w3.org/ns/auth/acl#accessTo', '?ruleRes'));
-        $q->addParameter(new HasTriple('?rule', 'http://www.w3.org/ns/auth/acl#agent', '?who'));
-        $q->addParameter(new HasTriple('?rule', 'http://www.w3.org/ns/auth/acl#accessTo', '?what'));
-        $inheritedRules = $res->getFedora()->runQuery($q);
-        $this->processSparql($inheritedRules);
-        
-        $q = new Query();
-        $q->addParameter((new HasValue('http://www.w3.org/ns/auth/acl#accessTo', $res->getUri(true)))->setSubVar('?rule'));
-        $q->addParameter(new HasTriple('?rule', 'http://www.w3.org/ns/auth/acl#agent', '?who'));
-        $q->addParameter(new HasTriple('?rule', 'http://www.w3.org/ns/auth/acl#accessTo', '?what'));
-        $directRules = $res->getFedora()->runQuery($q);
-        $this->processSparql($directRules);
-    }
-    
-    private function processSparql($results, FedoraResource) {
-        foreach($inheritedRules as $i) {
-            if (!isset($this->rules[$i->rule])) {
-                $this->rules[$i->rule] = new WebAclRule($i->rul);
+    const QUERY       = "
+        SELECT DISTINCT ?rule {
+            { 
+                SELECT DISTINCT ?rule
+                WHERE {
+                    ?@ <http://fedora.info/definitions/v4/repository#hasParent>* / ^<http://www.w3.org/ns/auth/acl#accessTo> ?rule .
+                    ?rule a <http://www.w3.org/ns/auth/acl#Authorization> .
+                }
+            } UNION {
+                SELECT DISTINCT ?rule
+                WHERE {
+                    ?rule a <http://www.w3.org/ns/auth/acl#Authorization> .
+                    ?rule <http://www.w3.org/ns/auth/acl#accessToClass> / ^a ?@ . 
+                }
             }
-            $this->rules[$i->rule]->roles[] = $i->who;
-            $this->rules[$i->rule]->
+        }
+    ";
+    const CLASS_QUERY = "
+        SELECT DISTINCT ?rule
+        WHERE {
+            ?rule a <http://www.w3.org/ns/auth/acl#Authorization> .
+            ?rule <http://www.w3.org/ns/auth/acl#accessToClass> ?@ .
+        }
+    ";
+
+    /**
+     * Should debug information be displayed
+     * @var bool 
+     */
+    static public $debug = false;
+
+    /**
+     * Should `WebAclRule` resources be synced with the Fedora immediately
+     * @var bool
+     * @see setAutosave()
+     */
+    static private $autosave = true;
+
+    /**
+     * When autosave is turned on, all changes to `WebAclRule` objects are
+     * immediately synced with the Fedora.
+     * It is convenient but may be slower if you apply many rules to a single
+     * resource (e.g. when you grant the same access rights to many users).
+     * 
+     * When autosave is off, you must call a `save()` method for the changes
+     * to be populated to the Fedora (of course you must also commit
+     * a transaction separately to make them persistent).
+     * @param bool $autosave
+     */
+    static public function setAutosave(bool $autosave) {
+        self::$autosave = $autosave;
+    }
+
+    /**
+     * Grants given rights to a given class.
+     * 
+     * Remember such rules are applied to all resources of a given class
+     * in the whole repository!
+     * @param Fedora $fedora Fedora connection object
+     * @param string $class class URI
+     * @param int $mode WebAclRule::READ or WebAclRule::WRITE
+     */
+    static public function grantClass(Fedora $fedora, string $class,
+                                      int $mode = WebAclRule::READ) {
+        WebAclRule::checkMode($mode);
+        $rules = self::getClassRules($fedora, $class);
+
+        $curMode = array(WebAclRule::NONE);
+        foreach ($rules as $i) {
+            $curMode[] = $i->getMode();
+        }
+        $curMode = max($curMode);
+
+        if ($mode > $curMode) {
+            if (count($rules) > 0) {
+                $first = array_pop($rules);
+                $first->setMode($mode);
+                if (self::$autosave) {
+                    $first->save();
+                }
+                foreach ($rules as $i) {
+                    $i->delete();
+                }
+            } else {
+                $rule = new WebAclRule($fedora);
+                $rule->setMode($mode);
+                $rule->addClass($class);
+                if (self::$autosave) {
+                    $rule->save();
+                }
+            }
         }
     }
+
+    /**
+     * Revokes given rights from a given class.
+     * 
+     * Remember such rules are applied to all resources of a given class
+     * in the whole repository!
+     * @param Fedora $fedora Fedora connection object
+     * @param string $class class URI
+     * @param int $mode WebAclRule::READ or WebAclRule::WRITE
+     */
+    static public function revokeClass(Fedora $fedora, string $class,
+                                       int $mode = WebAclRule::READ) {
+        WebAclRule::checkMode($mode);
+        $rules = self::getClassRules($fedora, $class);
+        foreach ($rules as $i) {
+            if ($mode === WebAclRule::READ) {
+                $i->delete($fedora);
+            } else if ($i->getMode() >= $mode) {
+                $i->setMode(WebAclRule::READ);
+                if (self::$autosave) {
+                    $i->save();
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets access rights for a given class.
+     * @param Fedora $fedora Fedora connection object
+     * @param string $class class URI
+     * @return int (WebAclRule::READ or WebAclRule::WRITE)
+     */
+    static public function getClassMode(Fedora $fedora, string $class): int {
+        $mode  = array(WebAclRule::NONE);
+        $rules = self::getClassRules($fedora, $class);
+        foreach ($rules as $r) {
+            if ($r->hasClass($class)) {
+                $mode[] = $r->getMode();
+            }
+        }
+        return max($mode);
+    }
+
+    /**
+     * Fetches an array of all `WebAclRule` objects defining access rules for
+     * a given class.
+     * @param Fedora $fedora Fedora connection object
+     * @param string $class class URI
+     * @return array
+     */
+    static public function getClassRules(Fedora $fedora, string $class): array {
+        $query   = new SimpleQuery(self::CLASS_QUERY, array($class));
+        $results = $fedora->runQuery($query);
+        $rules   = self::initRules($results, $fedora);
+        return $rules;
+    }
+
+    /**
+     * Preprocesses rules fetched from the SPARQL query:
+     * - skips rules which no longer exist in the Fedora
+     * - splits compound rules into simple ones
+     * @param Result $results SPARQL result set containg a `rule` variable
+     *   with a Fedora URIs of ACL Fedora resources
+     * @param Fedora $fedora Fedora connection object
+     * @return array collection of `WebAclRule` objects
+     */
+    static private function initRules(Result $results, Fedora $fedora): array {
+        $rules = array();
+        foreach ($results as $i) {
+            $rule = (string) $i->rule;
+            if (!isset($rules[$rule])) {
+                try {
+                    $rules[$rule] = new WebAclRule($fedora, $rule);
+                } catch (AlreadyInCache $e) {
+                    $rules[$rule] = $fedora->getResourceByUri($rule);
+                } catch (Deleted $e) {
+                    
+                }
+            }
+        }
+
+        $validRules = array();
+        foreach ($rules as $r) {
+            $tmp = $r->makeValid();
+            if (count($tmp) > 1) {
+                foreach ($tmp as $i) {
+                    $i->save();
+                    $validRules[] = $i;
+                }
+                $r->delete($fedora);
+            } else {
+                $validRules[] = $r;
+            }
+        }
+
+        return $validRules;
+    }
+
+    /**
+     * FedoraResource for which ACL rules are stored.
+     * @var \acdhOeaw\fedora\FedoraResource 
+     */
+    private $res;
+
+    /**
+     * Collection of rules inherited from parent (in Fedora terms) resources.
+     * @var array 
+     */
+    private $extRules = array();
+
+    /**
+     * Collection of rules applied dirtectly to the resource or its classes.
+     * @var array 
+     */
+    private $resRules = array();
+
+    /**
+     * Creates a WebAcl object
+     * @param FedoraResource $res corresponding Fedora resource
+     */
+    public function __construct(FedoraResource $res) {
+        $this->res = $res;
+        $this->reload(true);
+    }
+
+    /**
+     * Manually triggers synchronization of all stored `WebAclRule` objects
+     * with the Fedora.
+     * @see setAutocommit()
+     */
+    public function save() {
+        foreach ($this->resRules as $i) {
+            $i->save();
+        }
+    }
+
+    /**
+     * Revokes privileges from all users, groups and classes for a given 
+     * Fedora resource.
+     * 
+     * If `$mode` equals to `WebAclRule::WRITE` all privileges are limited to
+     * `WebAclRule::READ`.
+     * 
+     * If `$mode` equals to `WebAclRule::READ` all privileges are revoked.
+     * @param int $mode WebAclRule::READ or WebAclRule::WRITE
+     * @param int $recursive how deep in repository structure (in ACDH terms)
+     *   rights should be revoked (0 - only current resource, 1 - and all its
+     *   children, etc.)
+     * @return \acdhOeaw\fedora\acl\WebAcl
+     */
+    public function revokeAll(int $mode = WebAclRule::READ, int $recursive = 0): WebAcl {
+        WebAclRule::checkMode($mode);
+
+        if ($mode == WebAclRule::WRITE) {
+            foreach ($this->resRules as $i) {
+                $i->setMode(WebAclRule::READ);
+                if (self::$autosave) {
+                    $i->save();
+                }
+            }
+        } else {
+            foreach ($this->resRules as $i) {
+                $i->delete();
+            }
+            $this->resRules = array();
+        }
+
+        if ($recursive) {
+            foreach ($this->res->getChildren() as $i) {
+                $i->getAcl()->setAutosave(true)->revokeAll($mode, $recursive - 1);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Returns effective access rights for a given user/group.
+     * @param string $type WebAclRule::USER or WebAclRule::Group
+     * @param string $name user/group name
+     * @param bool $inherited should rules inherited from parent (in Fedora 
+     *   terms) resources be taken into account?
+     * @return int (WebAclRule::READ or WebAclRule::WRITE)
+     */
+    public function getMode(string $type, string $name = null,
+                            bool $inherited = false): int {
+        WebAclRule::checkRoleType($type);
+
+        $modes = array(WebAclRule::NONE);
+
+        if ($type !== WebAclRule::USER || $name !== WebAclRule::PUBLIC_USER) {
+            $modes[] = $this->getMode(WebAclRule::USER, WebAclRule::PUBLIC_USER, $inherited);
+        } else {
+            $classes = $this->res->getClasses();
+            $rules   = array_merge($this->resRules, $this->extRules);
+            foreach ($rules as $r) {
+                foreach ($classes as $c) {
+                    if ($r->hasClass($c)) {
+                        $modes[] = $r->getMode();
+                    }
+                }
+            }
+        }
+
+        $rules = $this->resRules;
+        if ($inherited) {
+            $rules = array_merge($rules, $this->extRules);
+        }
+        foreach ($rules as $i) {
+            if ($i->hasRole($type, $name)) {
+                $modes[] = $i->getMode();
+            }
+        }
+        return max($modes);
+    }
+
+    /**
+     * Grants give rights to a given user/group.
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @param string $name user/group name
+     * @param int $mode WebAclRule::READ or WebAclRule::WRITE
+     * @param int $recursive how deep in repository structure (in ACDH terms)
+     *   rights should be granted (0 - only to current resource, 1 - and to all
+     *   its children, etc.)
+     */
+    public function grant(string $type, string $name,
+                          int $mode = WebAclRule::READ, int $recursive = 0) {
+        WebAclRule::checkRoleType($type);
+        WebAclRule::checkMode($mode);
+        $fedora = $this->res->getFedora();
+
+        $curMode   = array(WebAclRule::NONE);
+        $matches   = array();
+        $modeMatch = null;
+        foreach ($this->resRules as $i) {
+            $iMode = $i->getMode();
+            if ($i->hasRole($type, $name)) {
+                $matches[] = $i;
+                $curMode[] = $iMode;
+            }
+            if ($iMode === $mode) {
+                $modeMatch = $i;
+            }
+        }
+        $curMode = max($curMode);
+
+        if ($mode > $curMode) {
+            foreach ($matches as $i) {
+                $i->deleteRole($type, $name);
+            }
+            if ($modeMatch) {
+                $modeMatch->addRole($type, $name);
+            } else {
+                $rule = new WebAclRule($fedora);
+                $rule->setMode($mode);
+                $rule->addResource($this->res);
+                $rule->addRole($type, $name);
+                if (self::$autosave) {
+                    $rule->save();
+                }
+                $this->resRules[] = $rule;
+            }
+            if (self::$autosave) {
+                foreach ($matches as $i) {
+                    $rule->save();
+                }
+            }
+        }
+
+        if ($recursive) {
+            foreach ($this->res->getChildren() as $i) {
+                $i->getAcl()->grant($type, $name, $mode, $recursive - 1);
+            }
+        }
+    }
+
+    /**
+     * Revokes access rights from a given user/group.
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @param string $name user/group name
+     * @param int $mode WebAclRule::READ or WebAclRule::WRITE
+     * @param int $recursive how deep in repository structure (in ACDH terms)
+     *   rights should be revoked (0 - only from current resource, 1 - and from
+     *   all its children, etc.)
+     */
+    public function revoke(string $type, string $name,
+                           int $mode = WebAclRule::READ, int $recursive = 0) {
+        WebAclRule::checkRoleType($type);
+        WebAclRule::checkMode($mode);
+
+        $toDel = array();
+        foreach ($this->resRules as $i) {
+            if ($i->hasRole($type, $name) && $i->getMode() >= $mode) {
+                if ($i->getRolesCount() == 1) {
+                    $toDel[] = $i;
+                } else {
+                    $i->deleteRole($type, $name);
+                    if (self::$autosave) {
+                        $i->save();
+                    }
+                }
+            }
+        }
+        $this->resRules = array_diff($this->resRules, $toDel);
+        $this->extRules = array_diff($this->extRules, $toDel);
+        foreach ($toDel as $i) {
+            $i->delete();
+        }
+
+        if ($mode === WebAclRule::WRITE) {
+            $this->grant($type, $name, WebAclRule::READ, 0);
+        }
+
+        if ($recursive) {
+            foreach ($this->res->getChildren() as $i) {
+                $i->getAcl()->revoke($type, $name, $mode, $recursive - 1);
+            }
+        }
+    }
+
+    /**
+     * Fetches an array of `WebAclRule` objects containing access rules for
+     * a corresponding Fedora resource.
+     * @param bool $inherited should rules inherited from parent (in Fedora 
+     *   terms) resources be taken into account?
+     * @return array
+     */
+    public function getRules(bool $inherited = true): array {
+        $ret = array();
+        foreach ($this->resRules as $i) {
+            $ret[] = $i->getData();
+        }
+        if ($inherited) {
+            foreach ($this->extRules as $i) {
+                $ret = $i->getData();
+            }
+        }
+        return $ret;
+    }
+
+    /**
+     * Reloads access rules by quering a triplestore.
+     * See class description for use cases.
+     */
+    public function reload(): WebAcl {
+        $fedora         = $this->res->getFedora();
+        $uri            = $this->res->getUri(true);
+        $this->resRules = array();
+        $this->extRules = array();
+
+        $query   = new SimpleQuery(self::QUERY, array($uri, $uri));
+        $results = $fedora->runQuery($query);
+        $rules   = self::initRules($results, $fedora);
+        foreach ($rules as $r) {
+            if ($r->hasResource($uri)) {
+                $this->resRules[] = $r;
+            } else {
+                $this->extRules[] = $r;
+            }
+        }
+        return $this;
+    }
+
 }
 
