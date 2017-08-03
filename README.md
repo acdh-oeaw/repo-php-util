@@ -333,4 +333,30 @@ At the moment two *metadata lookup* implementations exist:
 
 If you have a bunch of data in a form of an RDF graph, you can ingest it easily with the `MetadataCollection` class.
 
+## Managing access rights
 
+Every `FedoraResource` object provides a corresponding `WebAcl` object which can be used for access rights management, e.g. to grant write to `user` and read to public:
+
+```php
+$fedora->begin();
+$res = $fedora->getResourceById('https://my.id');
+$aclObj = $res->getAcl();
+$aclObj->grant(acdhOeaw\fedora\acl\WebAclRule::USER, 'user1', acdhOeaw\fedora\acl\WebAclRule::WRITE);
+$aclObj->grant(acdhOeaw\fedora\acl\WebAclRule::USER, acdhOeaw\fedora\acl\WebAclRule::PUBLIC_USER, acdhOeaw\fedora\acl\WebAclRule::READ);
+$fedora->commit();
+```
+
+Rights can be automatically applied also to children (in ACDH repo terms), e.g. here to direct children and second-order children:
+
+
+```php
+$fedora->begin();
+$res = $fedora->getResourceById('https://my.id');
+$aclObj = $res->getAcl();
+$aclObj->grant(acdhOeaw\fedora\acl\WebAclRule::USER, 'user1', acdhOeaw\fedora\acl\WebAclRule::WRITE, 2);
+$fedora->commit();
+```
+
+Simlarly a `revoke()` method exists as well as methods for managing RDF-class based access rules.
+
+See documenation for details.
