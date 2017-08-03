@@ -64,13 +64,9 @@ try {
     $ind->setFedoraLocation('/test');
     $indRes = $ind->index();
 
-    if (count($indRes) !== 4) {
-        throw new Exception("resources count doesn't match " . count($indRes));
-    }
+    assert(count($indRes) === 4, new Exception("resources count doesn't match " . count($indRes)));
     foreach ($indRes as $i) {
-        if (!preg_match('|/rest/test/|', $i->getUri(true))) {
-            throw new Exception('Resource created at wrong location: ' . $i->getUri(true));
-        }
+        assert(preg_match('|/rest/test/|', $i->getUri(true)), new Exception('Resource created at wrong location: ' . $i->getUri(true)));
         $i->delete();
     }
     $fedora->commit();
@@ -83,9 +79,7 @@ echo "simple reindexing\n";
 try {
     $fedora->begin();
     $indRes = $ind->index();
-    if (count($indRes) !== 4) {
-        throw new Exception("resources count doesn't match " . count($indRes));
-    }
+    assert(count($indRes) === 4, new Exception("resources count doesn't match " . count($indRes)));
     foreach ($indRes as $i) {
         $i->delete();
     }
@@ -107,9 +101,7 @@ try {
     $ind->setMetaLookup($metaLookup);
     $ind->setFilter('/xml$/');
     $indRes     = $ind->index();
-    if (count($indRes) !== 1) {
-        throw new Exception("resource wasn't indexed");
-    }
+    assert(count($indRes) === 1, new Exception("resource wasn't indexed"));
     $meta = $indRes[0]->getMetadata();
     if ($meta->getLiteral('https://some.sample/property') != 'sample value') {
         echo $indRes[0]->__metaToString();
@@ -136,9 +128,7 @@ try {
     $ind->setMetaLookup($metaLookup);
     $ind->setFilter('/xml$/');
     $indRes     = $ind->index();
-    if (count($indRes) !== 1) {
-        throw new Exception("resource wasn't indexed");
-    }
+    assert(count($indRes) === 1, new Exception("resource wasn't indexed"));
     $meta = $indRes[0]->getMetadata();
     if ($meta->getLiteral('https://some.sample/property') != 'sample value') {
         echo $indRes[0]->__metaToString();
@@ -173,9 +163,7 @@ try {
     $ind->setFilter('/^' . $fileName . '$/');
     $ind->setMetaLookup(new MetaLookupFile(array('.'), '.ttl'));
     $indRes = $ind->index();
-    if (count($indRes) !== 1) {
-        throw new Exception('resource not indexed');
-    }
+    assert(count($indRes) === 1, new Exception("resource wasn't indexed"));
     if ($indRes[0]->getUri(true) !== $res2->getUri(true)) {
         $fedora->rollback();
         throw new Exception("URIs don't match");
@@ -219,9 +207,7 @@ try {
     $ind->setMetaLookup(new MetaLookupFile(array('.'), '.ttl'));
     $indRes = $ind->index();
     // indexed resource should match manually created one
-    if (count($indRes) !== 1) {
-        throw new Exception('resource not indexed');
-    }
+    assert(count($indRes) === 1, new Exception("resource wasn't indexed"));
     if ($indRes[0]->getUri(true) !== $res4->getUri(true)) {
         $fedora->rollback();
         throw new Exception("URIs don't match");
