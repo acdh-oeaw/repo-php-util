@@ -37,8 +37,9 @@ use EasyRdf\Resource;
 use InvalidArgumentException;
 use RuntimeException;
 use acdhOeaw\fedora\exceptions\Deleted;
-use acdhOeaw\fedora\exceptions\NoAcdhId;
 use acdhOeaw\fedora\exceptions\ManyAcdhIds;
+use acdhOeaw\fedora\exceptions\NoAcdhId;
+use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\fedora\metadataQuery\Query;
 use acdhOeaw\fedora\metadataQuery\QueryParameter;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
@@ -208,11 +209,17 @@ class FedoraResource {
 
     /**
      * Removes the resource from the Fedora
+     * @param bool $deep if true, a tombstone resource will be deleted as well
      */
-    public function delete() {
-        $request = new Request('DELETE', $this->fedora->sanitizeUri($this->getUri()));
+    public function delete(bool $deep = false) {
+        $uri = $this->fedora->sanitizeUri($this->getUri());
+        $request = new Request('DELETE', $uri);
         $this->fedora->sendRequest($request);
         $this->fedora->getCache()->delete($this);
+        if ($deep) {
+            $request = new Request('DELETE', $uri . '/fcr:tombstone');
+            $this->fedora->sendRequest($request);
+        }
     }
 
     /**
@@ -348,10 +355,14 @@ class FedoraResource {
         try {
             $resp = $this->fedora->sendRequest($request);
         } catch (RequestException $e) {
-            if ($e->getCode() !== 410) {
-                throw $e;
+            switch ($e->getCode()) {
+                case 410:
+                    throw new Deleted();
+                case 404:
+                    throw new NotFound();
+                default:
+                    throw $e;
             }
-            throw new Deleted();
         }
 
         $graph = new Graph();
