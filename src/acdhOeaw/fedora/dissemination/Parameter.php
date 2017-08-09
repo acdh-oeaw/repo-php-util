@@ -83,9 +83,11 @@ class Parameter extends FedoraResource {
     }
 
     public function getValue(FedoraResource $res, string $method): string {
-        $meta    = $this->getMetadata();
-        $default = $meta->all(RC::get('fedoraServiceParamDefaultValueProp'));
-        $valueProp = $meta->getResource(RC::get('fedoraServiceParamRdfPropertyProp'));
+        $meta      = $this->getMetadata();
+        $default   = $meta->all(RC::get('fedoraServiceParamDefaultValueProp'));
+        $default   = count($default) > 0 ? (string) $default[0] : '';
+        $valueProp = $meta->all(RC::get('fedoraServiceParamRdfPropertyProp'));
+        $valueProp = count($valueProp) > 0 ? (string) $valueProp[0] : '';
         return self::value($res, $valueProp, $default, $method);
     }
 
