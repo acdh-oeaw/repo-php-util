@@ -36,6 +36,7 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use InvalidArgumentException;
 use RuntimeException;
+use acdhOeaw\fedora\dissemination\Service;
 use acdhOeaw\fedora\exceptions\Deleted;
 use acdhOeaw\fedora\exceptions\ManyAcdhIds;
 use acdhOeaw\fedora\exceptions\NoAcdhId;
@@ -45,6 +46,7 @@ use acdhOeaw\fedora\metadataQuery\QueryParameter;
 use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\fedora\metadataQuery\HasValue;
 use acdhOeaw\fedora\metadataQuery\MatchesRegEx;
+use acdhOeaw\fedora\metadataQuery\SimpleQuery;
 use acdhOeaw\fedora\acl\WebAcl;
 use acdhOeaw\util\RepoConfig as RC;
 
@@ -58,10 +60,10 @@ use acdhOeaw\util\RepoConfig as RC;
  */
 class FedoraResource {
 
-    const ADD = 'ADD';
-    const UPDATE = 'UPDATE';
+    const ADD       = 'ADD';
+    const UPDATE    = 'UPDATE';
     const OVERWRITE = 'OVERWRITE';
-    
+
     /**
      * List of metadata properties managed exclusively by the Fedora.
      * @var array
@@ -118,7 +120,7 @@ class FedoraResource {
      * @var \acdhOeaw\fedora\acl\WebAcl
      */
     private $acl;
-    
+
     /**
      * Creates new resource based on its Fedora URI.
      * 
@@ -212,7 +214,7 @@ class FedoraResource {
      * @param bool $deep if true, a tombstone resource will be deleted as well
      */
     public function delete(bool $deep = false) {
-        $uri = $this->fedora->sanitizeUri($this->getUri());
+        $uri     = $this->fedora->sanitizeUri($this->getUri());
         $request = new Request('DELETE', $uri);
         $this->fedora->sendRequest($request);
         $this->fedora->getCache()->delete($this);
@@ -510,6 +512,42 @@ class FedoraResource {
             $this->acl = new WebAcl($this);
         }
         return $this->acl;
+    }
+
+    public function getDissServices(): array {
+        $ret = array();
+
+        // by RDF class
+        $query = "
+            SELECT ?uri WHERE {
+                ?uri a ?@ .
+                ?uri ?@ / ^a ?@ .
+            }
+        ";
+        $param = array(
+            RC::get('fedoraServiceClass'),
+            RC::get('fedoraServiceSupportsProp'),
+            $this->getUri(true)
+        );
+        $query = new SimpleQuery($query, $param);
+        $results = $this->fedora->runQuery($query);
+        foreach($results as $i) {
+            $service = new Service($this->fedora, $i->uri);
+            foreach ($service->getFormats() as $format) {
+                $ret[$format] = $service;
+            }
+        }
+        
+        // directly attached
+        $meta = $this->getMetadata();
+        foreach ($meta->allResources(RC::get('fedoraHasServiceProp')) as $id) {
+            $service = new Service($this->fedora, $this->fedora->getResourceById($id)->getUri(true));
+            foreach ($service->getFormats() as $format) {
+                $ret[$format] = $service;
+            }
+        }
+        
+        return $ret;
     }
 
     /**
