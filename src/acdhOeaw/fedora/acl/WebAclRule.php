@@ -333,10 +333,11 @@ class WebAclRule extends FedoraResource {
 
     /**
      * Removes the ACL rule from the Fedora
+     * @param bool $deep if true, a tombstone resource will be deleted as well
      */
-    public function delete() {
+    public function delete(bool $deep = false) {
         if ($this->uri != '') {
-            parent::delete();
+            parent::delete($deep);
         }
         $this->uri       = '';
         $this->resources = $this->classes   = array();

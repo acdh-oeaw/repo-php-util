@@ -34,8 +34,9 @@ use EasyRdf\Sparql\Result;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\fedora\metadataQuery\SimpleQuery;
-use acdhOeaw\fedora\exceptions\Deleted;
 use acdhOeaw\fedora\exceptions\AlreadyInCache;
+use acdhOeaw\fedora\exceptions\Deleted;
+use acdhOeaw\fedora\exceptions\NotFound;
 
 /**
  * Provides ACL management.
@@ -158,7 +159,7 @@ class WebAcl {
                     $first->save();
                 }
                 foreach ($rules as $i) {
-                    $i->delete();
+                    $i->delete(true);
                 }
             } else {
                 $rule = new WebAclRule($fedora);
@@ -186,7 +187,7 @@ class WebAcl {
         $rules = self::getClassRules($fedora, $class);
         foreach ($rules as $i) {
             if ($mode === WebAclRule::READ) {
-                $i->delete($fedora);
+                $i->delete(true);
             } else if ($i->getMode() >= $mode) {
                 $i->setMode(WebAclRule::READ);
                 if (self::$autosave) {
@@ -247,6 +248,8 @@ class WebAcl {
                     $rules[$rule] = $fedora->getResourceByUri($rule);
                 } catch (Deleted $e) {
                     
+                } catch (NotFound $e) {
+                    
                 }
             }
         }
@@ -259,7 +262,7 @@ class WebAcl {
                     $i->save();
                     $validRules[] = $i;
                 }
-                $r->delete($fedora);
+                $r->delete(true);
             } else {
                 $validRules[] = $r;
             }
@@ -332,7 +335,7 @@ class WebAcl {
             }
         } else {
             foreach ($this->resRules as $i) {
-                $i->delete();
+                $i->delete(true);
             }
             $this->resRules = array();
         }
@@ -475,7 +478,7 @@ class WebAcl {
         $this->resRules = array_diff($this->resRules, $toDel);
         $this->extRules = array_diff($this->extRules, $toDel);
         foreach ($toDel as $i) {
-            $i->delete();
+            $i->delete(true);
         }
 
         if ($mode === WebAclRule::WRITE) {
