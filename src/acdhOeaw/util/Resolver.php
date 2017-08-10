@@ -75,6 +75,7 @@ class Resolver {
         foreach ($accept as $mime) {
             if (isset($dissServ[$mime])){
                 $request = $dissServ[$mime]->getRequest($res);
+                break;
             }            
         }
         $this->redirect($request->getUri());
