@@ -54,7 +54,10 @@ class Query {
         
     }
 
-    public function addParameter(QueryParameter $p): Query {
+    public function addParameter(QueryParameter $p, bool $optional = false): Query {
+        if($optional) {
+            $p->setOptional(true);
+        }
         $this->param[] = $p;
         return $this;
     }
