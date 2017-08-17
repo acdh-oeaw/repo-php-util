@@ -47,6 +47,8 @@ class Query {
     private $orderBy = array();
     private $groupBy = array();
     private $joinClause = '';
+	private $offset;
+    private $limit;
 
     public function __construct() {
         
@@ -69,6 +71,16 @@ class Query {
 
     public function setSelect(array $select): Query {
         $this->select = $select;
+        return $this;
+    }
+	
+	public function setLimit(int $limit): Query {
+        $this->limit = $limit;
+        return $this;
+    }
+    
+    public function setOffset(int $offset): Query {
+        $this->offset = $offset;
         return $this;
     }
     
@@ -106,6 +118,8 @@ class Query {
 
         $query .= $this->getGroupBy();
         $query .= $this->getOrderBy();
+		$query .= $this->getLimit();
+        $query .= $this->getOffset();
 
         return $query;
     }
@@ -150,6 +164,20 @@ class Query {
         return 'FILTER (' . implode(' && ', $filter) . ')';
     }
 
+	private function getLimit() {
+        if (empty($this->limit)) {
+            return '';
+        }
+        return 'LIMIT ' . $this->limit . "\n";
+    }
+    
+    private function getOffset() {
+        if (empty($this->offset)) {
+            return '';
+        }
+        return 'OFFSET ' . $this->offset . "\n";
+    }
+	
     private function getOrderBy() {
         if (count($this->orderBy) == 0) {
             return '';
