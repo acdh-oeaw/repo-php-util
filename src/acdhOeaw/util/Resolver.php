@@ -65,18 +65,26 @@ class Resolver {
         }
     }
 
-    public function resolve() {
+    public function resolve(string $defaultServ = null) {
         $resId    = $this->config->get('baseUrl') . filter_input(\INPUT_SERVER, 'REDIRECT_URL');
         $res      = $this->findResource($resId);
         $dissServ = $res->getDissServices();
 
+        if ($defaultServ && isset($dissServ[$defaultServ])) {
+            $request = $dissServ[$defaultServ]->getRequest($res);
+        } else {
+            $request = new Request('GET', $res->getUri(true));
+        }
+
         $accept  = $this->parseAccept();
-        $request = new Request('GET', $res->getUri(true));
+        if (isset($dissServ['gui'])) {
+
+        }
         foreach ($accept as $mime) {
             if (isset($dissServ[$mime])){
                 $request = $dissServ[$mime]->getRequest($res);
                 break;
-            }            
+            }
         }
         $this->redirect($request->getUri());
         return;
