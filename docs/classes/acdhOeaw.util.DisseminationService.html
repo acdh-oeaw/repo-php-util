@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">213</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-312300408"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-312300408" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-112410334"></a>
+                                <a href="../namespaces/acdhOeaw.html" style="margin-left: 30px; padding-left: 0">acdhOeaw</a>
+            </div>
+            <div id="namespace-112410334" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-406044029"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.html" style="margin-left: 30px; padding-left: 0">fedora</a>
+            </div>
+            <div id="namespace-406044029" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-722338668"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.acl.html" style="margin-left: 30px; padding-left: 0">acl</a>
+            </div>
+            <div id="namespace-722338668" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.acl.WebAcl.html">WebAcl</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.acl.WebAclRule.html">WebAclRule</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-433403467"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.dissemination.html" style="margin-left: 30px; padding-left: 0">dissemination</a>
+            </div>
+            <div id="namespace-433403467" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.Parameter.html">Parameter</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.Service.html">Service</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-104802645"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.exceptions.html" style="margin-left: 30px; padding-left: 0">exceptions</a>
+            </div>
+            <div id="namespace-104802645" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.AclException.html">AclException</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.AlreadyInCache.html">AlreadyInCache</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.AmbiguousMatch.html">AmbiguousMatch</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.CacheInconsistent.html">CacheInconsistent</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.Deleted.html">Deleted</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.ManyAcdhIds.html">ManyAcdhIds</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.NoAcdhId.html">NoAcdhId</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.NotFound.html">NotFound</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.NotInCache.html">NotInCache</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-958370948"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.metadataQuery.html" style="margin-left: 30px; padding-left: 0">metadataQuery</a>
+            </div>
+            <div id="namespace-958370948" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html">HasProperty</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasTriple.html">HasTriple</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html">HasValue</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html">MatchesRegEx</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">Query</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html">QueryParameter</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.SimpleQuery.html">SimpleQuery</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.Fedora.html">Fedora</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.FedoraCache.html">FedoraCache</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.FedoraResource.html">FedoraResource</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.SparqlClient.html">SparqlClient</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1708202977"></a>
+                                <a href="../namespaces/acdhOeaw.schema.html" style="margin-left: 30px; padding-left: 0">schema</a>
+            </div>
+            <div id="namespace-1708202977" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1020289491"></a>
+                                <a href="../namespaces/acdhOeaw.schema.dissemination.html" style="margin-left: 30px; padding-left: 0">dissemination</a>
+            </div>
+            <div id="namespace-1020289491" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.dissemination.CiriloService.html">CiriloService</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.dissemination.Parameter.html">Parameter</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.dissemination.Service.html">Service</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-530476272"></a>
+                                <a href="../namespaces/acdhOeaw.schema.file.html" style="margin-left: 30px; padding-left: 0">file</a>
+            </div>
+            <div id="namespace-530476272" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.file.CmdiFile.html">CmdiFile</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.file.File.html">File</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-673683088"></a>
+                                <a href="../namespaces/acdhOeaw.schema.redmine.html" style="margin-left: 30px; padding-left: 0">redmine</a>
+            </div>
+            <div id="namespace-673683088" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.Issue.html">Issue</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.Project.html">Project</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.Redmine.html">Redmine</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.User.html">User</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.Object.html">Object</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2021230632"></a>
+                                <a href="../namespaces/acdhOeaw.util.html" style="margin-left: 30px; padding-left: 0">util</a>
+            </div>
+            <div id="namespace-2021230632" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-641780651"></a>
+                                <a href="../namespaces/acdhOeaw.util.metadataValidator.html" style="margin-left: 30px; padding-left: 0">metadataValidator</a>
+            </div>
+            <div id="namespace-641780651" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.metadataValidator.Error.html">Error</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html">MetadataValidator</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.metadataValidator.OntologyProperty.html">OntologyProperty</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1429519431"></a>
+                                <a href="../namespaces/acdhOeaw.util.metaLookup.html" style="margin-left: 30px; padding-left: 0">metaLookup</a>
+            </div>
+            <div id="namespace-1429519431" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/acdhOeaw.util.metaLookup.MetaLookupInterface.html">MetaLookupInterface</a></li>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.metaLookup.MetaLookupFile.html">MetaLookupFile</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.metaLookup.MetaLookupGraph.html">MetaLookupGraph</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.DisseminationService.html">DisseminationService</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.Indexer.html">Indexer</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.MetadataCollection.html">MetadataCollection</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.RepoConfig.html">RepoConfig</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.Resolver.html">Resolver</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/acdhOeaw.util.html">\acdhOeaw\util</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\acdhOeaw\util</small>DisseminationService</h1>
+                    <p><em>Description of DisseminationService</em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.util.DisseminationService.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.DisseminationService.html#method_findParams" class="">findParams()</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.DisseminationService.html#method_getUrl" class="">getUrl()</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.DisseminationService.html#method_getRequest" class="">getRequest()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.util.DisseminationService.html#property_debug" class="">$debug</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.util.DisseminationService.html#method_filterHeaders" class="">filterHeaders()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.util.DisseminationService.html#property_service" class="">$service</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.DisseminationService.html#property_reqPost" class="">$reqPost</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.DisseminationService.html#property_parameters" class="">$parameters</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/trash.DisseminationService.html"><div class="path-wrapper">trash/DisseminationService.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\acdhOeaw\util\DisseminationService</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                author
+                            </th>
+                            <td>
+                                                                    <p>zozlak</p>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_debug" name="property_debug" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$debug</h3>
+                <pre class="signature">$debug : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_service" name="property_service" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$service</h3>
+                <pre class="signature">$service : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_reqPost" name="property_reqPost" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$reqPost</h3>
+                <pre class="signature">$reqPost : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_parameters" name="property_parameters" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$parameters</h3>
+                <pre class="signature">$parameters : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct(\acdhOeaw\fedora\FedoraResource  <span class="argument">$res</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a></td>
+                                <td>$res </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_findParams" name="method_findParams" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">findParams()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">findParams(\acdhOeaw\util\string  <span class="argument">$resId</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\acdhOeaw\util\string</td>
+                                <td>$resId </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getUrl" name="method_getUrl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getUrl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getUrl() </pre>
+                <p><em></em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getRequest" name="method_getRequest" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getRequest()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getRequest() </pre>
+                <p><em></em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_filterHeaders" name="method_filterHeaders" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">filterHeaders()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">filterHeaders(\GuzzleHttp\Psr7\Response  <span class="argument">$response</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\GuzzleHttp\Psr7\Response</td>
+                                <td>$response </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">DisseminationService.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/trash/DisseminationService.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on September 5th, 2017 at 14:10.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

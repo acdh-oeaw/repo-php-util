@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">213</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-2045958963"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-2045958963" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1139599512"></a>
+                                <a href="../namespaces/acdhOeaw.html" style="margin-left: 30px; padding-left: 0">acdhOeaw</a>
+            </div>
+            <div id="namespace-1139599512" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-388714141"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.html" style="margin-left: 30px; padding-left: 0">fedora</a>
+            </div>
+            <div id="namespace-388714141" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1120821294"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.acl.html" style="margin-left: 30px; padding-left: 0">acl</a>
+            </div>
+            <div id="namespace-1120821294" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.acl.WebAcl.html">WebAcl</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.acl.WebAclRule.html">WebAclRule</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1552382914"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.dissemination.html" style="margin-left: 30px; padding-left: 0">dissemination</a>
+            </div>
+            <div id="namespace-1552382914" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.Parameter.html">Parameter</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.Service.html">Service</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1497055313"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.exceptions.html" style="margin-left: 30px; padding-left: 0">exceptions</a>
+            </div>
+            <div id="namespace-1497055313" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.AclException.html">AclException</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.AlreadyInCache.html">AlreadyInCache</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.AmbiguousMatch.html">AmbiguousMatch</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.CacheInconsistent.html">CacheInconsistent</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.Deleted.html">Deleted</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.ManyAcdhIds.html">ManyAcdhIds</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.NoAcdhId.html">NoAcdhId</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.NotFound.html">NotFound</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.NotInCache.html">NotInCache</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1664192728"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.metadataQuery.html" style="margin-left: 30px; padding-left: 0">metadataQuery</a>
+            </div>
+            <div id="namespace-1664192728" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html">HasProperty</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasTriple.html">HasTriple</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html">HasValue</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html">MatchesRegEx</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">Query</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html">QueryParameter</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.SimpleQuery.html">SimpleQuery</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.Fedora.html">Fedora</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.FedoraCache.html">FedoraCache</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.FedoraResource.html">FedoraResource</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.SparqlClient.html">SparqlClient</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-149806230"></a>
+                                <a href="../namespaces/acdhOeaw.schema.html" style="margin-left: 30px; padding-left: 0">schema</a>
+            </div>
+            <div id="namespace-149806230" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1947142682"></a>
+                                <a href="../namespaces/acdhOeaw.schema.dissemination.html" style="margin-left: 30px; padding-left: 0">dissemination</a>
+            </div>
+            <div id="namespace-1947142682" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.dissemination.CiriloService.html">CiriloService</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.dissemination.Parameter.html">Parameter</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.dissemination.Service.html">Service</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2089270755"></a>
+                                <a href="../namespaces/acdhOeaw.schema.file.html" style="margin-left: 30px; padding-left: 0">file</a>
+            </div>
+            <div id="namespace-2089270755" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.file.CmdiFile.html">CmdiFile</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.file.File.html">File</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1563104143"></a>
+                                <a href="../namespaces/acdhOeaw.schema.redmine.html" style="margin-left: 30px; padding-left: 0">redmine</a>
+            </div>
+            <div id="namespace-1563104143" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.Issue.html">Issue</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.Project.html">Project</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.Redmine.html">Redmine</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.User.html">User</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.Object.html">Object</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1160819910"></a>
+                                <a href="../namespaces/acdhOeaw.util.html" style="margin-left: 30px; padding-left: 0">util</a>
+            </div>
+            <div id="namespace-1160819910" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1881375944"></a>
+                                <a href="../namespaces/acdhOeaw.util.metadataValidator.html" style="margin-left: 30px; padding-left: 0">metadataValidator</a>
+            </div>
+            <div id="namespace-1881375944" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.metadataValidator.Error.html">Error</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html">MetadataValidator</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.metadataValidator.OntologyProperty.html">OntologyProperty</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1259354839"></a>
+                                <a href="../namespaces/acdhOeaw.util.metaLookup.html" style="margin-left: 30px; padding-left: 0">metaLookup</a>
+            </div>
+            <div id="namespace-1259354839" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/acdhOeaw.util.metaLookup.MetaLookupInterface.html">MetaLookupInterface</a></li>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.metaLookup.MetaLookupFile.html">MetaLookupFile</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.metaLookup.MetaLookupGraph.html">MetaLookupGraph</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.DisseminationService.html">DisseminationService</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.Indexer.html">Indexer</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.MetadataCollection.html">MetadataCollection</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.RepoConfig.html">RepoConfig</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.Resolver.html">Resolver</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/acdhOeaw.util.metadataValidator.html">\acdhOeaw\util\metadataValidator</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\acdhOeaw\util\metadataValidator</small>MetadataValidator</h1>
+                    <p><em>Validates metadata (EasyRdf\Graph or EasyRdf\Resource) against the ontology
+in the Fedora.</em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#method_validateGraph" class="">validateGraph()</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#method_validateResource" class="">validateResource()</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#method_validateFedoraResource" class="">validateFedoraResource()</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#method_printResults" class="">printResults()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#constant_RDFS_TYPE" class="">RDFS_TYPE</a><br />
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#method_checkClass" class="">checkClass()</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#method_checkProperty" class="">checkProperty()</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#method_getPropertyDef" class="">getPropertyDef()</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#method_checkRangeDomain" class="">checkRangeDomain()</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#method_loadClasses" class="">loadClasses()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#property_cache" class="">$cache</a><br />
+                                                                    <a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html#property_classes" class="">$classes</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/util.metadataValidator.MetadataValidator.html"><div class="path-wrapper">util/metadataValidator/MetadataValidator.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">repo-php-util</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\acdhOeaw\util\metadataValidator\MetadataValidator</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                author
+                            </th>
+                            <td>
+                                                                    <p>zozlak</p>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                                    <a id="constants" name="constants"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Constants</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_RDFS_TYPE" name="constant_RDFS_TYPE" class="anchor"></a>
+            <article id="constant_RDFS_TYPE" class="constant">
+                <h3 class="">RDFS_TYPE</h3>
+                <pre class="signature">RDFS_TYPE</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_cache" name="property_cache" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$cache</h3>
+                <pre class="signature">$cache : array</pre>
+                <p><em>Stores RDF properties definitions fetched from the repository.</em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_classes" name="property_classes" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$classes</h3>
+                <pre class="signature">$classes : array</pre>
+                <p><em>Stores inheritence list for all classes as a map. Key is class URI,
+value is an array of inherited class URIs (including class URI).</em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validateGraph" name="method_validateGraph" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validateGraph()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validateGraph(\EasyRdf\Graph  <span class="argument">$graph</span>, \acdhOeaw\fedora\Fedora  <span class="argument">$fedora</span>) : array</pre>
+                <p><em>Checks a given RDF graph against ontology in a given Fedora repository.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\EasyRdf\Graph</td>
+                                <td>$graph </td>
+                                <td><p>RDF graph to be checked</p></td>
+                            </tr>
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.Fedora.html">\acdhOeaw\fedora\Fedora</a></td>
+                                <td>$fedora </td>
+                                <td><p>repository connection object</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>list of errors</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validateResource" name="method_validateResource" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validateResource()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validateResource(Resource  <span class="argument">$res</span>, \acdhOeaw\fedora\Fedora  <span class="argument">$fedora</span>) : array</pre>
+                <p><em>Checks a given EasyRdf\Resource against ontology in a given repository.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>Resource</td>
+                                <td>$res </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.Fedora.html">\acdhOeaw\fedora\Fedora</a></td>
+                                <td>$fedora </td>
+                                <td><p>repository connection object</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>list of errors</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validateFedoraResource" name="method_validateFedoraResource" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validateFedoraResource()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validateFedoraResource(\acdhOeaw\fedora\FedoraResource  <span class="argument">$res</span>) : array</pre>
+                <p><em>Checks a given FedoraResource. Simple overlay on top of the
+validateResource() method.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a></td>
+                                <td>$res </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>list of errors</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_printResults" name="method_printResults" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">printResults()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">printResults(array  <span class="argument">$results</span>, string  <span class="argument">$format = &#039;text&#039;</span>) </pre>
+                <p><em>Pretty prints a list of errors.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$results </td>
+                                <td><p>list of errors</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$format </td>
+                                <td><p>print format: tsv or text</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_checkClass" name="method_checkClass" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">checkClass()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">checkClass(Resource  <span class="argument">$res</span>, \acdhOeaw\fedora\Fedora  <span class="argument">$fedora</span>) : array</pre>
+                <p><em>Checks if a resource is of known class</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>Resource</td>
+                                <td>$res </td>
+                                <td><p>resource to be checked</p></td>
+                            </tr>
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.Fedora.html">\acdhOeaw\fedora\Fedora</a></td>
+                                <td>$fedora </td>
+                                <td><p>repository connection object</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>list of errors</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_checkProperty" name="method_checkProperty" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">checkProperty()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">checkProperty(string  <span class="argument">$property</span>, Resource  <span class="argument">$res</span>, \acdhOeaw\fedora\Fedora  <span class="argument">$fedora</span>) : array</pre>
+                <p><em>Checks if a given property is defined in the ontology and if all its
+values for a given resource match property definition provided by the
+ontology.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$property </td>
+                                <td><p>RDF property to be checked</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>Resource</td>
+                                <td>$res </td>
+                                <td><p>resource containing given property values</p></td>
+                            </tr>
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.Fedora.html">\acdhOeaw\fedora\Fedora</a></td>
+                                <td>$fedora </td>
+                                <td><p>repository connection object</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\RuntimeException</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>list of errors</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getPropertyDef" name="method_getPropertyDef" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">getPropertyDef()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getPropertyDef(string  <span class="argument">$property</span>, \acdhOeaw\fedora\Fedora  <span class="argument">$fedora</span>) : \acdhOeaw\util\metadataValidator\OntologyProperty</pre>
+                <p><em>Fetches property definition from cache.</em></p>
+                <p>Creates a deifinition if it does not exist.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$property </td>
+                                <td><p>RDF property URI</p></td>
+                            </tr>
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.Fedora.html">\acdhOeaw\fedora\Fedora</a></td>
+                                <td>$fedora </td>
+                                <td><p>repository connection object</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/acdhOeaw.util.metadataValidator.OntologyProperty.html">\acdhOeaw\util\metadataValidator\OntologyProperty</a>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_checkRangeDomain" name="method_checkRangeDomain" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">checkRangeDomain()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">checkRangeDomain(\acdhOeaw\util\metadataValidator\type  <span class="argument">$res</span>, string  <span class="argument">$class</span>) : boolean</pre>
+                <p><em>Checks if a given subject/value is of a given class taking into account
+class inheritance.</em></p>
+                <p>Literal values are not checked at the moment!</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\acdhOeaw\util\metadataValidator\type</td>
+                                <td>$res </td>
+                                <td><p>subject/value to be checked</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$class </td>
+                                <td><p>class a subject/value should match</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_loadClasses" name="method_loadClasses" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">loadClasses()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">loadClasses(\acdhOeaw\fedora\Fedora  <span class="argument">$fedora</span>) </pre>
+                <p><em>Loads classes defined in the ontology.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.Fedora.html">\acdhOeaw\fedora\Fedora</a></td>
+                                <td>$fedora </td>
+                                <td><p>repository connection object</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">MetadataValidator.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/util/metadataValidator/MetadataValidator.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on September 5th, 2017 at 14:10.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

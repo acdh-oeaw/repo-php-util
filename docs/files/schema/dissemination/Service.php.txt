@@ -45,7 +45,7 @@ use acdhOeaw\util\RepoConfig as RC;
  * - cfg:fedoraTitleProp - a service name
  * - cfg:fedoraServiceLocProp - a service location containing parameter bindings
  *   (copy of the Fedora 3 wsdl:binding/wsdl:operation/http:operation/@location)
- * - cfg:fedoraServiceRetMimeProp - a MIME type provided by this service
+ * - cfg:fedoraServiceRetFormatProp - a MIME type provided by this service
  * - cfg:fedoraServiceSupportsProp - a class supported by this service
  *   (use ldp:Container to support all resources in the repository)
  * - cfg:ciriloIdProp - a Fedora 3 service ID used to match a resource in 
@@ -59,20 +59,20 @@ use acdhOeaw\util\RepoConfig as RC;
 class Service extends Object {
 
     private $location;
-    private $retMime;
+    private $format   = array();
     private $params   = array();
     private $supports = array();
 
     public function __construct(Fedora $fedora, string $id, string $location,
-                                string $retMime, array $supports) {
+                                array $format, array $supports) {
         parent::__construct($fedora, $id);
 
-        if ($id == '' || $location == '' || $retMime == '' || count($supports) == 0) {
+        if ($id == '' || $location == '' || $format == '' || count($supports) == 0) {
             throw new InvalidArgumentException('title, location, mime type and supported classes have to be specified');
         }
 
         $this->location = $location;
-        $this->retMime  = $retMime;
+        $this->format   = $format;
         $this->supports = $supports;
         $this->fedora   = $fedora;
     }
@@ -90,15 +90,17 @@ class Service extends Object {
         $meta = (new Graph())->resource('.');
 
         $meta->addType(RC::get('fedoraServiceClass'));
-        
+
         $meta->addResource(RC::idProp(), $this->getId());
 
         $meta->addLiteral(RC::titleProp(), $this->getId());
 
         $meta->addLiteral(RC::get('fedoraServiceLocProp'), $this->location);
 
-        $retProp = RC::get('fedoraServiceRetMimeProp');
-        $meta->addLiteral($retProp, $this->retMime);
+        $retProp = RC::get('fedoraServiceRetFormatProp');
+        foreach ($this->format as $i) {
+            $meta->addLiteral($retProp, $i);
+        }
 
         $supProp = RC::get('fedoraServiceSupportsProp');
         foreach ($this->supports as $i) {

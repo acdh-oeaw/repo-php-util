@@ -185,13 +185,9 @@ class MetadataCollection extends Graph {
         }
 
         $this->removeLiteralIds();
-        echo "###\n";
         $this->promoteUrisToIds();
-        echo "###\n";
         $this->buildIndex();
-        echo "###\n";
         $this->mapUris($namespace, false);
-        echo "###\n";
 
         $imported     = array();
         $toBeImported = array_values($this->resources());
