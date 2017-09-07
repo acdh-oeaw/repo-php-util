@@ -506,7 +506,7 @@ class WebAcl {
         }
         if ($inherited) {
             foreach ($this->extRules as $i) {
-                $ret = $i->getData();
+                $ret[] = $i->getData();
             }
         }
         return $ret;
