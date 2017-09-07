@@ -132,68 +132,93 @@ class WebAcl {
     }
 
     /**
-     * Grants given rights to a given class.
+     * Grants given rights on a given class to a given user/group.
      * 
      * Remember such rules are applied to all resources of a given class
      * in the whole repository!
+     * 
+     * As setting class rules depends on the data in the triplestore you
+     * shoud commit the Fedora transaction immediately after calling this method.
      * @param Fedora $fedora Fedora connection object
      * @param string $class class URI
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @param string $name user/group name
      * @param int $mode WebAclRule::READ or WebAclRule::WRITE
      */
     static public function grantClass(Fedora $fedora, string $class,
+                                      string $type, string $name,
                                       int $mode = WebAclRule::READ) {
+        WebAclRule::checkRoleType($type);
         WebAclRule::checkMode($mode);
         $rules = self::getClassRules($fedora, $class);
 
-        $curMode = array(WebAclRule::NONE);
+        $curMode   = array(WebAclRule::NONE);
+        $modeMatch = null;
         foreach ($rules as $i) {
             $curMode[] = $i->getMode();
+            if ($i->getMode() === $mode) {
+                $modeMatch = $i;
+            }
         }
         $curMode = max($curMode);
 
         if ($mode > $curMode) {
-            if (count($rules) > 0) {
-                $first = array_pop($rules);
-                $first->setMode($mode);
-                if (self::$autosave) {
-                    $first->save();
-                }
-                foreach ($rules as $i) {
-                    $i->delete(true);
-                }
+            foreach ($rules as $i) {
+                $i->deleteRole($type, $name);
+            }
+            if ($modeMatch) {
+                $modeMatch->addRole($type, $name);
             } else {
                 $rule = new WebAclRule($fedora);
                 $rule->setMode($mode);
                 $rule->addClass($class);
-                if (self::$autosave) {
-                    $rule->save();
-                }
+                $rule->addRole($type, $name);
+                $rule->save();
+            }
+            foreach ($rules as $i) {
+                $rule->save();
             }
         }
     }
 
     /**
-     * Revokes given rights from a given class.
+     * Revokes given rights on a given class from a given user/group.
      * 
      * Remember such rules are applied to all resources of a given class
      * in the whole repository!
+     * 
+     * As setting class rules depends on the data in the triplestore you
+     * shoud commit the Fedora transaction immediately after calling this method.
      * @param Fedora $fedora Fedora connection object
      * @param string $class class URI
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @param string $name user/group name
      * @param int $mode WebAclRule::READ or WebAclRule::WRITE
      */
     static public function revokeClass(Fedora $fedora, string $class,
+                                       string $type, string $name,
                                        int $mode = WebAclRule::READ) {
+        WebAclRule::checkRoleType($type);
         WebAclRule::checkMode($mode);
         $rules = self::getClassRules($fedora, $class);
+
         foreach ($rules as $i) {
-            if ($mode === WebAclRule::READ) {
-                $i->delete(true);
-            } else if ($i->getMode() >= $mode) {
-                $i->setMode(WebAclRule::READ);
-                if (self::$autosave) {
+            if ($i->getMode() >= $mode) {
+                if ($i->getRolesCount() == 1) {
+                    $i->delete(true);
+                } else {
+                    $i->deleteRole($type, $name);
                     $i->save();
                 }
             }
+        }
+
+        if ($mode === WebAclRule::WRITE) {
+            $rule = new WebAclRule($fedora);
+            $rule->setMode(WebAclRule::READ);
+            $rule->addClass($class);
+            $rule->addRole($type, $name);
+            $rule->save();
         }
     }
 
