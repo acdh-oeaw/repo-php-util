@@ -145,8 +145,8 @@ class Indexer {
      */
     public function __construct(FedoraResource $resource) {
         $this->resource = $resource;
-        $this->binaryClass     = RC::get('indexerDefaultCollectionClass');
-        $this->collectionClass = RC::get('indexerDefaultBinaryClass');
+        $this->binaryClass     = RC::get('indexerDefaultBinaryClass');
+        $this->collectionClass = RC::get('indexerDefaultCollectionClass');
 
         $metadata  = $this->resource->getMetadata();
         $locations = $metadata->allLiterals(RC::locProp());
