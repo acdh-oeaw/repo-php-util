@@ -153,9 +153,9 @@ class FedoraResource {
     }
 
     /**
-     * Returns resource's ACDH ID.
+     * Returns resource's ACDH UUID.
      * 
-     * If there is no or are many IDs, an error is thrown.
+     * If there is no or are many ACDH UUIDs, an error is thrown.
      * 
      * @return string
      * @throws RuntimeException
@@ -231,13 +231,19 @@ class FedoraResource {
      * Use the updateMetadata() method to write them back.
      * 
      * @param EasyRdf\Resource $metadata
+     * @param bool $fixReferences Should reference to other repository resources
+     *   be switched into corresponding UUIDs?
      * @see updateMetadata()
      */
-    public function setMetadata(Resource $metadata) {
+    public function setMetadata(Resource $metadata, bool $fixReferences = false) {
         $this->metadata = $metadata;
         $this->updated  = false;
 
         $this->fedora->getCache()->reload($this);
+
+        if ($fixReferences) {
+            $this->fedora->fixMetadataReferences($this->metadata);
+        }
     }
 
     /**
@@ -518,26 +524,26 @@ class FedoraResource {
         $ret = array();
 
         // by RDF class
-        $query = "
+        $query   = "
             SELECT ?uri WHERE {
                 ?uri a ?@ .
                 ?uri ?@ / ^a ?@ .
             }
         ";
-        $param = array(
+        $param   = array(
             RC::get('fedoraServiceClass'),
             RC::get('fedoraServiceSupportsProp'),
             $this->getUri(true)
         );
-        $query = new SimpleQuery($query, $param);
+        $query   = new SimpleQuery($query, $param);
         $results = $this->fedora->runQuery($query);
-        foreach($results as $i) {
+        foreach ($results as $i) {
             $service = new Service($this->fedora, $i->uri);
             foreach ($service->getFormats() as $format) {
                 $ret[$format] = $service;
             }
         }
-        
+
         // directly attached
         $meta = $this->getMetadata();
         foreach ($meta->allResources(RC::get('fedoraHasServiceProp')) as $id) {
@@ -546,7 +552,7 @@ class FedoraResource {
                 $ret[$format] = $service;
             }
         }
-        
+
         return $ret;
     }
 

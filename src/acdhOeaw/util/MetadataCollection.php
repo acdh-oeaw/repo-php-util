@@ -53,6 +53,10 @@ class MetadataCollection extends Graph {
     const SKIP   = 1;
     const CREATE = 2;
 
+    /**
+     * Turns debug messages on
+     * @var bool
+     */
     static public $debug = false;
 
     /**
@@ -80,7 +84,7 @@ class MetadataCollection extends Graph {
     private $resource;
 
     /**
-     *
+     * Fedora path in the repo where imported resources are created.
      * @var string
      */
     private $fedoraLoc = '/';

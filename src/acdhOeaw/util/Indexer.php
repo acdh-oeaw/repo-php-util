@@ -45,6 +45,10 @@ use RuntimeException;
  */
 class Indexer {
 
+    /**
+     * Turns debug messages on
+     * @var bool
+     */
     static public $debug = false;
     
     /**
@@ -100,17 +104,21 @@ class Indexer {
     private $uploadSizeLimit = 0;
 
     /**
-     *
+     * Fedora path in the repo where imported resources are created.
      * @var string
      */
     private $fedoraLoc = '/';
     
     /**
-     * URI of the RDF class assigned to indexed resources
+     * URI of an RDF class assigned to indexed collections.
      * @var string
      */
     private $collectionClass;
     
+    /**
+     * URI of an RDF class assigned to indexed binary resources.
+     * @var type 
+     */
     private $binaryClass;
 
     /**
@@ -167,10 +175,24 @@ class Indexer {
         $this->paths = $paths;
     }
 
+    /**
+     * Sets default RDF class for imported collections.
+     * 
+     * Overrides setting read form the `cfg::indexerDefaultCollectionClass` 
+     * configuration property.
+     * @param string $class
+     */
     public function setCollectionClass(string $class) {
         $this->collectionClass = $class;
     }
 
+    /**
+     * Sets default RDF class for imported binary resources.
+     * 
+     * Overrides setting read form the `cfg::indexerDefaultBinaryClass` 
+     * configuration property.
+     * @param string $class
+     */
     public function setBinaryClass(string $class) {
         $this->binaryClass = $class;
     }

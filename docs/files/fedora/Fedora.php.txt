@@ -40,6 +40,7 @@ use RuntimeException;
 use BadMethodCallException;
 use acdhOeaw\fedora\FedoraCache;
 use acdhOeaw\fedora\exceptions\Deleted;
+use acdhOeaw\fedora\exceptions\NoAcdhId;
 use acdhOeaw\fedora\exceptions\NotInCache;
 use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\fedora\exceptions\AmbiguousMatch;
@@ -168,7 +169,7 @@ class Fedora {
     public function __clearCache() {
         $this->cache = new FedoraCache();
     }
-    
+
     /**
      * Creates a resource in the Fedora and returns corresponding Resource object
      * 
@@ -191,15 +192,15 @@ class Fedora {
         $request = new Request($method, $path);
         $request = self::attachData($request, $data);
         try {
-            $resp    = $this->sendRequest($request);
+            $resp = $this->sendRequest($request);
         } catch (ClientException $e) {
             if (strpos($e->getMessage(), 'tombstone resource') === false) {
                 throw $e;
             }
             throw new Deleted();
         }
-        $uri     = $resp->getHeader('Location')[0];
-        $res     = $this->getResourceByUri($uri);
+        $uri = $resp->getHeader('Location')[0];
+        $res = $this->getResourceByUri($uri);
 
         // merge the metadata created by Fedora (and Doorkeeper) upon resource creation
         // with the ones provided by user
@@ -567,6 +568,48 @@ class Fedora {
      */
     public function inTransaction(): bool {
         return $this->txUrl !== null;
+    }
+
+    /**
+     * Tries to switch references to all repository resources into their UUIDs.
+     * 
+     * Changes are done in-place!
+     * @param Resource $meta metadata to apply changes to
+     * @return Resource
+     */
+    public function fixMetadataReferences(Resource $meta): Resource {
+        $properties = array_diff($meta->propertyUris(), array(RC::idProp()));
+        foreach ($properties as $p) {
+            foreach ($meta->allResources($p) as $obj) {
+                $id  = null;
+                $uri = $obj->getUri();
+                try {
+                    $res = $this->getResourceById($uri);
+                    $id  = $res->getId();
+                } catch (NotFound $e) {
+                    try {
+                        $res = $this->getResourceByUri($uri);
+                        $id  = $res->getId();
+                    } catch (NotFound $e) {
+                        
+                    } catch (NoAcdhId $e) {
+                        
+                    } catch (ClientException $e) {
+                        
+                    }
+                } catch (NoAcdhId $e) {
+                    
+                } catch (ClientException $e) {
+                    
+                }
+
+                if ($id !== null && $id !== $obj->getUri()) {
+                    $meta->delete($p, $obj);
+                    $meta->addResource($p, $id);
+                }
+            }
+        }
+        return $meta;
     }
 
 }
