@@ -33,7 +33,7 @@ $fedora = new Fedora();
 
 MetadataCollection::$debug = true;
 
-echo "\n######################################################\n\n";
+echo "\n###################################################### graph-small 1\n\n";
 
 $resources = array();
 try {
@@ -43,7 +43,7 @@ try {
     $res->delete(RC::relProp(), $toDel);
 
     $fedora->begin();
-    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true);
+    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP);
     $fedora->commit();
 } finally {
     $fedora->rollback();
@@ -54,7 +54,7 @@ try {
     $fedora->commit();
 }
 
-echo "\n######################################################\n\n";
+echo "\n###################################################### graph-small 2\n\n";
 sleep(5);
 
 $resources = array();
@@ -62,7 +62,7 @@ try {
     $graph = new MetadataCollection($fedora, 'tests/data/graph-small.ttl');
 
     $fedora->begin();
-    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true);
+    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP);
     $fedora->commit();
 } finally {
     $fedora->rollback();
@@ -74,7 +74,7 @@ try {
 }
 
 
-echo "\n######################################################\n\n";
+echo "\n###################################################### graph-large\n\n";
 sleep(5);
 
 $resources = array();
@@ -82,7 +82,7 @@ try {
     $graph = new MetadataCollection($fedora, 'tests/data/graph-large.ttl');
 
     $fedora->begin();
-    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true);
+    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP);
     $fedora->commit();
 } finally {
     $fedora->rollback();
@@ -93,17 +93,21 @@ try {
     $fedora->commit();
 }
 
-echo "\n######################################################\n\n";
+echo "\n###################################################### graph-cycle\n\n";
 sleep(5);
 
 $resources = array();
-
-$graph = new MetadataCollection($fedora, 'tests/data/graph-cycle.ttl');
-$fedora->begin();
 try {
-    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP, true);
-    throw new Exception('no error');
-} catch (RuntimeException $e) {
-    
+    $graph = new MetadataCollection($fedora, 'tests/data/graph-cycle.ttl');
+
+    $fedora->begin();
+    $resources = $graph->import('https://id.acdh.oeaw.ac.at/', MetadataCollection::SKIP);
+    $fedora->commit();
+} finally {
+    $fedora->rollback();
+    $fedora->begin();
+    foreach ($resources as $i) {
+        $i->delete();
+    }
+    $fedora->commit();
 }
-$fedora->rollback();
