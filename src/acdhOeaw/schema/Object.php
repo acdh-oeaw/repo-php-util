@@ -64,6 +64,15 @@ abstract class Object {
     private $id;
 
     /**
+     * Allows to keep track of the corresponding repository resource state:
+     * - null - unknown
+     * - true - recent call to updateRms() created the repository resource
+     * - false - repository resource already existed uppon last updateRms() call
+     * @var bool
+     */
+    protected $created;
+
+    /**
      * Fedora connection object.
      * @var \acdhOeaw\fedora\Fedora 
      */
@@ -72,8 +81,8 @@ abstract class Object {
     /**
      * Creates an object representing a real-world entity.
      * 
-     * @param Fedora $fedora
-     * @param string $id
+     * @param Fedora $fedora repository connection object
+     * @param string $id entity identifier (derived class-specific)
      */
     public function __construct(Fedora $fedora, string $id) {
         $this->fedora = $fedora;
@@ -153,12 +162,14 @@ abstract class Object {
      */
     public function updateRms(bool $create = true, bool $uploadBinary = true,
                               string $path = '/'): FedoraResource {
-        $created = $this->findResource($create, $uploadBinary, $path);
+        $this->created = $this->findResource($create, $uploadBinary, $path);
 
         // if it has just been created it would be a waste of time to update it
-        if (!$created) {
-            $meta = $this->mergeMetadata($this->res->getMetadata(), $this->getMetadata());
-            $this->res->setMetadata($meta, true);
+        if (!$this->created) {
+            $meta = $this->getMetadata();
+            $this->fedora->fixMetadataReferences($meta);
+            $meta = $this->mergeMetadata($this->res->getMetadata(), $meta);
+            $this->res->setMetadata($meta);
             $this->res->updateMetadata();
 
             $binaryContent = $this->getBinaryData();
@@ -168,6 +179,19 @@ abstract class Object {
         }
 
         return $this->res;
+    }
+
+    /**
+     * Informs about the corresponding repository resource state uppon last call
+     * to the `updateRms()` method:
+     * - null - the updateRms() was not called yet
+     * - true - repository resource was created by last call to the updateRms()
+     * - false - repository resource already existed uppoin last call to the
+     *   updateRms()
+     * @return bool
+     */
+    public function getCreated(): bool {
+        return $this->created;
     }
 
     /**
