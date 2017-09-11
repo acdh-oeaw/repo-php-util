@@ -109,24 +109,44 @@ class File extends Object {
     }
 
     /**
-     *
+     * File path
      * @var string 
      */
     private $path;
 
     /**
-     *
+     * Metadata lookup object to be used for metadata resoultion
      * @var \acdhOeaw\util\metaLookup\metaLookupInterface
+     * @see setMetaLookup()
      */
     private $metaLookup;
 
     /**
-     * 
-     * @param Fedora $fedora
-     * @param type $id
+     * RDF class to be set as a this file's type.
+     * @var string
      */
-    public function __construct(Fedora $fedora, string $id) {
-        $this->path = $id;
+    private $class;
+
+    /**
+     * URI of the resource which should be set as this file's parent
+     * (cfg::fedoraRelProp is used).
+     * @var string
+     */
+    private $parent;
+
+    /**
+     * Creates an object representing a file (or a directory) in a filesystem.
+     * @param Fedora $fedora repository connection object
+     * @param type $id file path
+     * @param string $class RDF class to be used as a repository resource type
+     * @param string $parent URI of a repository resource being parent of 
+     *   created one
+     */
+    public function __construct(Fedora $fedora, string $id,
+                                string $class = null, string $parent = null) {
+        $this->path   = $id;
+        $this->class  = $class;
+        $this->parent = $parent;
 
         $prefix = RC::get('containerToUriPrefix');
         $id     = self::sanitizePath($id);
@@ -136,23 +156,24 @@ class File extends Object {
     }
 
     /**
+     * Creates RDF metadata for a file.
      * 
-     * @param string $class
-     * @param string $parent
+     * Can use metadata lookup mechanism - see the setMetaLookup() method.
      * @return Resource
+     * @see setMetaLookup()
      */
-    public function getMetadata(string $class = null, string $parent = null): Resource {
+    public function getMetadata(): Resource {
         $graph = new Graph();
         $meta  = $graph->resource('.');
 
         $meta->addResource(RC::idProp(), $this->getId());
 
-        if ($class != '') {
-            $meta->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', $class);
+        if ($this->class != '') {
+            $meta->addResource('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', $this->class);
         }
 
-        if ($parent) {
-            $meta->addResource(RC::relProp(), $parent);
+        if ($this->parent) {
+            $meta->addResource(RC::relProp(), $this->parent);
         }
 
         $meta->addLiteral(RC::locProp(), self::getRelPath(self::sanitizePath($this->path)));
@@ -172,6 +193,14 @@ class File extends Object {
         return $meta;
     }
 
+    /**
+     * Sets a metadata lookup object to be used for searching for file's
+     * metadata which can not be automatically derived from the file itself.
+     * 
+     * Metadata found using metadata lookup have precedense over metadata
+     * automatically derived from the file.
+     * @param MetaLookupInterface $metaLookup metadata lookup object
+     */
     public function setMetaLookup(MetaLookupInterface $metaLookup) {
         $this->metaLookup = $metaLookup;
     }
@@ -181,7 +210,7 @@ class File extends Object {
      * @return string
      */
     protected function getBinaryData(): string {
-        return $this->path;
+        return is_dir($this->path) ? '' : $this->path;
     }
 
     /**
