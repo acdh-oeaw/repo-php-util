@@ -275,7 +275,8 @@ class MetadataCollection extends Graph {
 
         echo self::$debug ? "Mapping objects to ACDH UUIDs...\n" : '';
         foreach ($resources as $res) {
-            foreach ($res->propertyUris($res) as $prop) {
+            $properties = array_diff($res->propertyUris($res), array(RC::idProp()));
+            foreach ($properties as $prop) {
                 foreach ($res->allResources($prop) as $value) {
                     $uri = $value->getUri();
                     if (isset($map[$uri])) {
