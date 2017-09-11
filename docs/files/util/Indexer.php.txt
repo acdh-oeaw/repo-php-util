@@ -320,11 +320,15 @@ class Indexer {
             $class = $i->isDir() ? $this->collectionClass : $this->binaryClass;
             $meta = $file->getMetadata($class, $this->resource->getId());
             $this->resource->getFedora()->fixMetadataReferences($meta);
-
+            
             try {
                 // resource already exists and should be updated
                 $res = $file->getResource(false, false);
                 echo self::$debug ? "update " : "";
+                $curMeta = $res->getMetadata();
+                $curMeta->merge($meta, array(RC::idProp()));
+                $res->setMetadata($curMeta, true);
+                $res->updateMetadata();
 
                 if ($upload) {
                     echo self::$debug ? "+ upload " : "";

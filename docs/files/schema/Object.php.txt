@@ -158,7 +158,7 @@ abstract class Object {
         // if it has just been created it would be a waste of time to update it
         if (!$created) {
             $meta = $this->mergeMetadata($this->res->getMetadata(), $this->getMetadata());
-            $this->res->setMetadata($meta);
+            $this->res->setMetadata($meta, true);
             $this->res->updateMetadata();
 
             $binaryContent = $this->getBinaryData();
@@ -198,9 +198,11 @@ abstract class Object {
                 throw $e;
             }
 
+            $meta      = $this->getMetadata();
+            $this->fedora->fixMetadataReferences($meta);
             $binary    = $uploadBinary ? $this->getBinaryData() : '';
             $method    = substr($path, -1) == '/' ? 'POST' : 'PUT';
-            $this->res = $this->fedora->createResource($this->getMetadata(), $binary, $path, $method);
+            $this->res = $this->fedora->createResource($meta, $binary, $path, $method);
             $result    = 'not found - created';
         }
 
