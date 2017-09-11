@@ -50,7 +50,7 @@ class Indexer {
      * @var bool
      */
     static public $debug = false;
-    
+
     /**
      * Returns standardized value of the containerDir configuration property.
      * @return string
@@ -108,13 +108,13 @@ class Indexer {
      * @var string
      */
     private $fedoraLoc = '/';
-    
+
     /**
      * URI of an RDF class assigned to indexed collections.
      * @var string
      */
     private $collectionClass;
-    
+
     /**
      * URI of an RDF class assigned to indexed binary resources.
      * @var type 
@@ -152,7 +152,7 @@ class Indexer {
      * @throws RuntimeException
      */
     public function __construct(FedoraResource $resource) {
-        $this->resource = $resource;
+        $this->resource        = $resource;
         $this->binaryClass     = RC::get('indexerDefaultBinaryClass');
         $this->collectionClass = RC::get('indexerDefaultCollectionClass');
 
@@ -196,7 +196,7 @@ class Indexer {
     public function setBinaryClass(string $class) {
         $this->binaryClass = $class;
     }
-    
+
     /**
      * Sets file name filter for child resources.
      * 
@@ -233,7 +233,7 @@ class Indexer {
     public function setFedoraLocation(string $fedoraLoc) {
         $this->fedoraLoc = $fedoraLoc;
     }
-    
+
     /**
      * Sets size treshold for uploading child resources as binary resources.
      * 
@@ -285,7 +285,7 @@ class Indexer {
         if (count($this->paths) === 0) {
             throw new RuntimeException('No paths set');
         }
-        
+
         foreach ($this->paths as $path) {
             foreach (new DirectoryIterator(self::containerDir() . $path) as $i) {
                 $newRes     = $this->indexEntry($i);
@@ -312,39 +312,15 @@ class Indexer {
         $upload = $i->isFile() && $this->uploadSizeLimit > $i->getSize();
 
         if (!$skip) {
-            $file = new File($this->resource->getFedora(), $i->getPathname());
+            $class = $i->isDir() ? $this->collectionClass : $this->binaryClass;
+            $file  = new File($this->resource->getFedora(), $i->getPathname(), $class, $this->resource->getId());
             if ($this->metaLookup) {
                 $file->setMetaLookup($this->metaLookup);
             }
-            
-            $class = $i->isDir() ? $this->collectionClass : $this->binaryClass;
-            $meta = $file->getMetadata($class, $this->resource->getId());
-            $this->resource->getFedora()->fixMetadataReferences($meta);
-            
-            try {
-                // resource already exists and should be updated
-                $res = $file->getResource(false, false);
-                echo self::$debug ? "update " : "";
-                $curMeta = $res->getMetadata();
-                $curMeta->merge($meta, array(RC::idProp()));
-                $res->setMetadata($curMeta, true);
-                $res->updateMetadata();
+            $res          = $file->updateRms(true, $upload);
+            $indexedRes[] = $res;
 
-                if ($upload) {
-                    echo self::$debug ? "+ upload " : "";
-                    $res->updateContent($i->getPathname(), true);
-                }
-
-                $indexedRes[] = $res;
-            } catch (NotFound $e) {
-                // resource does not exist and must be created
-                $res = $this->resource->getFedora()->createResource(
-                    $meta, $upload ? $i->getPathname() : '', $this->fedoraLoc
-                );
-
-                $indexedRes[] = $res;
-                echo self::$debug ? "create " : "";
-            }
+            echo self::$debug ? ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") : '';
         } else {
             echo self::$debug ? "skip " : "";
         }
