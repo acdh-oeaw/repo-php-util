@@ -31,6 +31,7 @@
 namespace acdhOeaw\fedora;
 
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\RequestException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
@@ -378,6 +379,15 @@ class FedoraResource {
         $meta  = $graph->resource($this->uri);
 
         return $meta;
+    }
+
+    /**
+     * Returns resource's binary content.
+     * @return Response PSR-7 response containing resource's binary content
+     */
+    public function getContent(): Response {
+        $request = new Request('GET', $this->uri);
+        return $this->fedora->sendRequest($request);
     }
 
     /**
