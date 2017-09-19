@@ -530,6 +530,10 @@ class FedoraResource {
         return $this->acl;
     }
 
+    /**
+     * Returns list of dissemination services available for a resource.
+     * @return array
+     */
     public function getDissServices(): array {
         $ret = array();
 

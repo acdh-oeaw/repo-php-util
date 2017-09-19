@@ -30,17 +30,12 @@
 
 namespace acdhOeaw\util;
 
-use RuntimeException;
-use DomainException;
 use InvalidArgumentException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\fedora\exceptions\NotFound;
-use acdhOeaw\fedora\exceptions\NoAcdhId;
-use acdhOeaw\fedora\metadataQuery\Query;
-use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -299,11 +294,9 @@ class MetadataCollection extends Graph {
      * @return bool
      */
     private function isIdElsewhere(Resource $res): bool {
-        $idProp = RC::idProp();
-
         $revMatches = $this->reversePropertyUris($res);
         foreach ($revMatches as $prop) {
-            if ($prop != $idProp) {
+            if ($prop != RC::idProp()) {
                 continue;
             }
             $matches = $this->resourcesMatching($prop, $res);
@@ -325,9 +318,8 @@ class MetadataCollection extends Graph {
      * @return boolean
      */
     private function containsWrongRefs(Resource $res, string $namespace): bool {
-        $idProp = RC::idProp();
         foreach ($res->propertyUris() as $prop) {
-            if ($prop == $idProp) {
+            if ($prop == RC::idProp()) {
                 continue;
             }
             foreach ($res->allResources($prop) as $val) {
@@ -346,13 +338,11 @@ class MetadataCollection extends Graph {
      * Promotes subjects being fully qualified URLs to ids.
      */
     private function promoteUrisToIds() {
-        $idProp = RC::idProp();
-
         echo self::$debug ? "Promoting URIs to ids..." : '';
         foreach ($this->resources() as $i) {
             if (!$i->isBNode()) {
                 echo "\t" . $i->getUri() . "\n";
-                $i->addResource($idProp, $i->getUri());
+                $i->addResource(RC::idProp(), $i->getUri());
             }
         }
     }
@@ -366,7 +356,14 @@ class MetadataCollection extends Graph {
      * @throws InvalidArgumentException
      */
     private function sanitizeResource(Resource $res, string $namespace): Resource {
+        $nonIdProps = array_diff($res->propertyUris(), array(RC::idProp()));
+        if (count($nonIdProps) == 0) {
+            // don't do anything when it's purely-id resource
+            return $res;
+        }
+
         $this->fedora->fixMetadataReferences($res);
+
         if ($this->containsWrongRefs($res, $namespace)) {
             echo $res->copy()->getGraph()->serialise('ntriples') . "\n";
             throw new InvalidArgumentException('resource contains references to blank nodes');
@@ -375,7 +372,6 @@ class MetadataCollection extends Graph {
         if (count($res->allLiterals(RC::titleProp())) == 0) {
             $res->addLiteral(RC::titleProp(), $res->getResource(RC::idProp()));
         }
-
 
         if ($res->isA('http://xmlns.com/foaf/0.1/Person') || $res->isA('http://xmlns.com/foaf/0.1/Agent')) {
             $res = self::makeAgent($res);
@@ -394,10 +390,9 @@ class MetadataCollection extends Graph {
     private function removeLiteralIds() {
         echo self::$debug ? "Removing literal ids...\n" : "";
 
-        $idProp = RC::idProp();
         foreach ($this->resources() as $i) {
-            foreach ($i->allLiterals($idProp) as $j) {
-                $i->delete($idProp, $j);
+            foreach ($i->allLiterals(RC::idProp()) as $j) {
+                $i->delete(RC::idProp(), $j);
                 if (self::$debug) {
                     echo "\tremoved " . $j . " from " . $i->getUri() . "\n";
                 }

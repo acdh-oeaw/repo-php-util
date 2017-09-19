@@ -234,8 +234,9 @@ class Fedora {
      * @return \acdhOeaw\fedora\FedoraResource
      */
     public function getResourceByUri(string $uri): FedoraResource {
+        $uri = $this->standardizeUri($uri);
         try {
-            return $this->cache->getByUri($this->standardizeUri($uri));
+            return $this->cache->getByUri($uri);
         } catch (NotInCache $e) {
             return new FedoraResource($this, $uri);
         }
@@ -495,6 +496,9 @@ class Fedora {
     public function standardizeUri(string $uri): string {
         if ($uri == '') {
             throw new BadMethodCallException('URI is empty');
+        }
+        if (substr($uri, 0, 1) === '/') {
+            $uri = substr($uri, 1);
         }
         $uri = preg_replace('|^https?://[^/]+/rest/(tx:[-0-9a-zA-Z]+/)?|', '', $uri);
         $uri = $this->apiUrl . '/' . $uri;
