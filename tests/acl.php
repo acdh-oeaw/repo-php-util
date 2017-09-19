@@ -294,22 +294,25 @@ try {
     assert(AR::NONE == WebAcl::getClassMode($fedora, $testClass1) && AR::NONE == WebAcl::getClassMode($fedora, $testClass2));
     assert(AR::NONE == $acl1->getMode(AR::USER, AR::PUBLIC_USER) && AR::NONE == $acl2->getMode(AR::USER, AR::PUBLIC_USER));
     
-    WebAcl::grantClass($fedora, $testClass1, AR::READ);
-    WebAcl::grantClass($fedora, $testClass2, AR::WRITE);
+    WebAcl::grantClass($fedora, $testClass1, AR::USER, AR::PUBLIC_USER, AR::READ);
+    WebAcl::grantClass($fedora, $testClass1, AR::USER, 'user1', AR::READ);
+    WebAcl::grantClass($fedora, $testClass2, AR::USER, AR::PUBLIC_USER, AR::WRITE);
     $fedora->commit(); sleep(2);
     
-    assert(AR::READ === WebAcl::getClassMode($fedora, $testClass1));
-    assert(AR::WRITE === WebAcl::getClassMode($fedora, $testClass2));
+    assert(AR::READ === WebAcl::getClassMode($fedora, $testClass1, AR::USER, AR::PUBLIC_USER));
+    assert(AR::READ === WebAcl::getClassMode($fedora, $testClass1, AR::USER, 'user1'));
+    assert(AR::WRITE === WebAcl::getClassMode($fedora, $testClass2, AR::USER, AR::PUBLIC_USER));
     $acl1->reload();
     $acl2->reload();
-    assert(AR::READ === $acl1->getMode(AR::USER, AR::PUBLIC_USER));
-    assert(AR::WRITE === $acl2->getMode(AR::USER, AR::PUBLIC_USER));
+    assert(AR::READ === WebAcl::getClassMode($fedora, $testClass1, AR::USER, AR::PUBLIC_USER));
+    assert(AR::READ === WebAcl::getClassMode($fedora, $testClass1, AR::USER, 'user1'));
+    assert(AR::WRITE === WebAcl::getClassMode($fedora, $testClass2, AR::USER, AR::PUBLIC_USER));
     
     $fedora->begin();
-    WebAcl::revokeClass($fedora, $testClass1);
-    assert(AR::NONE === WebAcl::getClassMode($fedora, $testClass1));
-    WebAcl::revokeClass($fedora, $testClass2, AR::WRITE);
-    assert(AR::READ === WebAcl::getClassMode($fedora, $testClass2));
+    WebAcl::revokeClass($fedora, $testClass1, AR::USER, AR::PUBLIC_USER);
+    assert(AR::NONE === WebAcl::getClassMode($fedora, $testClass1, AR::USER, AR::PUBLIC_USER));
+    WebAcl::revokeClass($fedora, $testClass2, AR::WRITE, AR::USER, AR::PUBLIC_USER);
+    assert(AR::READ === WebAcl::getClassMode($fedora, $testClass2, AR::USER, AR::PUBLIC_USER));
     
     $fedora->commit(); sleep(2);
     $acl1->reload();

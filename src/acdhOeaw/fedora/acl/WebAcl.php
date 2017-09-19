@@ -100,6 +100,8 @@ class WebAcl {
         WHERE {
             ?rule a <http://www.w3.org/ns/auth/acl#Authorization> .
             ?rule <http://www.w3.org/ns/auth/acl#accessToClass> ?@ .
+            ?rule ?@ ?role .
+            FILTER (str(?role) = ?#)
         }
     ";
 
@@ -150,7 +152,7 @@ class WebAcl {
                                       int $mode = WebAclRule::READ) {
         WebAclRule::checkRoleType($type);
         WebAclRule::checkMode($mode);
-        $rules = self::getClassRules($fedora, $class);
+        $rules = self::getClassRules($fedora, $class, $type, $name);
 
         $curMode   = array(WebAclRule::NONE);
         $modeMatch = null;
@@ -200,7 +202,7 @@ class WebAcl {
                                        int $mode = WebAclRule::READ) {
         WebAclRule::checkRoleType($type);
         WebAclRule::checkMode($mode);
-        $rules = self::getClassRules($fedora, $class);
+        $rules = self::getClassRules($fedora, $class, $type, $name);
 
         foreach ($rules as $i) {
             if ($i->getMode() >= $mode) {
@@ -223,14 +225,17 @@ class WebAcl {
     }
 
     /**
-     * Gets access rights for a given class.
+     * Gets access rights of a given user/group to a given class.
      * @param Fedora $fedora Fedora connection object
      * @param string $class class URI
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @param string $name user/group name
      * @return int (WebAclRule::READ or WebAclRule::WRITE)
      */
-    static public function getClassMode(Fedora $fedora, string $class): int {
+    static public function getClassMode(Fedora $fedora, string $class,
+                                        string $type, string $name): int {
         $mode  = array(WebAclRule::NONE);
-        $rules = self::getClassRules($fedora, $class);
+        $rules = self::getClassRules($fedora, $class, $type, $name);
         foreach ($rules as $r) {
             if ($r->hasClass($class)) {
                 $mode[] = $r->getMode();
@@ -241,13 +246,21 @@ class WebAcl {
 
     /**
      * Fetches an array of all `WebAclRule` objects defining access rules for
-     * a given class.
+     * a given user/group to a given class.
      * @param Fedora $fedora Fedora connection object
      * @param string $class class URI
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @param string $name user/group name
      * @return array
      */
-    static public function getClassRules(Fedora $fedora, string $class): array {
-        $query   = new SimpleQuery(self::CLASS_QUERY, array($class));
+    static public function getClassRules(Fedora $fedora, string $class,
+                                         string $type, string $name): array {
+        $prop    = array(
+            WebAclRule::USER  => 'http://www.w3.org/ns/auth/acl#agent',
+            WebAclRule::GROUP => 'http://www.w3.org/ns/auth/acl#agentClass'
+        );
+        $param   = array($class, $prop[$type], $name);
+        $query   = new SimpleQuery(self::CLASS_QUERY, $param);
         $results = $fedora->runQuery($query);
         $rules   = self::initRules($results, $fedora);
         return $rules;
