@@ -590,7 +590,6 @@ class FedoraResource {
         );
         $param = array_merge($param1, $param1, $param2, $param2);
         $query   = new SimpleQuery($query, $param);
-        echo $query->getQuery() . "\n";
         $results = $this->fedora->runQuery($query);
         foreach ($results as $i) {
             $service = new Service($this->fedora, $i->uri);
