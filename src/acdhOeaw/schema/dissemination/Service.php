@@ -46,46 +46,115 @@ use acdhOeaw\util\RepoConfig as RC;
  * - cfg:fedoraServiceLocProp - a service location containing parameter bindings
  *   (copy of the Fedora 3 wsdl:binding/wsdl:operation/http:operation/@location)
  * - cfg:fedoraServiceRetFormatProp - a MIME type provided by this service
- * - cfg:fedoraServiceSupportsProp - a class supported by this service
- *   (use ldp:Container to support all resources in the repository)
  * - cfg:ciriloIdProp - a Fedora 3 service ID used to match a resource in 
  *   Fedora 4 with a corresponding service deployment method of Fedora 3
  * 
  * Dissemination service parameters are modeled as its child resources
  * (cfg:fedoraRelProp) - see Parameter class description for details.
+ * 
+ * Matching between repository resources and dissemination services can be
+ * described in two ways:
+ * - using the cfg:fedoraHasServiceProp pointing directly from the resource's
+ *   metadata to the dissemination service
+ * - by a matching rules defined with the `Service::addMatch()` method
+ *   (see below)
  *
  * @author zozlak
  */
 class Service extends Object {
 
+    /**
+     * Dissemination service location (URL).
+     * 
+     * It should contain references to all parameters passed by the query URL
+     * in form of `{parameterName|transformation}`. Remarks:
+     * - There is also a special `RES_URI` parameter available providing the URI 
+     *   of the resource being disseminated
+     * - For available transformations see the 
+     *   `\acdhOeaw\fedora\dissemination\Parameter::transform()`.
+     * 
+     * An example value: `https://my.service?res={RES_URI|url}&myParam={myParam|}
+     * 
+     * @var string
+     * @see \acdhOeaw\fedora\dissemination\Parameter::transform()
+     */
     private $location;
-    private $format   = array();
-    private $params   = array();
-    private $supports = array();
 
+    /**
+     * Return formats provided by the service
+     * @var array
+     */
+    private $format = array();
+
+    /**
+     * Parameters used by the service
+     * @var array
+     */
+    private $params = array();
+
+    /**
+     * Resources matching rules for the service
+     * @var array
+     */
+    private $matches = array();
+
+    /**
+     * Creates an object representing the dissemination service
+     * @param Fedora $fedora repository connection object
+     * @param string $id dissemination service id
+     * @param string $location dissemination service location (see the 
+     *   `$location` property description)
+     * @param array $format list of return types provided by the dissemination
+     *   service
+     * @throws InvalidArgumentException
+     */
     public function __construct(Fedora $fedora, string $id, string $location,
-                                array $format, array $supports) {
+                                array $format) {
         parent::__construct($fedora, $id);
 
-        if ($id == '' || $location == '' || $format == '' || count($supports) == 0) {
-            throw new InvalidArgumentException('title, location, mime type and supported classes have to be specified');
+        if ($id == '' || $location == '' || $format == '') {
+            throw new InvalidArgumentException('title, location and mime type have to be specified');
         }
 
         $this->location = $location;
         $this->format   = $format;
-        $this->supports = $supports;
         $this->fedora   = $fedora;
     }
 
+    /**
+     * Defines a dissemination service parameter.
+     * @param string $name parameter name
+     * @param bool $byValue should parameter be passed by value?
+     * @param bool $required is parameter required?
+     * @param string $defaultValue default parameter value
+     * @param string $rdfProperty RDF property holding parameter value in
+     *   resources' metadata
+     */
     public function addParameter(string $name, bool $byValue, bool $required,
                                  string $defaultValue = '',
                                  string $rdfProperty = '_') {
-        $id             = $this->getId() . '/' . $name;
+        $id             = $this->getId() . '/param/' . $name;
         $this->params[] = new Parameter(
             $this->fedora, $id, $this, $name, $byValue, $required, $defaultValue, $rdfProperty
         );
     }
 
+    /**
+     * Defines a matching rule for the dissemination service
+     * @param string $property RDF property to be checked in resource's metadata
+     * @param string $value expected RDF property value in resource's metadata
+     * @param bool $required is this match rule compulsory?
+     * @see \acdhOeaw\schema\dissemination\Match
+     */
+    public function addMatch(string $property, string $value, bool $required) {
+        $id              = $this->getid() . '/match/' . (count($this->matches) + 1);
+        $this->matches[] = new Match($this->fedora, $id, $this, $property, $value, $required);
+    }
+
+    /**
+     * Returns metadata describing the dissemination service.
+     * @return Resource
+     */
     public function getMetadata(): Resource {
         $meta = (new Graph())->resource('.');
 
@@ -102,19 +171,30 @@ class Service extends Object {
             $meta->addLiteral($retProp, $i);
         }
 
-        $supProp = RC::get('fedoraServiceSupportsProp');
-        foreach ($this->supports as $i) {
-            $meta->addResource($supProp, $i);
-        }
-
         return $meta;
     }
 
+    /**
+     * Updates the dissemination service definition in the repository.
+     * @param bool $create should repository resource be created if it does not
+     *   exist?
+     * @param bool $uploadBinary should binary data of the real-world entity
+     *   be uploaded uppon repository resource creation?
+     * @param string $path where to create a resource (if it does not exist).
+     *   If it it ends with a "/", the resource will be created as a child of
+     *   a given collection). All the parents in the Fedora resource tree have
+     *   to exist (you can not create "/foo/bar" if "/foo" does not exist already).
+     * @return FedoraResource
+     */
     public function updateRms(bool $create = true, bool $uploadBinary = true,
                               string $path = '/'): FedoraResource {
         parent::updateRms($create, $uploadBinary, $path);
 
         foreach ($this->params as $i) {
+            $i->updateRms($create, $uploadBinary, $path);
+        }
+
+        foreach ($this->matches as $i) {
             $i->updateRms($create, $uploadBinary, $path);
         }
 

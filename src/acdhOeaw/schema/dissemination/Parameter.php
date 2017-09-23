@@ -57,18 +57,63 @@ use acdhOeaw\util\RepoConfig as RC;
  * parameter value.
  * This is needed because of the differences between Fedora 3 and Fedora 4 data
  * models.
- *
+ * 
+ * Typically you shouldn't create the Parameter object on your own but use the
+ * `\achdOeaw\schema\dissemination\Service::addParameter()` method instead.
+ * 
  * @author zozlak
  */
 class Parameter extends Object {
 
+    /**
+     * Dissemination service parameter id
+     * @var string 
+     */
     private $serviceId;
+
+    /**
+     * Dissemination service parameter name
+     * @var string 
+     */
     private $name;
+
+    /**
+     * Is parameter passed by value?
+     * @var bool 
+     */
     private $byValue;
+
+    /**
+     * Is parameter required?
+     * @var bool 
+     */
     private $required;
+
+    /**
+     * Parameter default value.
+     * @var string 
+     */
     private $defaultValue;
+
+    /**
+     * RDF property holding parameter value in resources' metadata.
+     * @var string
+     */
     private $rdfProperty;
 
+    /**
+     * Creates the parameter object
+     * @param \acdhOeaw\fedora\Fedora $fedora repository connection object
+     * @param string $id parameter id
+     * @param \acdhOeaw\schema\dissemination\Service $service dissemination
+     *   service using this parameter
+     * @param string $name parameter name
+     * @param bool $byValue is parameter value passed by value?
+     * @param bool $required is parameter required?
+     * @param string $defaultValue default parameter value
+     * @param string $rdfProperty RDF property storing parameter value in 
+     *   resources' metadata
+     */
     public function __construct(Fedora $fedora, string $id, Service $service,
                                 string $name, bool $byValue, bool $required,
                                 string $defaultValue, string $rdfProperty) {
@@ -82,12 +127,16 @@ class Parameter extends Object {
         $this->rdfProperty  = $rdfProperty;
     }
 
+    /**
+     * Returns metadata describing the dissemination service parameter
+     * @return Resource
+     */
     public function getMetadata(): Resource {
         $meta = (new Graph())->resource('.');
 
         $meta->addResource(RC::relProp(), $this->serviceId);
-        
         $meta->addResource(RC::idProp(), $this->getId());
+        $meta->addType(RC::get('fedoraServiceParamClass'));
 
         $titleProp = RC::get('fedoraTitleProp');
         $meta->addLiteral($titleProp, $this->name);
