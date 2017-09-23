@@ -1,9 +1,9 @@
 <?php
 
-/*
+/**
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,23 +22,40 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * @package repo-php-util
+ * @copyright (c) 2017, Austrian Centre for Digital Humanities
+ * @license https://opensource.org/licenses/MIT
  */
 
 namespace acdhOeaw\fedora\dissemination;
 
 use RuntimeException;
-use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
-use acdhOeaw\fedora\exceptions\NotInCache;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
- * Description of Parameter
+ * Represents a dissemination service parameter.
  *
+ * For a description of the dissemination services data model see the 
+ * `\acdhOeaw\schema\dissemination\Service` class description.
  * @author zozlak
+ * @see \acdhOeaw\schema\dissemination\Service
  */
 class Parameter extends FedoraResource {
 
+    /**
+     * Performs parameter value transformation.
+     * 
+     * Supported transformations are:
+     * - identity (no transformation)
+     * - base64 encoding
+     * - url encoding
+     * @param string $value value to be transformed
+     * @param string $method transformation to be applied (''/'base64'/'url')
+     * @return string
+     * @throws RuntimeException
+     */
     static public function transform(string $value, string $method) {
         switch ($method) {
             case '':
@@ -52,6 +69,15 @@ class Parameter extends FedoraResource {
         }
     }
 
+    /**
+     * Returns parameter value for a given resource.
+     * @param FedoraResource $res repository resource to return the value for
+     * @param string $valueProp RDF property holding the parameter value
+     * @param string $default parameter default value
+     * @param string $method transformation to be applied on the parameter value
+     * @return string
+     * @see transform()
+     */
     static public function value(FedoraResource $res, string $valueProp,
                                  string $default, string $method): string {
         $value = $default;
@@ -68,20 +94,22 @@ class Parameter extends FedoraResource {
         return self::transform($value, $method);
     }
 
-    public function __construct(Fedora $fedora, string $uri = '') {
-        try {
-            $fedora->getCache()->deleteByUri($fedora->standardizeUri($uri));
-        } catch (NotInCache $ex) {
-            
-        }
-        parent::__construct($fedora, $uri);
-    }
-
+    /**
+     * Returns parameter name
+     * @return string
+     */
     public function getName(): string {
         $meta = $this->getMetadata();
         return (string) $meta->getLiteral(RC::titleProp());
     }
 
+    /**
+     * Return parameter value for a given repository resource
+     * @param FedoraResource $res repository resource to get the value for
+     * @param string $method transformation to be applied on the value
+     * @return string
+     * @see transform()
+     */
     public function getValue(FedoraResource $res, string $method): string {
         $meta      = $this->getMetadata();
         $default   = $meta->all(RC::get('fedoraServiceParamDefaultValueProp'));

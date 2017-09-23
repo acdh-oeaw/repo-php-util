@@ -211,10 +211,15 @@ class FedoraResource {
     }
 
     /**
-     * Removes the resource from the Fedora
-     * @param bool $deep if true, a tombstone resource will be deleted as well
+     * Removes the resource from the Fedora.
+     * 
+     * Please remember searching for children is done using SPARQL query so any
+     * changes made since the beginning of the transaction won't be taken into
+     * account.
+     * @param bool $deep should tombstone resource will be deleted?
+     * @param bool $children should children be removed?
      */
-    public function delete(bool $deep = false) {
+    public function delete(bool $deep = false, bool $children = false) {
         $uri     = $this->fedora->sanitizeUri($this->getUri());
         $request = new Request('DELETE', $uri);
         $this->fedora->sendRequest($request);
@@ -222,6 +227,12 @@ class FedoraResource {
         if ($deep) {
             $request = new Request('DELETE', $uri . '/fcr:tombstone');
             $this->fedora->sendRequest($request);
+        }
+
+        if ($children) {
+            foreach ($this->getChildren() as $i) {
+                $i->delete($deep, $children);
+            }
         }
     }
 
@@ -537,19 +548,49 @@ class FedoraResource {
     public function getDissServices(): array {
         $ret = array();
 
-        // by RDF class
-        $query   = "
-            SELECT ?uri WHERE {
-                ?uri a ?@ .
-                ?uri ?@ / ^a ?@ .
+        // by metadata propeties match
+        $query   = '
+            SELECT ?uri (count(distinct ?prop1) as ?countReq) (count(distinct ?prop2) as ?countOpt) (count(distinct ?match3) as ?baseReq) (count(distinct ?match4) as ?baseOpt)
+            WHERE {
+                OPTIONAL {
+                    ?@ ?prop1 ?value1 .
+                    ?match1 ?@ / ^?@ ?uri .
+                    ?match1 ?@ ?prop1 .
+                    ?match1 ?@ ?matchValue1 .
+                    ?match1 ?@ "true"^^xsd:boolean .
+                    FILTER (str(?value1) = str(?matchValue1))
+                } OPTIONAL {
+                    ?@ ?prop2 ?value2 .
+                    ?match2 ?@ / ^?@ ?uri .
+                    ?match2 ?@ ?prop2 .
+                    ?match2 ?@ ?matchValue2 .
+                    ?match2 ?@ "false"^^xsd:boolean .
+                    FILTER (str(?value2) = str(?matchValue2))
+                } OPTIONAL {
+                    ?uri ?@ / ^?@ ?match3 .
+                    ?match3 ?@ "true"^^xsd:boolean .
+                } OPTIONAL {
+                    ?uri ?@ / ^?@ ?match4 .
+                    ?match4 ?@ "false"^^xsd:boolean .
+                }
             }
-        ";
-        $param   = array(
-            RC::get('fedoraServiceClass'),
-            RC::get('fedoraServiceSupportsProp'),
-            $this->getUri(true)
+            GROUP BY ?uri
+            HAVING (?countReq >= ?baseReq && (?baseOpt = 0 || ?countOpt > 0))
+        ';
+        $param1  = array(
+            $this->getUri(true),
+            RC::relProp(), RC::idProp(),
+            RC::get('fedoraServiceMatchProp'),
+            RC::get('fedoraServiceMatchValue'),
+            RC::get('fedoraServiceMatchRequired'),
         );
+        $param2  = array(
+            RC::idProp(), RC::relProp(),
+            RC::get('fedoraServiceMatchRequired')
+        );
+        $param = array_merge($param1, $param1, $param2, $param2);
         $query   = new SimpleQuery($query, $param);
+        echo $query->getQuery() . "\n";
         $results = $this->fedora->runQuery($query);
         foreach ($results as $i) {
             $service = new Service($this->fedora, $i->uri);
