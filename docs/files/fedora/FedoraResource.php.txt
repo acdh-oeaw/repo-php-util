@@ -371,7 +371,8 @@ class FedoraResource {
      * @throws Deleted
      */
     private function getMetadataFromFedora(): Resource {
-        $request = new Request('GET', $this->uri . '/fcr:metadata');
+        $uri = $this->fedora->sanitizeUri($this->uri);
+        $request = new Request('GET', $uri . '/fcr:metadata');
         try {
             $resp = $this->fedora->sendRequest($request);
         } catch (RequestException $e) {
@@ -387,7 +388,7 @@ class FedoraResource {
 
         $graph = new Graph();
         $graph->parse($resp->getBody());
-        $meta  = $graph->resource($this->uri);
+        $meta  = $graph->resource($uri);
 
         return $meta;
     }
@@ -397,7 +398,8 @@ class FedoraResource {
      * @return Response PSR-7 response containing resource's binary content
      */
     public function getContent(): Response {
-        $request = new Request('GET', $this->uri);
+        $uri = $this->fedora->sanitizeUri($this->uri);
+        $request = new Request('GET', $uri);
         return $this->fedora->sendRequest($request);
     }
 
@@ -590,7 +592,6 @@ class FedoraResource {
         );
         $param = array_merge($param1, $param1, $param2, $param2);
         $query   = new SimpleQuery($query, $param);
-        echo $query->getQuery() . "\n";
         $results = $this->fedora->runQuery($query);
         foreach ($results as $i) {
             $service = new Service($this->fedora, $i->uri);

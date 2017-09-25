@@ -133,6 +133,22 @@ class Fedora {
     private $cache;
 
     /**
+     * Timestamp of the last transaction prolongation.
+     * @var int
+     * @see begin()
+     * @see prolong()
+     */
+    private $txTimestamp;
+    
+    /**
+     * Number of seconds between automatic transaction prolongation.
+     * @var int
+     * @see begin()
+     * @see prolong()
+     */
+    private $txKeepAlive = 90;
+    
+    /**
      * Creates Fedora connection object from a given configuration.
      */
     public function __construct() {
@@ -218,6 +234,9 @@ class Fedora {
      * @return \GuzzleHttp\Psr7\Response
      */
     public function sendRequest(Request $request): Response {
+        if ($this->txUrl && time() - $this->txTimestamp > $this->txKeepAlive) {
+            $this->prolong();
+        }
         return $this->client->send($request);
     }
 
@@ -515,10 +534,18 @@ class Fedora {
      * visible in the triplestore coupled with the Fedora until the transaction
      * is committed.
      * 
+     * @param int $keepAliveTimeout Automatic transaction prolongment timeout
+     *   (see the `prolong()` method) - if a Fedora REST API is called and at 
+     *   least `$keepAliveTimeout` seconds passed since last prolongation, the 
+     *   transaction will be automatically prolonged.
      * @see rollback()
      * @see commit()
+     * @see prolong()
      */
-    public function begin() {
+    public function begin(int $keepAliveTimeout = 90) {
+        $this->txKeepAlive = $keepAliveTimeout;
+        $this->txTimestamp = time();
+        
         $resp = $this->client->post($this->apiUrl . '/fcr:tx');
         $loc  = $resp->getHeader('Location');
         if (count($loc) == 0) {
@@ -541,13 +568,27 @@ class Fedora {
     }
 
     /**
+     * Fedora transactions automatically expire after 3 minutes. If you want 
+     * a transaction to be kept longer it must be manually prolonged. This
+     * method does it for you.
+     * @see begin()
+     */
+    public function prolong() {
+        if ($this->txUrl) {
+            $this->txTimestamp = time();
+            $this->client->post($this->txUrl . '/fcr:tx');
+        }
+    }
+
+
+    /**
      * Overrides the transaction URI to be used by the Fedora connection.
      * 
      * Use with care.
      * 
-     * @param type $txUrl
+     * @param string $txUrl
      */
-    public function setTransactionId($txUrl) {
+    public function setTransactionId(string $txUrl) {
         $this->txUrl = $txUrl;
     }
 
