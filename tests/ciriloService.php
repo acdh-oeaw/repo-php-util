@@ -42,7 +42,7 @@ $fedora->commit();
 $fedora->begin();
 $res  = $fedora->getResourceByUri('http://fedora.localhost/rest/ontology/class/f4/33/54/f1/f43354f1-db26-439f-b8fd-aee4e873470e');
 $meta = $res->getMetadata();
-$meta->addResource('https://vocabs.acdh.oeaw.ac.at/#hasSTYLESHEET', 'https://id.acdh.oeaw.ac.at/7c1c6b18-34e6-e36f-c51c-c841940fc803');
+$meta->addResource('https://vocabs.acdh.oeaw.ac.at/schema#hasSTYLESHEET', 'https://id.acdh.oeaw.ac.at/7c1c6b18-34e6-e36f-c51c-c841940fc803');
 $res->setMetadata($meta);
 $res->updateMetadata();
 $fedora->commit();

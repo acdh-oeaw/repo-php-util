@@ -84,7 +84,9 @@ class SparqlClient {
      * @return \EasyRdf\Sparql\Result
      */
     public function query(string $query): Result {
-        $request = new Request('GET', $this->url . '?query=' . rawurlencode($query));
+        $headers = array('Content-Type' => 'application/x-www-form-urlencoded');
+        $body = 'query=' . rawurlencode($query);
+        $request = new Request('POST', $this->url, $headers, $body);
         $response = $this->client->send($request);
         $body = $response->getBody();
         $result = new Result($body, 'application/sparql-results+json');
