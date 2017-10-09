@@ -223,12 +223,22 @@ class File extends Object {
      * @return Resource final metadata
      */
     protected function mergeMetadata(Resource $current, Resource $new): Resource {
-        $title = $current->getLiteral(RC::titleProp());
         $meta  = $current->merge($new, array(RC::idProp()));
-        if ($title) {
-            $meta->delete(RC::titleProp());
-            $meta->addLiteral(RC::titleProp(), $title);
+        
+        // title handling logic:
+        // if title is not provided by an external metadata (also when there is
+        // no external metadata) and current
+        $oldTitle = $current->getLiteral(RC::titleProp());
+        $extTitle = null;
+        if ($this->metaLookup) {
+            $extMeta = $this->metaLookup->getMetadata($this->path, $new);
+            $extTitle = $extMeta->getLiteral(RC::titleProp());
         }
+        if ($oldTitle !== null && $extTitle === null) {
+            $meta->delete(RC::titleProp());
+            $meta->addLiteral(RC::titleProp(), $oldTitle, $oldTitle->getLang());
+        }
+
         return $meta;
     }
 
