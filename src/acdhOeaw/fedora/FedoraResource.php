@@ -594,6 +594,9 @@ class FedoraResource {
         $query   = new SimpleQuery($query, $param);
         $results = $this->fedora->runQuery($query);
         foreach ($results as $i) {
+            if (!isset($i->uri)) {
+                continue; // no matching dissemination services
+            }
             $service = new Service($this->fedora, $i->uri);
             foreach ($service->getFormats() as $format) {
                 $ret[$format] = $service;
