@@ -30,8 +30,8 @@
 
 namespace acdhOeaw\util;
 
+use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
-use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\schema\file\File;
 use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\util\metaLookup\MetaLookupInterface;
@@ -63,7 +63,7 @@ class Indexer {
      * FedoraResource which children are created by the Indexer
      * @var FedoraResource
      */
-    private $resource;
+    private $parent;
 
     /**
      * File system paths where resource children are located
@@ -107,7 +107,7 @@ class Indexer {
      * Fedora path in the repo where imported resources are created.
      * @var string
      */
-    private $fedoraLoc = '/';
+    private $fedoraLoc;
 
     /**
      * URI of an RDF class assigned to indexed collections.
@@ -144,35 +144,62 @@ class Indexer {
     private $metaLookup;
 
     /**
+     * Repository connection
+     * @var \acdhOeaw\fedora\Fedora
+     */
+    private $fedora;
+
+    /**
      * Creates an indexer object for a given Fedora resource.
      * 
      * @param FedoraResource $resource
-     * @param string $encoding character encoding used by the operation system
-     *   (will be autodetected if not provided)
-     * @throws RuntimeException
      */
-    public function __construct(FedoraResource $resource) {
-        $this->resource        = $resource;
+    public function __construct(FedoraResource $resource = null) {
         $this->binaryClass     = RC::get('indexerDefaultBinaryClass');
         $this->collectionClass = RC::get('indexerDefaultCollectionClass');
 
-        $metadata  = $this->resource->getMetadata();
-        $locations = $metadata->allLiterals(RC::locProp());
+        if ($resource !== null) {
+            $this->setParent($resource);
+            $this->fedora = $resource->getFedora();
+        }
+    }
+
+    /**
+     * Sets the repository connection object
+     * @param \acdhOeaw\util\Fedora $fedora
+     */
+    public function setFedora(Fedora $fedora): Indexer {
+        $this->fedora = $fedora;
+        return $this;
+    }
+    
+    /**
+     * Sets the parent resource for the indexed files
+     * @param FedoraResource $resource
+     */
+    public function setParent(FedoraResource $resource): Indexer {
+        $this->parent = $resource;
+        $this->fedora = $this->parent->getFedora();
+        $metadata     = $this->parent->getMetadata();
+        $locations    = $metadata->allLiterals(RC::locProp());
         foreach ($locations as $i) {
             $loc = preg_replace('|/$|', '', self::containerDir() . $i->getValue());
             if (is_dir($loc)) {
                 $this->paths[] = $i->getValue();
             }
         }
+        return $this;
     }
 
     /**
      * Overrides file system paths to look into for child resources.
      * 
      * @param array $paths
+     * @return \acdhOeaw\util\Indexer
      */
-    public function setPaths(array $paths) {
+    public function setPaths(array $paths): Indexer {
         $this->paths = $paths;
+        return $this;
     }
 
     /**
@@ -181,9 +208,11 @@ class Indexer {
      * Overrides setting read form the `cfg::indexerDefaultCollectionClass` 
      * configuration property.
      * @param string $class
+     * @return \acdhOeaw\util\Indexer
      */
-    public function setCollectionClass(string $class) {
+    public function setCollectionClass(string $class): Indexer {
         $this->collectionClass = $class;
+        return $this;
     }
 
     /**
@@ -192,18 +221,22 @@ class Indexer {
      * Overrides setting read form the `cfg::indexerDefaultBinaryClass` 
      * configuration property.
      * @param string $class
+     * @return \acdhOeaw\util\Indexer
      */
-    public function setBinaryClass(string $class) {
+    public function setBinaryClass(string $class): Indexer {
         $this->binaryClass = $class;
+        return $this;
     }
 
     /**
      * Sets file name filter for child resources.
      * 
      * @param string $filter regular expression conformant with preg_replace()
+     * @return \acdhOeaw\util\Indexer
      */
-    public function setFilter(string $filter) {
+    public function setFilter(string $filter): Indexer {
         $this->filter = $filter;
+        return $this;
     }
 
     /**
@@ -212,9 +245,11 @@ class Indexer {
      * be created for each subdirectory (`$ifFlat` equals to `false`).
      * 
      * @param bool $ifFlat
+     * @return \acdhOeaw\util\Indexer
      */
-    public function setFlatStructure(bool $ifFlat) {
+    public function setFlatStructure(bool $ifFlat): Indexer {
         $this->flatStructure = $ifFlat;
+        return $this;
     }
 
     /**
@@ -229,9 +264,11 @@ class Indexer {
      * If it exists already, its location is not changed.
      * 
      * @param string $fedoraLoc fedora location 
+     * @return \acdhOeaw\util\Indexer
      */
-    public function setFedoraLocation(string $fedoraLoc) {
+    public function setFedoraLocation(string $fedoraLoc): Indexer {
         $this->fedoraLoc = $fedoraLoc;
+        return $this;
     }
 
     /**
@@ -241,18 +278,22 @@ class Indexer {
      * be created containing full metadata but no binary content.
      * 
      * @param bool $limit maximum size in bytes (0 will cause no files upload)
+     * @return \acdhOeaw\util\Indexer
      */
-    public function setUploadSizeLimit(int $limit) {
+    public function setUploadSizeLimit(int $limit): Indexer {
         $this->uploadSizeLimit = $limit;
+        return $this;
     }
 
     /**
      * Sets maximum indexing depth. 
      * 
      * @param int $depth maximum indexing depth (0 - only initial Resource dir, 1 - also its direct subdirectories, etc.)
+     * @return \acdhOeaw\util\Indexer
      */
-    public function setDepth(int $depth) {
+    public function setDepth(int $depth): Indexer {
         $this->depth = $depth;
+        return $this;
     }
 
     /**
@@ -261,18 +302,22 @@ class Indexer {
      * Note this setting is skipped when the `$flatStructure` is set to `true`.
      * 
      * @param bool $include should resources be created for empty directories
+     * @return \acdhOeaw\util\Indexer
      * @see setFlatStructure()
      */
-    public function setIncludeEmptyDirs(bool $include) {
+    public function setIncludeEmptyDirs(bool $include): Indexer {
         $this->includeEmpty = $include;
+        return $this;
     }
 
     /**
      * Sets a class providing metadata for indexed files.
      * @param MetaLookupInterface $metaLookup
+     * @return \acdhOeaw\util\Indexer
      */
-    public function setMetaLookup(MetaLookupInterface $metaLookup) {
+    public function setMetaLookup(MetaLookupInterface $metaLookup): Indexer {
         $this->metaLookup = $metaLookup;
+        return $this;
     }
 
     /**
@@ -312,8 +357,9 @@ class Indexer {
         $upload = $i->isFile() && $this->uploadSizeLimit > $i->getSize();
 
         if (!$skip) {
-            $class = $i->isDir() ? $this->collectionClass : $this->binaryClass;
-            $file  = new File($this->resource->getFedora(), $i->getPathname(), $class, $this->resource->getId());
+            $class  = $i->isDir() ? $this->collectionClass : $this->binaryClass;
+            $parent = $this->parent === null ? null : $this->parent->getId();
+            $file   = new File($this->fedora, $i->getPathname(), $class, $parent);
             if ($this->metaLookup) {
                 $file->setMetaLookup($this->metaLookup);
             }
@@ -333,7 +379,7 @@ class Indexer {
             echo self::$debug ? "entering " . $i->getPathname() . "\n" : "";
             $ind = clone($this);
             if (!$this->flatStructure) {
-                $ind->resource = $res;
+                $ind->parent = $res;
             }
             $ind->setDepth($this->depth - 1);
             $path       = File::getRelPath($i->getPathname());
