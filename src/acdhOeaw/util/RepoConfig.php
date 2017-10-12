@@ -99,7 +99,7 @@ class RepoConfig {
      * @return string
      */
     static public function idNmsp(): string {
-        return self::get('fedoraIdNamespace');
+        return self::get('fedoraUuidNamespace');
     }
 
     /**
