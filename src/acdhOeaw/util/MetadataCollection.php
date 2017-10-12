@@ -255,10 +255,14 @@ class MetadataCollection extends Graph {
                 $fedoraRes = $this->fedora->getResourceByIds($ids);
             } catch (NotFound $e) {
                 $meta = (new Graph())->resource('.');
+                $title = 'title stub created by the MetadataCollection';
                 foreach ($ids as $id) {
                     $meta->addResource(RC::idProp(), $id);
+                    if (strpos($id, RC::get('fedoraIdNamespace')) === 0) {
+                        $title = substr($id, strlen(RC::get('fedoraIdNamespace')));
+                    }
                 }
-                $meta->addLiteral(RC::titleProp(), 'title stub created by the MetadataCollection');
+                $meta->addLiteral(RC::titleProp(), $title);
                 $fedoraRes = $this->fedora->createResource($meta);
                 $found     = 'new';
             }
