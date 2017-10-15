@@ -268,8 +268,12 @@ class MetadataCollection extends Graph {
             }
             echo self::$debug ? "\t\t" . $found . ' ' . $fedoraRes->getId() . "\n" : '';
 
+            $uuid = $fedoraRes->getId();
             $result[$res->getUri()] = $fedoraRes;
-            $map[$res->getUri()]    = $fedoraRes->getId();
+            $map[$res->getUri()]    = $uuid;
+            foreach ($ids as $id) {
+                $map[$id]    = $uuid;
+            }
         }
 
         echo self::$debug ? "Mapping objects to ACDH UUIDs...\n" : '';
