@@ -99,9 +99,11 @@ class Indexer {
      * For child resources bigger then this limit an "RDF only" Fedora resources
      * will be created.
      * 
+     * Special value of -1 means "import all no matter their size"
+     * 
      * @var int
      */
-    private $uploadSizeLimit = 0;
+    private $uploadSizeLimit = -1;
 
     /**
      * Fedora path in the repo where imported resources are created.
@@ -172,7 +174,7 @@ class Indexer {
         $this->fedora = $fedora;
         return $this;
     }
-    
+
     /**
      * Sets the parent resource for the indexed files
      * @param FedoraResource $resource
@@ -277,7 +279,9 @@ class Indexer {
      * For files bigger then this treshold a "pure RDF" Fedora resources will
      * be created containing full metadata but no binary content.
      * 
-     * @param bool $limit maximum size in bytes (0 will cause no files upload)
+     * @param bool $limit maximum size in bytes; 0 will cause no files upload,
+     *   special value of -1 (default) will cause all files to be uploaded no 
+     *   matter their size
      * @return \acdhOeaw\util\Indexer
      */
     public function setUploadSizeLimit(int $limit): Indexer {
@@ -354,7 +358,7 @@ class Indexer {
         }
 
         $skip   = $this->isSkipped($i);
-        $upload = $i->isFile() && $this->uploadSizeLimit > $i->getSize();
+        $upload = $i->isFile() && ($this->uploadSizeLimit > $i->getSize() || $this->uploadSizeLimit === -1);
 
         if (!$skip) {
             $class  = $i->isDir() ? $this->collectionClass : $this->binaryClass;
