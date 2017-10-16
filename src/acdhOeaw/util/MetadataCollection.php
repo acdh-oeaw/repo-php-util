@@ -254,7 +254,7 @@ class MetadataCollection extends Graph {
             try {
                 $fedoraRes = $this->fedora->getResourceByIds($ids);
             } catch (NotFound $e) {
-                $meta = (new Graph())->resource('.');
+                $meta  = (new Graph())->resource('.');
                 $title = 'title stub created by the MetadataCollection';
                 foreach ($ids as $id) {
                     $meta->addResource(RC::idProp(), $id);
@@ -268,11 +268,11 @@ class MetadataCollection extends Graph {
             }
             echo self::$debug ? "\t\t" . $found . ' ' . $fedoraRes->getId() . "\n" : '';
 
-            $uuid = $fedoraRes->getId();
+            $uuid                   = $fedoraRes->getId();
             $result[$res->getUri()] = $fedoraRes;
             $map[$res->getUri()]    = $uuid;
             foreach ($ids as $id) {
-                $map[$id]    = $uuid;
+                $map[$id] = $uuid;
             }
         }
 
