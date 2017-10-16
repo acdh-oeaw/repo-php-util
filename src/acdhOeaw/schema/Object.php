@@ -173,7 +173,7 @@ abstract class Object {
             $this->res->updateMetadata();
 
             $binaryContent = $this->getBinaryData();
-            if ($create && $binaryContent !== '') {
+            if ($uploadBinary && $binaryContent !== '') {
                 $this->res->updateContent($binaryContent, true);
             }
         }
