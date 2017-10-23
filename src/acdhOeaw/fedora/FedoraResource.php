@@ -213,13 +213,16 @@ class FedoraResource {
     /**
      * Removes the resource from the Fedora.
      * 
-     * Please remember searching for children is done using SPARQL query so any
-     * changes made since the beginning of the transaction won't be taken into
-     * account.
+     * Please remember searching for children and references is done using 
+     * a SPARQL query so any changes made since the beginning of the transaction 
+     * won't be taken into account.
      * @param bool $deep should tombstone resource will be deleted?
      * @param bool $children should children be removed?
+     * @param bool $references should references to the resource be removed?
+     *   (applies also for children when `$children == true`)
      */
-    public function delete(bool $deep = false, bool $children = false) {
+    public function delete(bool $deep = false, bool $children = false,
+                           bool $references = false) {
         $uri     = $this->fedora->sanitizeUri($this->getUri());
         $request = new Request('DELETE', $uri);
         $this->fedora->sendRequest($request);
@@ -231,7 +234,30 @@ class FedoraResource {
 
         if ($children) {
             foreach ($this->getChildren() as $i) {
-                $i->delete($deep, $children);
+                $i->delete($deep, $children, $references);
+            }
+        }
+
+        if ($references) {
+            $id      = $this->getId();
+            $query   = new SimpleQuery('SELECT * WHERE {?res ?prop ?@}');
+            $query->setValues(array($id));
+            $results = $this->fedora->runQuery($query);
+            foreach ($results as $i) {
+                try {
+                    $res  = $this->fedora->getResourceByUri($i->res);
+                    $meta = $res->getMetadata();
+                    foreach ($meta->propertyUris() as $prop) {
+                        $meta->deleteResource($prop, $id);
+                    }
+                    $res->setMetadata($meta);
+                    echo $res->getUri(true) . " removing references to $id \n";
+                    $res->updateMetadata(self::OVERWRITE);
+                } catch (Deleted $e) {
+                    
+                } catch (NotFound $e) {
+                    
+                }
             }
         }
     }
