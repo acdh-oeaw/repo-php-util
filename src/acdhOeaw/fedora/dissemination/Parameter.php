@@ -31,6 +31,7 @@
 namespace acdhOeaw\fedora\dissemination;
 
 use RuntimeException;
+use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\util\RepoConfig as RC;
 
@@ -94,6 +95,21 @@ class Parameter extends FedoraResource {
         return self::transform($value, $method);
     }
 
+    /**
+     * Creates a dissemination service parameter object.
+     * @param Fedora $fedora repository connection object
+     * @param string $uri UTI of the repository resource representing the 
+     *   dissemination service parameter
+     */
+    public function __construct(Fedora $fedora, string $uri = '') {
+        try {
+            $fedora->getCache()->deleteByUri($fedora->standardizeUri($uri));
+        } catch (NotInCache $ex) {
+
+        }
+        parent::__construct($fedora, $uri);
+    }
+    
     /**
      * Returns parameter name
      * @return string
