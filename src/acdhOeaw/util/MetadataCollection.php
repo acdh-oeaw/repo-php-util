@@ -173,11 +173,11 @@ class MetadataCollection extends Graph {
         $toBeImported    = $this->filterResources($namespace, $singleOutNmsp);
         $fedoraResources = $this->assureUuids($toBeImported);
 
-        foreach ($toBeImported as $res) {
+        foreach ($toBeImported as $n => $res) {
             $uri       = $res->getUri();
             $fedoraRes = $fedoraResources[$uri];
 
-            echo self::$debug ? "Importing " . $uri . "\n" : "";
+            echo self::$debug ? "Importing " . $uri . " (" . $n . "/" . count($toBeImported) . ")\n" : "";
             $this->sanitizeResource($res, $namespace);
 
             echo self::$debug ? "\tupdating " . $fedoraRes->getUri(true) . "\n" : "";
@@ -242,8 +242,8 @@ class MetadataCollection extends Graph {
 
         $result = array();
         $map    = array();
-        foreach ($resources as $res) {
-            echo self::$debug ? "\t" . $res->getUri() . "\n" : '';
+        foreach ($resources as $n => $res) {
+            echo self::$debug ? "\t" . $res->getUri() . " (" . $n . "/" . count($resources) . ")\n" : '';
 
             $ids = array();
             foreach ($res->allResources(RC::idProp()) as $id) {
@@ -346,7 +346,7 @@ class MetadataCollection extends Graph {
      * Promotes subjects being fully qualified URLs to ids.
      */
     private function promoteUrisToIds() {
-        echo self::$debug ? "Promoting URIs to ids..." : '';
+        echo self::$debug ? "Promoting URIs to ids...\n" : '';
         foreach ($this->resources() as $i) {
             if (!$i->isBNode()) {
                 echo "\t" . $i->getUri() . "\n";
