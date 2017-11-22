@@ -367,10 +367,11 @@ class FedoraResource {
                     break;
             }
             $insert = self::getSparqlTriples($this->metadata);
-            $body   = sprintf('DELETE {%s} INSERT {%s} WHERE {}', $delete, $insert);
 
+            $body    = sprintf('DELETE {%s} INSERT {%s} WHERE {}', $delete, $insert);
             $headers = array('Content-Type' => 'application/sparql-update');
             $request = new Request('PATCH', $this->uri . '/fcr:metadata', $headers, $body);
+
             $this->fedora->sendRequest($request);
 
             $this->updated = true;
@@ -428,7 +429,7 @@ class FedoraResource {
      */
     private function getMetadataFromFedora(): Resource {
         $uri     = $this->fedora->sanitizeUri($this->uri);
-        $request = new Request('GET', $uri . '/fcr:metadata');
+        $request = new Request('GET', $uri . '/fcr:metadata', ['Accept' => 'application/n-triples']);
         try {
             $resp = $this->fedora->sendRequest($request);
         } catch (RequestException $e) {
@@ -442,8 +443,14 @@ class FedoraResource {
             }
         }
 
+        $format  = '';
+        $headers = $resp->getHeaders();
+        if (isset($headers['Content-Type'])) {
+            $format = explode(';', $headers['Content-Type'][0])[0];
+        }
+
         $graph = new Graph();
-        $graph->parse($resp->getBody());
+        $graph->parse($resp->getBody(), $format);
         $meta  = $graph->resource($uri);
 
         return $meta;
