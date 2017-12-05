@@ -368,7 +368,7 @@ class Indexer {
                 $file->setMetaLookup($this->metaLookup);
             }
             $res          = $file->updateRms(true, $upload);
-            $indexedRes[] = $res;
+            $indexedRes[$i->getPathname()] = $res;
 
             echo self::$debug ? ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") : '';
         } else {
