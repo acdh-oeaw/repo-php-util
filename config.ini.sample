@@ -1,6 +1,7 @@
 redmineApiUrl="https://redmine.acdh.oeaw.ac.at"
 redmineApiKey="putYourKeyHere"
 
+fedoraDefaultCollection=""
 fedoraIdProp="http://purl.org/dc/terms/identifier"
 fedoraUuidNamespace="https://id.acdh.oeaw.ac.at/uuid/"
 fedoraIdNamespace="https://id.acdh.oeaw.ac.at/"

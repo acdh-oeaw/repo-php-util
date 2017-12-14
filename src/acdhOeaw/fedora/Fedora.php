@@ -139,7 +139,7 @@ class Fedora {
      * @see prolong()
      */
     private $txTimestamp;
-    
+
     /**
      * Number of seconds between automatic transaction prolongation.
      * @var int
@@ -147,16 +147,32 @@ class Fedora {
      * @see prolong()
      */
     private $txKeepAlive = 90;
-    
+
+    /**
+     * Default location for creating resources.
+     * @var string
+     * @see createResource()
+     */
+    private $defaultCollection = '';
+
     /**
      * Creates Fedora connection object from a given configuration.
      */
     public function __construct() {
         $this->apiUrl       = preg_replace('|/$|', '', RC::get('fedoraApiUrl'));
         $authHeader         = 'Basic ' . base64_encode(RC::get('fedoraUser') . ':' . RC::get('fedoraPswd'));
-        $this->client       = new Client(['verify' => false, 'headers' => ['Authorization' => $authHeader]]);
+        $this->client       = new Client([
+            'verify'  => false,
+            'headers' => ['Authorization' => $authHeader]
+        ]);
         $this->sparqlClient = new SparqlClient(RC::get('sparqlUrl'), RC::get('fedoraUser'), RC::get('fedoraPswd'));
         $this->cache        = new FedoraCache();
+
+        try {
+            $this->defaultCollection = RC::get('fedoraDefaultCollection');
+        } catch (InvalidArgumentException $e) {
+            
+        }
     }
 
     /**
@@ -204,7 +220,7 @@ class Fedora {
             throw new BadMethodCallException('method must be PUT or POST');
         }
         $baseUrl = $this->txUrl ? $this->txUrl : $this->apiUrl;
-        $path    = $path ? $this->sanitizeUri($path) : $baseUrl;
+        $path    = $path ? $this->sanitizeUri($path) : $baseUrl . $this->defaultCollection;
         $request = new Request($method, $path);
         $request = self::attachData($request, $data);
         try {
@@ -545,7 +561,7 @@ class Fedora {
     public function begin(int $keepAliveTimeout = 90) {
         $this->txKeepAlive = $keepAliveTimeout;
         $this->txTimestamp = time();
-        
+
         $resp = $this->client->post($this->apiUrl . '/fcr:tx');
         $loc  = $resp->getHeader('Location');
         if (count($loc) == 0) {
@@ -579,7 +595,6 @@ class Fedora {
             $this->client->post($this->txUrl . '/fcr:tx');
         }
     }
-
 
     /**
      * Overrides the transaction URI to be used by the Fedora connection.
