@@ -28,27 +28,17 @@
  * @license https://opensource.org/licenses/MIT
  */
 
+
 namespace acdhOeaw\util\metaLookup;
 
-use EasyRdf\Resource;
+use Exception;
 
 /**
- * It is a common problem to couple binary data with their metadata.
- * 
- * This interface provides a method for returning metadata object based on the
- * binary file path.
+ * Exception thrown when a resource metadata were not found in the external
+ * source.
+ *
  * @author zozlak
  */
-interface MetaLookupInterface {
-
-    /**
-     * Returns metadata coupled with a file.
-     * @param string $path path to the data file
-     * @param \EasyRdf\Resource meta existing data file metadata
-     * @param bool $require should error be thrown when no metadata was found
-     *   (when false a resource with no triples is returned)
-     * @return \EasyRdf\Resource fetched metadata
-     */
-    public function getMetadata(string $path, Resource $meta,
-                                bool $require = false): Resource;
+class MetaLookupException extends Exception {
+    
 }
