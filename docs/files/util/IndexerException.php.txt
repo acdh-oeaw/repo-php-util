@@ -28,28 +28,48 @@
  * @license https://opensource.org/licenses/MIT
  */
 
-namespace acdhOeaw\util\metaLookup;
 
-use EasyRdf\Resource;
+namespace acdhOeaw\util;
+
+use Exception;
+use Throwable;
 
 /**
- * It is a common problem to couple binary data with their metadata.
- * 
- * This interface provides a method for returning metadata object based on the
- * binary file path.
+ * Exception used by the Indexer class, giving access to resources which were
+ * commited when an error occured.
+ *
  * @author zozlak
  */
-interface MetaLookupInterface {
+class IndexerException extends Exception {
 
     /**
-     * Returns metadata coupled with a file.
-     * @param string $path path to the data file
-     * @param \EasyRdf\Resource meta existing data file metadata
-     * @param bool $require should error be thrown when no metadata was found
-     *   (when false a resource with no triples is returned)
-     * @return \EasyRdf\Resource fetched metadata
+     * A collection of already processed resources
+     * @var array
      */
-    public function getMetadata(string $path, Resource $meta,
-                                bool $require = false): Resource;
+    private $resources = array();
+
+    /**
+     * Creates the exception
+     * @param string $message exception message
+     * @param int $code exception code
+     * @param Throwable $previous original exception
+     * @param array $resources collection of already commited resources
+     */
+    public function __construct(string $message = "", int $code = 0,
+                                Throwable $previous = null,
+                                array $resources = array()) {
+        parent::__construct($message, $code, $previous);
+        $this->resources = $resources;
+    }
+
+    /**
+     * Returns the collection of resources which were already processed when
+     * an error occured.
+     * @return array
+     */
+    public function getCommitedResources(): array {
+        return $this->resources;
+    }
+
 }
 

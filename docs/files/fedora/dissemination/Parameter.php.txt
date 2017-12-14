@@ -31,6 +31,8 @@
 namespace acdhOeaw\fedora\dissemination;
 
 use RuntimeException;
+use EasyRdf\Resource;
+use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\util\RepoConfig as RC;
 
@@ -95,6 +97,21 @@ class Parameter extends FedoraResource {
     }
 
     /**
+     * Creates a dissemination service parameter object.
+     * @param Fedora $fedora repository connection object
+     * @param string $uri UTI of the repository resource representing the 
+     *   dissemination service parameter
+     */
+    public function __construct(Fedora $fedora, string $uri = '') {
+        try {
+            $fedora->getCache()->deleteByUri($fedora->standardizeUri($uri));
+        } catch (NotInCache $ex) {
+            
+        }
+        parent::__construct($fedora, $uri);
+    }
+
+    /**
      * Returns parameter name
      * @return string
      */
@@ -107,15 +124,32 @@ class Parameter extends FedoraResource {
      * Return parameter value for a given repository resource
      * @param FedoraResource $res repository resource to get the value for
      * @param string $method transformation to be applied on the value
+     * @param string $format format indication to be attached to the resource 
+     *   URI by appending `?format=$format` to them.
+     *   Applied only to URIs.
+     *   Will work only for URIs pointing to a resolver making use of such 
+     *   format indication (but the class is unable to verify that).
+     *   To be used when a dissemination service needs to preprocess a resource
+     *   with other dissemination service.
      * @return string
      * @see transform()
      */
-    public function getValue(FedoraResource $res, string $method): string {
+    public function getValue(FedoraResource $res, string $method,
+                             string $format = ''): string {
         $meta      = $this->getMetadata();
         $default   = $meta->all(RC::get('fedoraServiceParamDefaultValueProp'));
         $default   = count($default) > 0 ? (string) $default[0] : '';
         $valueProp = $meta->all(RC::get('fedoraServiceParamRdfPropertyProp'));
-        $valueProp = count($valueProp) > 0 ? (string) $valueProp[0] : '';
+        if (count($valueProp) > 0) {
+            $isRes     = $valueProp[0] instanceof Resource;
+            $valueProp = (string) $valueProp[0];
+            if ($isRes && strlen($format) > 0) {
+                $glue      = strpos($valueProp, '?') !== false ? '&' : '?';
+                $valueProp .= $glue . 'format=' . rawurldecode($format);
+            }
+        } else {
+            $valueProp = '';
+        }
         return self::value($res, $valueProp, $default, $method);
     }
 

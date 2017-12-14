@@ -104,18 +104,21 @@ class Service extends FedoraResource {
         $uri = $meta->getLiteral(RC::get('fedoraServiceLocProp'));
 
         $param = array();
-        preg_match_all('#{[-A-Za-z_0-9]+([|][a-zA-Z0-9]+)?}#', $uri, $param);
+        preg_match_all('#{[-A-Za-z_0-9]+([|][a-zA-Z0-9]+)?([|][-_a-zA-Z0-9]+)?}#', $uri, $param);
         $param = $param[0];
         foreach ($param as $i) {
             $ii = explode('|', substr($i, 1, -1));
-            if (count($ii) === 1) {
+            if (count($ii) < 2) {
                 $ii[1] = '';
+            }
+            if (count($ii) < 3) {
+                $ii[2] = '';
             }
 
             if ($ii[0] === 'RES_URI') {
-                $value = Parameter::value($res, '.', '', $ii[1]);
+                $value = Parameter::value($res, '.', '', $ii[1], $ii[2]);
             } else if (isset($this->param[$ii[0]])) {
-                $value = $this->param[$ii[0]]->getValue($res, $ii[1]);
+                $value = $this->param[$ii[0]]->getValue($res, $ii[1], $ii[2]);
             } else {
                 throw new RuntimeException('unknown parameter ' . $i);
             }

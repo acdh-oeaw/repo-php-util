@@ -88,11 +88,14 @@ class MetaLookupFile implements MetaLookupInterface {
      * @param string $path path to the file
      * @param \EasyRdf\Resource $meta file's metadata (just for conformance with
      *   the interface, they are not used)
+     * @param bool $require should error be thrown when no metadata was found
+     *   (when false a resource with no triples is returned)
      * @return \EasyRdf\Resource fetched metadata
      * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws MetaLookupException
      */
-    public function getMetadata(string $path, Resource $meta): Resource {
+    public function getMetadata(string $path, Resource $meta,
+                                bool $require = false): Resource {
         if (!file_exists($path)) {
             throw new InvalidArgumentException('no such file');
         }
@@ -121,7 +124,7 @@ class MetaLookupFile implements MetaLookupInterface {
                 if (count($candidates) == 1) {
                     return $candidates[0];
                 } else if (count($candidates) > 1) {
-                    throw new RuntimeException('more then one metadata resource');
+                    throw new MetaLookupException('more then one metadata resource');
                 } else{
                     echo self::$debug ? "      but no metadata inside\n" : '';
                 }
@@ -130,7 +133,11 @@ class MetaLookupFile implements MetaLookupInterface {
             }
         }
 
-        return $graph->resource('.');
+        if ($require) {
+            throw new MetaLookupException('External metadata not found', 11);
+        } else {
+            return $graph->resource('.');
+        }
     }
 
 }

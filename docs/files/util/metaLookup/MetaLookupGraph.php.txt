@@ -40,7 +40,7 @@ use acdhOeaw\util\RepoConfig as RC;
  *
  * @author zozlak
  */
-class MetaLookupGraph implements MetaLookupInterface{
+class MetaLookupGraph implements MetaLookupInterface {
 
     /**
      * Debug flag - setting it to true causes loggin messages to be displayed.
@@ -55,7 +55,7 @@ class MetaLookupGraph implements MetaLookupInterface{
     private $graph;
 
     /**
-     * 
+     * Creates a MetaLookupGraph from a given EasyRdf\Graph
      * @param \EasyRdf\Graph $graph metadata graph
      */
     public function __construct(Graph $graph) {
@@ -67,14 +67,17 @@ class MetaLookupGraph implements MetaLookupInterface{
      * @param string $path path to the file (just for conformance with
      *   the interface, it is not used)
      * @param \EasyRdf\Resource $meta file's metadata 
+     * @param bool $require should error be thrown when no metadata was found
+     *   (when false a resource with no triples is returned)
      * @return \EasyRdf\Resource fetched metadata
-     * @throws \RuntimeException
+     * @throws MetaLookupException
      */
-    public function getMetadata(string $path, Resource $meta): Resource {
+    public function getMetadata(string $path, Resource $meta,
+                                bool $require = false): Resource {
         if ($meta == null) {
             return(new Graph())->resource('.');
         }
-        
+
         $candidates = array();
         foreach ($meta->allResources(RC::idProp()) as $id) {
             foreach ($this->graph->resourcesMatching(RC::idProp(), $id) as $i) {
@@ -86,11 +89,15 @@ class MetaLookupGraph implements MetaLookupInterface{
             echo self::$debug ? "  metadata found\n" : '';
             return array_pop($candidates);
         } else if (count($candidates) > 1) {
-            throw new RuntimeException('more then one metadata resource');
+            throw new MetaLookupException('more then one metadata resource');
         }
 
         echo self::$debug ? "  metadata not found\n" : '';
-        return(new Graph())->resource('.');
+        if ($require) {
+            throw new MetaLookupException('External metadata not found');
+        } else {
+            return(new Graph())->resource('.');
+        }
     }
 
 }

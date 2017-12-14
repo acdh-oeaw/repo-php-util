@@ -173,7 +173,7 @@ abstract class Object {
             $this->res->updateMetadata();
 
             $binaryContent = $this->getBinaryData();
-            if ($create && $binaryContent !== '') {
+            if ($uploadBinary && $binaryContent !== '') {
                 $this->res->updateContent($binaryContent, true);
             }
         }
@@ -209,7 +209,7 @@ abstract class Object {
      */
     protected function findResource(bool $create = true,
                                     bool $uploadBinary = true,
-                                    string $path = '/'): bool {
+                                    string $path = ''): bool {
         $ids    = $this->getIds();
         echo self::$debug ? "searching for " . implode(', ', $ids) . "\n" : "";
         $result = '';
@@ -225,7 +225,7 @@ abstract class Object {
             $meta      = $this->getMetadata();
             $this->fedora->fixMetadataReferences($meta);
             $binary    = $uploadBinary ? $this->getBinaryData() : '';
-            $method    = substr($path, -1) == '/' ? 'POST' : 'PUT';
+            $method    = substr($path, -1) == '/' || $path === '' ? 'POST' : 'PUT';
             $this->res = $this->fedora->createResource($meta, $binary, $path, $method);
             $result    = 'not found - created';
         }
