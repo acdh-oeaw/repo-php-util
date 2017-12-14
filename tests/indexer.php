@@ -31,6 +31,7 @@ use acdhOeaw\util\metaLookup\MetaLookupFile;
 use acdhOeaw\util\metaLookup\MetaLookupGraph;
 use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\fedora\Fedora;
+
 require_once 'init.php';
 $fedora = new Fedora();
 
@@ -38,7 +39,7 @@ acdhOeaw\schema\Object::$debug       = true;
 acdhOeaw\fedora\Fedora::$debugGetRes = true;
 MetaLookupFile::$debug               = true;
 MetaLookupGraph::$debug              = true;
-Indexer::$debug                      = true;
+Indexer::$debug = true;
 
 $fedora->begin();
 $id = 'http://my.test/id';
@@ -61,13 +62,12 @@ try {
     $ind    = new Indexer($res);
     $ind->setUploadSizeLimit(10000000);
     $ind->setFilter('/txt|xml/');
-    $ind->setFedoraLocation('/test');
+    $ind->setFedoraLocation('/test/');
     $indRes = $ind->index();
 
-    assert(count($indRes) === 4, new Exception("resources count doesn't match " . count($indRes)));
+    assert(count($indRes) === 5, new Exception("resources count doesn't match " . count($indRes)));
     foreach ($indRes as $i) {
         assert(preg_match('|/rest/test/|', $i->getUri(true)), new Exception('Resource created at wrong location: ' . $i->getUri(true)));
-        $i->delete();
     }
     $fedora->commit();
 } finally {
@@ -79,13 +79,15 @@ echo "simple reindexing\n";
 try {
     $fedora->begin();
     $indRes = $ind->index();
-    assert(count($indRes) === 4, new Exception("resources count doesn't match " . count($indRes)));
+    assert(count($indRes) === 5, new Exception("resources count doesn't match " . count($indRes)));
     foreach ($indRes as $i) {
-        $i->delete();
+        assert(preg_match('|/rest/test/|', $i->getUri(true)), new Exception('Resource created at wrong location: ' . $i->getUri(true)));
+    }
+} finally {
+    foreach ($indRes as $i) {
+        $i->delete(true, false, true);
     }
     $fedora->commit();
-} finally {
-    $fedora->rollback();
 }
 
 echo "\n-------------------------------------------------------------------\n";
@@ -99,15 +101,16 @@ try {
     $ind->setDepth(0);
     $ind->setPaths(array('data'));
     $ind->setMetaLookup($metaLookup);
-    $ind->setFilter('/xml$/');
+    $ind->setFilter('/sample.xml$/');
     $indRes     = $ind->index();
-    assert(count($indRes) === 1, new Exception("resource wasn't indexed"));
-    $meta = $indRes[0]->getMetadata();
+    assert(count($indRes) === 1, new Exception("wrong indexed resources count " . count($indRes)));
+    $indRes     = array_pop($indRes);
+    $meta       = $indRes->getMetadata();
     if ($meta->getLiteral('https://some.sample/property') != 'sample value') {
-        echo $indRes[0]->__metaToString();
+        echo $indRes->__metaToString();
         throw new Exception('wrong metadata "' . $meta->getLiteral('https://some.sample/property') . '"');
     }
-    $indRes[0]->delete();
+    $indRes->delete(true, true, true);
     $fedora->commit();
 } finally {
     $fedora->rollback();
@@ -118,23 +121,74 @@ echo "automatic metadata fetching from graph\n";
 try {
     $fedora->__clearCache();
     $fedora->begin();
-    $graph      = new Graph();
-    $graph->parseFile('tests/data/sample.xml.ttl');
-    $metaLookup = new MetaLookupGraph($graph);
+    $metaLookup = new MetaLookupFile(array('.'), '.ttl');
     $fedora->begin();
     $ind        = new Indexer($res);
     $ind->setDepth(0);
     $ind->setPaths(array('data'));
     $ind->setMetaLookup($metaLookup);
-    $ind->setFilter('/xml$/');
+    $ind->setFilter('/sample.xml$/');
     $indRes     = $ind->index();
-    assert(count($indRes) === 1, new Exception("resource wasn't indexed"));
-    $meta = $indRes[0]->getMetadata();
+    assert(count($indRes) === 1, new Exception("wrong indexed resources count " . count($indRes)));
+    $indRes     = array_pop($indRes);
+    $meta       = $indRes->getMetadata();
     if ($meta->getLiteral('https://some.sample/property') != 'sample value') {
-        echo $indRes[0]->__metaToString();
+        echo $indRes->__metaToString();
         throw new Exception('wrong metadata "' . $meta->getLiteral('https://some.sample/property') . '"');
     }
-    $indRes[0]->delete();
+    $indRes->delete(true, true, true);
+    $fedora->commit();
+} finally {
+    $fedora->rollback();
+}
+
+echo "\n-------------------------------------------------------------------\n";
+echo "skipping resources without external metadata from file\n";
+try {
+    $fedora->__clearCache();
+    $fedora->begin();
+    $metaLookup = new MetaLookupFile(array('.'), '.ttl');
+    $fedora->begin();
+    $ind        = new Indexer($res);
+    $ind->setDepth(0);
+    $ind->setPaths(array('data'));
+    $ind->setMetaLookup($metaLookup, true);
+    $ind->setFilter('/xml$/');
+    $indRes     = $ind->index();
+    assert(count($indRes) === 1, new Exception("wrong indexed resources count " . count($indRes)));
+    $indRes     = array_pop($indRes);
+    $meta       = $indRes->getMetadata();
+    if ($meta->getLiteral('https://some.sample/property') != 'sample value') {
+        echo $indRes->__metaToString();
+        throw new Exception('wrong metadata "' . $meta->getLiteral('https://some.sample/property') . '"');
+    }
+    $indRes->delete(true, true, true);
+    $fedora->commit();
+} finally {
+    $fedora->rollback();
+}
+
+echo "\n-------------------------------------------------------------------\n";
+echo "skipping resources without external metadata from graph\n";
+try {
+    $fedora->__clearCache();
+    $fedora->begin();
+    $metaLookup = new MetaLookupFile(array('.'), '.ttl');
+    $fedora->begin();
+    $ind        = new Indexer($res);
+    $ind->setDepth(0);
+    $ind->setPaths(array('data'));
+    $ind->setMetaLookup($metaLookup, true);
+    $ind->setFilter('/sample.xml$/');
+    $indRes     = $ind->index();
+    assert(count($indRes) === 1, new Exception("wrong indexed resources count " . count($indRes)));
+    $indRes     = array_pop($indRes);
+    $meta       = $indRes->getMetadata();
+    if ($meta->getLiteral('https://some.sample/property') != 'sample value') {
+        echo $indRes->__metaToString();
+        throw new Exception('wrong metadata "' . $meta->getLiteral('https://some.sample/property') . '"');
+    }
+    $indRes->delete(true, true, true);
     $fedora->commit();
 } finally {
     $fedora->rollback();
@@ -164,7 +218,8 @@ try {
     $ind->setMetaLookup(new MetaLookupFile(array('.'), '.ttl'));
     $indRes = $ind->index();
     assert(count($indRes) === 1, new Exception("resource wasn't indexed"));
-    if ($indRes[0]->getUri(true) !== $res2->getUri(true)) {
+    $indRes = array_pop($indRes);
+    if ($indRes->getUri(true) !== $res2->getUri(true)) {
         $fedora->rollback();
         throw new Exception("URIs don't match");
     }
@@ -208,11 +263,35 @@ try {
     $indRes = $ind->index();
     // indexed resource should match manually created one
     assert(count($indRes) === 1, new Exception("resource wasn't indexed"));
-    if ($indRes[0]->getUri(true) !== $res4->getUri(true)) {
+    $indRes = array_pop($indRes);
+    if ($indRes->getUri(true) !== $res4->getUri(true)) {
         $fedora->rollback();
         throw new Exception("URIs don't match");
     }
     $fedora->commit();
 } finally {
     $fedora->rollback();
+}
+
+
+echo "\n-------------------------------------------------------------------\n";
+echo "autocommit works\n";
+try {
+    $indRes = array();
+    $fedora->begin();
+    $ind    = new Indexer($res);
+    $ind->setUploadSizeLimit(10000000);
+    $ind->setFilter('/txt|xml/');
+    $ind->setFedoraLocation('/test/');
+    $ind->setAutoCommit(2);
+    $indRes = $ind->index();
+    assert(count($indRes) === 5, new Exception("resources count doesn't match " . count($indRes)));
+    $fedora->commit();
+} finally {
+    $fedora->rollback();
+    $fedora->begin();
+    foreach ($indRes as $res) {
+        $res->delete(true, false, true);
+    }
+    $fedora->commit();
 }

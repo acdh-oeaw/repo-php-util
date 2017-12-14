@@ -35,6 +35,7 @@ use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\schema\file\File;
 use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\util\metaLookup\MetaLookupInterface;
+use acdhOeaw\util\metaLookup\MetaLookupException;
 use DirectoryIterator;
 use RuntimeException;
 
@@ -109,7 +110,7 @@ class Indexer {
      * Fedora path in the repo where imported resources are created.
      * @var string
      */
-    private $fedoraLoc;
+    private $fedoraLoc = '';
 
     /**
      * URI of an RDF class assigned to indexed collections.
@@ -131,6 +132,12 @@ class Indexer {
     private $depth = 1000;
 
     /**
+     * Number of resource automatically triggering a commit (0 - no auto commit)
+     * @var int
+     */
+    private $autoCommit = 0;
+
+    /**
      * Should resources be created for empty directories.
      * 
      * Skipped if `$flatStructure` equals to `true`
@@ -146,10 +153,32 @@ class Indexer {
     private $metaLookup;
 
     /**
+     * Should files without external metadata (provided by the `$metaLookup`
+     * object) be skipped.
+     * @var bool
+     */
+    private $metaLookupRequire = false;
+
+    /**
      * Repository connection
      * @var \acdhOeaw\fedora\Fedora
      */
     private $fedora;
+
+    /**
+     * Collection of resources commited during the ingestion. Used to handle
+     * errors.
+     * @var array
+     * @see index()
+     */
+    private $commitedRes;
+
+    /**
+     * Collection of indexed resources
+     * @var array
+     * @see index()
+     */
+    private $indexedRes;
 
     /**
      * Creates an indexer object for a given Fedora resource.
@@ -202,6 +231,20 @@ class Indexer {
     public function setPaths(array $paths): Indexer {
         $this->paths = $paths;
         return $this;
+    }
+
+    /**
+     * Controls the automatic commit behaviour.
+     * 
+     * Even when you use autocommit, you should commit your transaction after
+     * `Indexer::index()` (the only exception is when you set auto commit to 1
+     * forcing commiting each and every resource separately but you probably 
+     * don't want to do that for performance reasons).
+     * @param int $count number of resource automatically triggering a commit 
+     *   (0 - no auto commit)
+     */
+    public function setAutoCommit(int $count) {
+        $this->autoCommit = $count;
     }
 
     /**
@@ -317,32 +360,56 @@ class Indexer {
     /**
      * Sets a class providing metadata for indexed files.
      * @param MetaLookupInterface $metaLookup
+     * @param bool $require should files lacking external metadata be skipped
      * @return \acdhOeaw\util\Indexer
      */
-    public function setMetaLookup(MetaLookupInterface $metaLookup): Indexer {
-        $this->metaLookup = $metaLookup;
+    public function setMetaLookup(MetaLookupInterface $metaLookup,
+                                  bool $require = false): Indexer {
+        $this->metaLookup        = $metaLookup;
+        $this->metaLookupRequire = $require;
         return $this;
     }
 
     /**
-     * Does the indexing.
+     * Performs the indexing.
      * @return array a list FedoraResource objects representing indexed resources
      */
     public function index(): array {
-        $indexedRes = array();
+        list($indexed, $commited) = $this->__index();
+
+        $this->indexedRes  = array();
+        $this->commitedRes = array();
+        return $indexed;
+    }
+
+    /**
+     * Performs the indexing.
+     * @return array a two-element array with first element containing a collection
+     *   of indexed resources and a second one containing a collection of commited
+     *   resources
+     */
+    private function __index(): array {
+        $this->indexedRes  = array();
+        $this->commitedRes = array();
 
         if (count($this->paths) === 0) {
             throw new RuntimeException('No paths set');
         }
 
-        foreach ($this->paths as $path) {
-            foreach (new DirectoryIterator(self::containerDir() . $path) as $i) {
-                $newRes     = $this->indexEntry($i);
-                $indexedRes = array_merge($indexedRes, $newRes);
+        try {
+            foreach ($this->paths as $path) {
+                foreach (new DirectoryIterator(self::containerDir() . $path) as $i) {
+                    $this->indexEntry($i);
+                }
             }
+        } catch (\Throwable $e) {
+            if ($e instanceof IndexerException) {
+                $this->commitedRes = array_merge($this->commitedRes, $e->getCommitedResources());
+            }
+            throw new IndexerException($e->getMessage(), $e->getCode(), $e, $this->commitedRes);
         }
 
-        return $indexedRes;
+        return array($this->indexedRes, $this->commitedRes);
     }
 
     /**
@@ -350,11 +417,9 @@ class Indexer {
      * @param DirectoryIterator $i
      * @return array
      */
-    private function indexEntry(DirectoryIterator $i): array {
-        $indexedRes = array();
-
+    private function indexEntry(DirectoryIterator $i) {
         if ($i->isDot()) {
-            return $indexedRes;
+            return;
         }
 
         $skip   = $this->isSkipped($i);
@@ -365,13 +430,23 @@ class Indexer {
             $parent = $this->parent === null ? null : $this->parent->getId();
             $file   = new File($this->fedora, $i->getPathname(), $class, $parent);
             if ($this->metaLookup) {
-                $file->setMetaLookup($this->metaLookup);
+                $file->setMetaLookup($this->metaLookup, $this->metaLookupRequire);
             }
-            $res          = $file->updateRms(true, $upload);
-            $indexedRes[$i->getPathname()] = $res;
+            try {
+                $res = $file->updateRms(true, $upload, $this->fedoraLoc);
 
-            echo self::$debug ? ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") : '';
-        } else {
+                $this->indexedRes[$i->getPathname()] = $res;
+                echo self::$debug ? ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") : '';
+                $this->handleAutoCommit();
+            } catch (MetaLookupException $e) {
+                if ($this->metaLookupRequire) {
+                    $skip = true;
+                } else {
+                    throw $e;
+                }
+            }
+        }
+        if ($skip) {
             echo self::$debug ? "skip " : "";
         }
 
@@ -386,14 +461,15 @@ class Indexer {
                 $ind->parent = $res;
             }
             $ind->setDepth($this->depth - 1);
-            $path       = File::getRelPath($i->getPathname());
+            $path              = File::getRelPath($i->getPathname());
             $ind->setPaths(array($path));
-            $recRes     = $ind->index();
-            $indexedRes = array_merge($indexedRes, $recRes);
-            echo self::$debug ? "going back from " . $path . "\n" : "";
+            list($recRes, $recCom) = $ind->__index();
+            $this->indexedRes  = array_merge($this->indexedRes, $recRes);
+            $this->commitedRes = array_merge($this->commitedRes, $recCom);
+            echo self::$debug ? "going back from " . $path : "";
+            $this->handleAutoCommit();
+            echo self::$debug ? "\n" : "";
         }
-
-        return $indexedRes;
     }
 
     /**
@@ -415,6 +491,22 @@ class Indexer {
         $skipDir  = (!$this->includeEmpty && ($this->depth == 0 || $isEmptyDir) || $this->flatStructure);
         $skipFile = !preg_match($this->filter, $i->getFilename());
         return $i->isDir() && $skipDir || !$i->isDir() && $skipFile;
+    }
+
+    /**
+     * Performs autocommit if needed
+     * @return bool if autocommit was performed
+     */
+    private function handleAutoCommit(): bool {
+        $diff = count($this->indexedRes) - count($this->commitedRes);
+        if ($diff >= $this->autoCommit && $this->autoCommit > 0) {
+            echo self::$debug ? " + autocommit" : '';
+            $this->fedora->commit();
+            $this->commitedRes = $this->indexedRes;
+            $this->fedora->begin();
+            return true;
+        }
+        return false;
     }
 
 }
