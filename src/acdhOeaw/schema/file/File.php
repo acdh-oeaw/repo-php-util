@@ -122,6 +122,12 @@ class File extends Object {
     private $metaLookup;
 
     /**
+     * should metadata operations fail when no external metadata can be found
+     * @var bool
+     */
+    private $metaLookupRequire = false;
+
+    /**
      * RDF class to be set as a this file's type.
      * @var string
      */
@@ -186,7 +192,7 @@ class File extends Object {
         }
 
         if ($this->metaLookup) {
-            $addMeta = $this->metaLookup->getMetadata($this->path, $meta);
+            $addMeta = $this->metaLookup->getMetadata($this->path, $meta, $this->metaLookupRequire);
             $meta->merge($addMeta, array(RC::idProp()));
         }
 
@@ -200,9 +206,13 @@ class File extends Object {
      * Metadata found using metadata lookup have precedense over metadata
      * automatically derived from the file.
      * @param MetaLookupInterface $metaLookup metadata lookup object
+     * @param bool $require should metadata operations fail when no external
+     *   metadata can be found
      */
-    public function setMetaLookup(MetaLookupInterface $metaLookup) {
-        $this->metaLookup = $metaLookup;
+    public function setMetaLookup(MetaLookupInterface $metaLookup,
+                                  bool $require = false) {
+        $this->metaLookup        = $metaLookup;
+        $this->metaLookupRequire = $require;
     }
 
     /**
@@ -232,7 +242,7 @@ class File extends Object {
         $meta = $current->merge($new, array(RC::idProp()));
 
         if ($this->metaLookup) {
-            $extMeta  = $this->metaLookup->getMetadata($this->path, $new);
+            $extMeta  = $this->metaLookup->getMetadata($this->path, $new, $this->metaLookupRequire);
             $extTitle = $extMeta->getLiteral(RC::titleProp());
         }
         if ($oldTitle !== null && $extTitle === null) {
