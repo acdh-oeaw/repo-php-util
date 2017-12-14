@@ -32,6 +32,7 @@ namespace acdhOeaw\fedora;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
@@ -223,7 +224,12 @@ class FedoraResource {
      */
     public function delete(bool $deep = false, bool $children = false,
                            bool $references = false) {
-        $uri     = $this->fedora->sanitizeUri($this->getUri());
+        $uri            = $this->fedora->sanitizeUri($this->getUri());
+        $fedoraChildren = $this->getMetadata()->allResources('http://www.w3.org/ns/ldp#contains');
+        if (count($fedoraChildren) > 0) {
+            throw new RuntimeException("A resource has Fedora children");
+        }
+
         $request = new Request('DELETE', $uri);
         $this->fedora->sendRequest($request);
         $this->fedora->getCache()->delete($this);
@@ -251,7 +257,6 @@ class FedoraResource {
                         $meta->deleteResource($prop, $id);
                     }
                     $res->setMetadata($meta);
-                    echo $res->getUri(true) . " removing references to $id \n";
                     $res->updateMetadata(self::OVERWRITE);
                 } catch (Deleted $e) {
                     
