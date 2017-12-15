@@ -30,14 +30,15 @@
 
 namespace acdhOeaw\fedora;
 
+use BadMethodCallException;
+use InvalidArgumentException;
+use RuntimeException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Exception\ClientException;
 use EasyRdf\Resource;
 use EasyRdf\Sparql\Result;
-use RuntimeException;
-use BadMethodCallException;
 use acdhOeaw\fedora\FedoraCache;
 use acdhOeaw\fedora\exceptions\Deleted;
 use acdhOeaw\fedora\exceptions\NoAcdhId;
