@@ -166,4 +166,24 @@ class FedoraCache {
         return $this->getByMeta($obj->getMetadata());
     }
 
+    public function refresh() {
+        $outdated = [];
+        foreach ($this->cache as $uri => $i) {
+            try {
+                $i->getMetadata(true);
+            } catch (NotFound $e) {
+                $outdated[] = $uri;
+            } catch (Deleted $e) {
+                $outdated[] = $uri;
+            }
+        }
+        foreach ($outdated as $uri) {
+            unset($this->cache[$uri]);
+            foreach ($this->uri2id[$uri] as $id) {
+                unset($this->id2uri[$id]);
+            }
+            unset($this->uri2id[$uri]);
+        }
+    }
+
 }
