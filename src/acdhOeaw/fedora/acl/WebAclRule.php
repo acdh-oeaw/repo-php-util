@@ -32,6 +32,7 @@ namespace acdhOeaw\fedora\acl;
 
 use stdClass;
 use BadMethodCallException;
+use InvalidArgumentException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
@@ -99,7 +100,7 @@ class WebAclRule extends FedoraResource {
      * @var int 
      */
     private $mode = self::NONE;
-
+    
     /**
      * Returns an object representing a FedoraResource containg ACL rules.
      * 
@@ -311,19 +312,26 @@ class WebAclRule extends FedoraResource {
     }
 
     /**
-     * Saves the ACL rule to the corresponding Fedora resource.
+     * Saves the ACL rule.
      * 
-     * If the Fedora does not exist yet, it is created automatically.
+     * If there is no corresponging Fedora resource, it is created as a Fedora
+     * child of a resource denpted by the `$location` parameter.
+     * @param string $location URI of the parent resource (typically an ACL 
+     *   collection)
      * @return FedoraResource
      */
-    public function save(): FedoraResource {
+    public function save(string $location = null): FedoraResource {
         if ($this->uri != '') {
             $this->setMetadata($this->getAclMetadata());
             $this->updateMetadata();
         } else {
+            if ($location === null) {
+                throw new InvalidArgumentException('location parameter missing');
+            }
+            
             $meta      = $this->getAclMetadata();
             $meta->addResource(RC::idProp(), 'https://id.acdh.oeaw.ac.at/acl/' . microtime(true) . rand(0, 1000));
-            $res       = $this->fedora->createResource($meta, '', RC::get('fedoraAclUri'));
+            $res       = $this->fedora->createResource($meta, '', $location, 'POST');
             $this->uri = $res->getUri();
             $this->fedora->getCache()->delete($res);
             $this->fedora->getCache()->add($this);
@@ -371,15 +379,8 @@ class WebAclRule extends FedoraResource {
      * Changes made to the copy will not affect the original object.
      * @return stdClass
      */
-    public function getData(): stdClass {
-        $ret            = new stdClass();
-        $ret->uri       = $this->uri;
-        $ret->mode      = $this->mode;
-        $ret->resources = $this->resources;
-        $ret->classes   = $this->classes;
-        $ret->users     = $this->roles[self::USER];
-        $ret->groups    = $this->roles[self::GROUP];
-        return $ret;
+    public function getData(): WebAclRule {
+        return clone($this);
     }
 
     /**
@@ -420,5 +421,5 @@ class WebAclRule extends FedoraResource {
             }
         }
     }
-
+    
 }
