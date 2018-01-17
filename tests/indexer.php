@@ -36,7 +36,7 @@ require_once 'init.php';
 $fedora = new Fedora();
 
 acdhOeaw\schema\Object::$debug       = true;
-acdhOeaw\fedora\Fedora::$debugGetRes = true;
+acdhOeaw\fedora\Fedora::$debug = true;
 MetaLookupFile::$debug               = true;
 MetaLookupGraph::$debug              = true;
 Indexer::$debug = true;
