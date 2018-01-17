@@ -85,6 +85,11 @@ class FedoraCache {
         unset($this->cache[$uri]);
     }
 
+    /**
+     * Removes resource with a given internal id from cache.
+     * @param string $id resource repo internal id
+     * @throws NotInCache
+     */
     public function deleteById(string $id) {
         if (!isset($this->id2uri[$id])) {
             throw new NotInCache();
@@ -92,10 +97,18 @@ class FedoraCache {
         $this->deleteByUri($this->id2uri[$id]);
     }
 
+    /**
+     * Removes given resource from cache.
+     * @param FedoraResource $res resource object
+     */
     public function delete(FedoraResource $res) {
         $this->deleteByUri($res->getUri(true));
     }
 
+    /**
+     * Refreshes given resource in cache.
+     * @param FedoraResource $res resource object
+     */
     public function reload(FedoraResource $res) {
         if (isset($this->cache[$res->getUri(true)])) {
             $this->delete($res);
@@ -103,6 +116,14 @@ class FedoraCache {
         $this->add($res);
     }
 
+    /**
+     * Adds given object to the cache.
+     * @param FedoraResource $res resource object
+     * @throws AlreadyInCache
+     * @throws NotFound
+     * @throws Deleted
+     * @throws ClientException
+     */
     public function add(FedoraResource $res) {
         $uri = $res->getUri(true);
         if (isset($this->cache[$uri])) {
@@ -128,6 +149,12 @@ class FedoraCache {
         }
     }
 
+    /**
+     * Gets a resource from cache by its repo internal id.
+     * @param string $id resource's repo internal id
+     * @return FedoraResource
+     * @throws NotInCache
+     */
     public function getById(string $id): FedoraResource {
         if (!isset($this->id2uri[$id])) {
             throw new NotInCache();
@@ -135,6 +162,12 @@ class FedoraCache {
         return $this->cache[$this->id2uri[$id]];
     }
 
+    /**
+     * Gets a resource from cache by its URI.
+     * @param string $uri resource URI 
+     * @return FedoraResource
+     * @throws NotInCache
+     */
     public function getByUri(string $uri): FedoraResource {
         if (!isset($this->cache[$uri])) {
             throw new NotInCache();
@@ -142,6 +175,13 @@ class FedoraCache {
         return $this->cache[$uri];
     }
 
+    /**
+     * Gets resource from cache matchin on any identifier (metadata id property).
+     * @param Resource $meta resource's metadata
+     * @return FedoraResource
+     * @throws NotInCache
+     * @throws CacheInconsistent
+     */
     public function getByMeta(Resource $meta): FedoraResource {
         $matches = array();
         foreach ($meta->allResources(RC::idProp()) as $id) {
@@ -162,8 +202,38 @@ class FedoraCache {
         }
     }
 
+    /**
+     * Gets resource from cache matchin on any identifier (metadata id property).
+     * @param Object $obj object able to provide metadata using a 
+     *   `getMetadata()` method.
+     * @return FedoraResource
+     */
     public function getByObj(Object $obj): FedoraResource {
         return $this->getByMeta($obj->getMetadata());
+    }
+
+    /**
+     * Refreshes cache content (reloads existing resources, removes resources
+     * which no longer exist)
+     */
+    public function refresh() {
+        $outdated = [];
+        foreach ($this->cache as $uri => $i) {
+            try {
+                $i->getMetadata(true);
+            } catch (NotFound $e) {
+                $outdated[] = $uri;
+            } catch (Deleted $e) {
+                $outdated[] = $uri;
+            }
+        }
+        foreach ($outdated as $uri) {
+            unset($this->cache[$uri]);
+            foreach ($this->uri2id[$uri] as $id) {
+                unset($this->id2uri[$id]);
+            }
+            unset($this->uri2id[$uri]);
+        }
     }
 
 }

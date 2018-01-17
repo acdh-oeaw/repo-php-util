@@ -114,6 +114,7 @@ class SimpleQuery extends Query {
                 $value = array_shift($values);
             }
             $value = substr($i, 1, 1) == '#' ? QueryParameter::escapeLiteral($value) : QueryParameter::escapeUri($value);
+            $value = str_replace(array('\\', '$'), array('\\\\', '\\$'), $value); // preg replace special chars escape
             $query = preg_replace('/[?][#@]' . $varName . '/', $value, $query, 1);
         }
         if (count($values) > 0) {

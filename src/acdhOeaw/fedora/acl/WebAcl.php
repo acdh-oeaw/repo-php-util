@@ -506,6 +506,10 @@ class WebAcl {
         }
     }
 
+    /**
+     * Provides a nice printable representation.
+     * @return string
+     */
     public function __toString() {
         $ret = 'ACL rules for ' . $this->res->getUri() . ":\n";
         $ret .= "  Resource rules:\n";

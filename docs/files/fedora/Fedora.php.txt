@@ -30,14 +30,16 @@
 
 namespace acdhOeaw\fedora;
 
+use BadMethodCallException;
+use InvalidArgumentException;
+use RuntimeException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use EasyRdf\Resource;
 use EasyRdf\Sparql\Result;
-use RuntimeException;
-use BadMethodCallException;
 use acdhOeaw\fedora\FedoraCache;
 use acdhOeaw\fedora\exceptions\Deleted;
 use acdhOeaw\fedora\exceptions\NoAcdhId;
@@ -64,7 +66,7 @@ class Fedora {
      * Should debug messages be generated when searching for resources
      * @var bool
      */
-    static public $debugGetRes = false;
+    static public $debug = false;
 
     /**
      * Should debug messages be generated when running SPARQL queries
@@ -195,13 +197,23 @@ class Fedora {
     /**
      * Clears local cache. 
      * 
-     * In normal usage scenarios should not be used (but can be helpful e.g.
+     * Should not be used in normal usage scenarios (but can be helpful e.g.
      * while running tests).
      */
     public function __clearCache() {
         $this->cache = new FedoraCache();
     }
 
+    /**
+     * Forecefully reloads all cached resources' metadata.
+     * 
+     * Should not be used in normal usage scenarios (but can be helpful if
+     * resources were altered at a low level).
+     */
+    public function __refreshCache() {
+        $this->cache->refresh();
+    }
+    
     /**
      * Creates a resource in the Fedora and returns corresponding Resource object
      * 
@@ -244,16 +256,50 @@ class Fedora {
     }
 
     /**
+     * Moves resource to another location.
+     * 
+     * It is a Fedora method cause moving requires resource cache update and the
+     * resource cache is Fedora's private property.
+     * @param FedoraResource $res resource to be moved
+     * @param string $destination new location
+     */
+    public function moveResource(FedoraResource $res, string $destination): Response {
+        $uri         = $this->sanitizeUri($res->getUri());
+        $destination = $this->sanitizeUri($destination);
+        $request     = new Request('MOVE', $uri, ['Destination' => $destination]);
+        $response    = $this->sendRequest($request);
+        $this->cache->deleteById($res->getId());
+        $this->cache->add($res);
+        return $response;
+    }
+
+    /**
      * Sends a given HTTP request to the Fedora.
      * 
+     * Switches most important errors into specific error classes.
      * @param Request $request request to be send
-     * @return \GuzzleHttp\Psr7\Response
+     * @return Response
+     * @throws Deleted
+     * @throws NotFound
+     * @throws RequestException
      */
     public function sendRequest(Request $request): Response {
         if ($this->txUrl && time() - $this->txTimestamp > $this->txKeepAlive) {
             $this->prolong();
         }
-        return $this->client->send($request);
+        try {
+            $response = $this->client->send($request);
+        } catch (RequestException $e) {
+            switch ($e->getCode()) {
+                case 410:
+                    throw new Deleted();
+                case 404:
+                    throw new NotFound();
+                default:
+                    throw $e;
+            }
+        }
+        return $response;
     }
 
     /**
@@ -345,7 +391,7 @@ class Fedora {
      * @throws AmbiguousMatch
      */
     public function getResourceByIds(array $ids, bool $checkIfExist = true): FedoraResource {
-        echo self::$debugGetRes ? "[Fedora] searching for " . implode(', ', $ids) . "\n" : '';
+        echo self::$debug ? "[Fedora] searching for " . implode(', ', $ids) . "\n" : '';
 
         $matches = array();
         foreach ($ids as $id) {
@@ -359,13 +405,13 @@ class Fedora {
 
         switch (count($matches)) {
             case 0:
-                echo self::$debugGetRes ? "  not found\n" : '';
+                echo self::$debug ? "  not found\n" : '';
                 throw new NotFound();
             case 1:
-                echo self::$debugGetRes ? "  found\n" : '';
+                echo self::$debug ? "  found\n" : '';
                 return array_pop($matches);
             default:
-                echo self::$debugGetRes ? "  ambiguosus match: " . implode(', ', array_keys($matches)) . "\n" : '';
+                echo self::$debug ? "  ambiguosus match: " . implode(', ', array_keys($matches)) . "\n" : '';
                 throw new AmbiguousMatch();
         }
     }

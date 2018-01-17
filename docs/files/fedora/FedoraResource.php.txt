@@ -32,6 +32,7 @@ namespace acdhOeaw\fedora;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
@@ -117,10 +118,16 @@ class FedoraResource {
     private $updated = true;
 
     /**
-     * Object provind ACL support.
+     * Object providing ACL support.
      * @var \acdhOeaw\fedora\acl\WebAcl
      */
     private $acl;
+
+    /**
+     * URL of the ACL resource used by a given resource
+     * @var string
+     */
+    private $aclUrl = '';
 
     /**
      * Creates new resource based on its Fedora URI.
@@ -223,12 +230,17 @@ class FedoraResource {
      */
     public function delete(bool $deep = false, bool $children = false,
                            bool $references = false) {
-        $uri     = $this->fedora->sanitizeUri($this->getUri());
-        $request = new Request('DELETE', $uri);
+        $this->uri      = $this->fedora->sanitizeUri($this->getUri());
+        $fedoraChildren = $this->getMetadata()->allResources('http://www.w3.org/ns/ldp#contains');
+        if (count($fedoraChildren) > 0) {
+            throw new RuntimeException("A resource has Fedora children");
+        }
+
+        $request = new Request('DELETE', $this->uri);
         $this->fedora->sendRequest($request);
         $this->fedora->getCache()->delete($this);
         if ($deep) {
-            $request = new Request('DELETE', $uri . '/fcr:tombstone');
+            $request = new Request('DELETE', $this->uri . '/fcr:tombstone');
             $this->fedora->sendRequest($request);
         }
 
@@ -251,7 +263,6 @@ class FedoraResource {
                         $meta->deleteResource($prop, $id);
                     }
                     $res->setMetadata($meta);
-                    echo $res->getUri(true) . " removing references to $id \n";
                     $res->updateMetadata(self::OVERWRITE);
                 } catch (Deleted $e) {
                     
@@ -271,18 +282,7 @@ class FedoraResource {
     public function getFixity(): string {
         $uri     = $this->fedora->sanitizeUri($this->uri);
         $request = new Request('GET', $uri . '/fcr:fixity');
-        try {
-            $resp = $this->fedora->sendRequest($request);
-        } catch (RequestException $e) {
-            switch ($e->getCode()) {
-                case 410:
-                    throw new Deleted();
-                case 404:
-                    throw new NotFound();
-                default:
-                    throw $e;
-            }
-        }
+        $resp    = $this->fedora->sendRequest($request);
 
         $graph     = new Graph();
         $graph->parse($resp->getBody());
@@ -338,7 +338,7 @@ class FedoraResource {
      * @see setMetadata()
      * @see getSparqlTriples()
      */
-    public function updateMetadata(string $mode = self::UPDATE) {
+    public function updateMetadata(string $mode = self::OVERWRITE) {
         if (!$this->updated) {
             $this->uri = $this->fedora->sanitizeUri($this->uri);
 
@@ -372,7 +372,14 @@ class FedoraResource {
             $headers = array('Content-Type' => 'application/sparql-update');
             $request = new Request('PATCH', $this->uri . '/fcr:metadata', $headers, $body);
 
-            $this->fedora->sendRequest($request);
+            try {
+                $this->fedora->sendRequest($request);
+            } catch (ClientException $e) {
+                if (Fedora::$debug) {
+                    echo $body;
+                }
+                throw $e;
+            }
 
             $this->updated = true;
         }
@@ -430,24 +437,14 @@ class FedoraResource {
     private function getMetadataFromFedora(): Resource {
         $uri     = $this->fedora->sanitizeUri($this->uri);
         $request = new Request('GET', $uri . '/fcr:metadata', ['Accept' => 'application/n-triples']);
-        try {
-            $resp = $this->fedora->sendRequest($request);
-        } catch (RequestException $e) {
-            switch ($e->getCode()) {
-                case 410:
-                    throw new Deleted();
-                case 404:
-                    throw new NotFound();
-                default:
-                    throw $e;
-            }
-        }
+        $resp    = $this->fedora->sendRequest($request);
 
         $format  = '';
         $headers = $resp->getHeaders();
         if (isset($headers['Content-Type'])) {
             $format = explode(';', $headers['Content-Type'][0])[0];
         }
+        $this->extractAcl($resp);
 
         $graph = new Graph();
         $graph->parse($resp->getBody(), $format);
@@ -596,11 +593,29 @@ class FedoraResource {
     }
 
     /**
+     * Returns URL of the resources' ACL collection
+     * @param bool $refresh should ACL URL be reread 
+     * @return string
+     */
+    public function getAclUrl(bool $refresh = false): string {
+        if ($refresh || $this->aclUrl === null) {
+            $request      = new Request('HEAD', $this->fedora->sanitizeUri($this->uri));
+            $response     = $this->fedora->sendRequest($request);
+            $this->extractAcl($response);
+        }
+        return $this->aclUrl;
+    }
+
+    /**
      * Returns a WebAcl object for access rules manipulation.
+     * @param bool $refresh should the ACL collection and rules be refreshed or
+     *   read from cache (there are many scenarios when reading requiring
+     *   ACL data to be outdated so the default beahviour is to refresh)
      * @return WebAcl
      */
-    public function getAcl(): WebAcl {
-        if (!$this->acl) {
+    public function getAcl(bool $refresh = true): WebAcl {
+        if ($refresh || $this->acl === null) {
+            $this->getAclUrl($refresh);
             $this->acl = new WebAcl($this);
         }
         return $this->acl;
@@ -696,6 +711,33 @@ class FedoraResource {
 
         $rdf = $res->getGraph()->serialise('ntriples');
         return $rdf;
+    }
+
+    /**
+     * Fetches ACL URL from Fedora response headers and updates the `$aclUrl` 
+     * property.
+     * 
+     * If new and old URLs differ, clears the `$acl` property.
+     * 
+     * If no appropriate header is found clears the `$aclUrl` and `$acl` 
+     * properties.
+     * @param Response $resp Fedora response
+     */
+    private function extractAcl(Response $resp) {
+        $headers = $resp->getHeaders();
+        foreach ($headers['Link'] ?? [] as $i) {
+            if (preg_match('/; ?rel="?acl"?$/', $i)) {
+                $i = explode(";", $i);
+                $newUrl = substr(trim($i[0]), 1, -1);
+                if ($this->aclUrl !== $newUrl) {
+                    $this->acl = null;
+                }
+                $this->aclUrl = $newUrl;
+                return;
+            } 
+        }
+        $this->aclUrl = '';
+        $this->acl = null;
     }
 
     /**
