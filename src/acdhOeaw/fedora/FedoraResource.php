@@ -62,9 +62,10 @@ use acdhOeaw\util\RepoConfig as RC;
  */
 class FedoraResource {
 
-    const ADD       = 'ADD';
-    const UPDATE    = 'UPDATE';
-    const OVERWRITE = 'OVERWRITE';
+    const ADD         = 'ADD';
+    const UPDATE      = 'UPDATE';
+    const OVERWRITE   = 'OVERWRITE';
+    const PARENT_PROP = 'http://fedora.info/definitions/v4/repository#hasParent';
 
     /**
      * List of metadata properties managed exclusively by the Fedora.
@@ -599,9 +600,24 @@ class FedoraResource {
      */
     public function getAclUrl(bool $refresh = false): string {
         if ($refresh || $this->aclUrl === null) {
-            $request      = new Request('HEAD', $this->fedora->sanitizeUri($this->uri));
-            $response     = $this->fedora->sendRequest($request);
+            $request  = new Request('HEAD', $this->fedora->sanitizeUri($this->uri));
+            $response = $this->fedora->sendRequest($request);
             $this->extractAcl($response);
+
+            // Fedora 4.7.4 doesn't provide ACL link header for binary resources
+            // if the ACL id directly attached to the resource (sic!).
+            // As a fallback we can try to run a sparql query.
+            if ($this->aclUrl == '') {
+                $query  = new SimpleQuery("SELECT ?aclUri WHERE { ?@ ?@ ?aclUri . }");
+                $query->setValues([
+                    $this->fedora->standardizeUri($this->uri),
+                    WebAcl::ACL_LINK_PROP
+                ]);
+                $result = $this->fedora->runQuery($query);
+                if (count($result) > 0) {
+                    $this->aclUrl = $result[0]->aclUri->getUri();
+                }
+            }
         }
         return $this->aclUrl;
     }
@@ -727,17 +743,17 @@ class FedoraResource {
         $headers = $resp->getHeaders();
         foreach ($headers['Link'] ?? [] as $i) {
             if (preg_match('/; ?rel="?acl"?$/', $i)) {
-                $i = explode(";", $i);
+                $i      = explode(";", $i);
                 $newUrl = substr(trim($i[0]), 1, -1);
                 if ($this->aclUrl !== $newUrl) {
                     $this->acl = null;
                 }
                 $this->aclUrl = $newUrl;
                 return;
-            } 
+            }
         }
         $this->aclUrl = '';
-        $this->acl = null;
+        $this->acl    = null;
     }
 
     /**

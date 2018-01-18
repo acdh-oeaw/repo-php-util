@@ -41,7 +41,7 @@ $idBase        = 'https://id.acdh.oeaw.ac.at/';
 $fedora->begin();
 $r = [];
 foreach (['c1', 'c1/c2', 'c1/r1', 'c1/r2', 'c1/c2/r1', 'c1/c2/r2'] as $i) {
-    $r[$i] = RF::create(['id' => $idBase . $i], $i, 'PUT');
+    $r[$i] = RF::create(['id' => $idBase . $i], $i, 'PUT', substr($i, -2, 1) === 'r' ? 'sample binary content' : '');
 }
 $fedora->commit();
 RF::removeAcl($fedora);
@@ -325,7 +325,7 @@ try {
 
     $aclCh->reload();
     assert(AR::READ === $aclCh->getMode(AR::USER, 'user1'));
-    
+
     $fedora->begin();
     $aclCh->createAcl();
     $aclP->revokeAll();
@@ -356,6 +356,30 @@ try {
     // it's valid if an ACL belongs to parent
     $r['c1']->getAcl()->createAcl();
     $r['c1/r1']->getAcl()->grant(AR::USER, AR::PUBLIC_USER, AR::READ);
+} finally {
+    RF::removeAcl($fedora, false);
+}
+
+
+echo "\n-------------------------------------------------------------------\n";
+echo "attaching an ACL directly to a binary resource works\n";
+try {
+    $fedora->begin();
+    $acl = $r['c1/c2/r1']->getAcl();
+
+    assert(AR::NONE === $acl->getMode(AR::USER, AR::PUBLIC_USER) && AR::NONE === $acl->getMode(AR::USER, 'user1') && AR::NONE === $acl->getMode(AR::GROUP, 'group1'));
+    $acl->createAcl();
+    $acl->grant(AR::USER, AR::PUBLIC_USER, AR::READ);
+    assert(AR::READ === $acl->getMode(AR::USER, AR::PUBLIC_USER));
+    assert(AR::READ === $acl->getMode(AR::USER, 'user1'));
+    assert(AR::READ === $acl->getMode(AR::GROUP, 'group1'));
+
+    $fedora->commit();
+
+    $acl = $r['c1/c2/r1']->getAcl(true);
+    assert(AR::READ === $acl->getMode(AR::USER, AR::PUBLIC_USER));
+    assert(AR::READ === $acl->getMode(AR::USER, 'user1'));
+    assert(AR::READ === $acl->getMode(AR::GROUP, 'group1'));
 } finally {
     RF::removeAcl($fedora, false);
 }
