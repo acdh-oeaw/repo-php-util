@@ -78,14 +78,15 @@ class Fedora {
      * Attaches binary content to a given Guzzle HTTP request
      * 
      * @param \GuzzleHttp\Psr7\Request $request HTTP request
-     * @param string $body binary content to be attached
-     *   It can be a file name, a string or an URL
-     *   If it is URL, a "redirecting Fedora resource" will be created
+     * @param $body binary content to be attached
+     *   It can be a file name, an URL, an array or a normal string.
+     *   If it is an URL, a "redirecting Fedora resource" will be created.
+     *   If it is an array, it should contain fields: contentType, filename, data
      * @return \GuzzleHttp\Psr7\Request
      */
-    static public function attachData(Request $request, string $body): Request {
+    static public function attachData(Request $request, $body): Request {
         $headers = $request->getHeaders();
-        if (file_exists($body)) {
+        if (is_string($body) && file_exists($body)) {
             $filename                       = rawurldecode(basename($body)); // lucky guess - unfortunately it is not clear how to escape header values
             $headers['Content-Type']        = mime_content_type($body);
             $headers['Content-Disposition'] = 'attachment; filename="' . $filename . '"';
@@ -94,7 +95,7 @@ class Fedora {
             $headers['Content-Type']        = $body['contentType'];
             $headers['Content-Disposition'] = 'attachment; filename="' . rawurldecode($body['filename']) . '"';
             $body                           = file_exists($body['data']) ? fopen($body, 'rb') : $body['data'];
-        } elseif (preg_match('|^[a-z0-9]+://|i', $body)) {
+        } elseif (is_string($body) && preg_match('|^[a-z0-9]+://|i', $body)) {
             $headers['Content-Type'] = 'message/external-body; access-type=URL; URL="' . $body . '"';
             $body                    = null;
         }
@@ -213,7 +214,7 @@ class Fedora {
     public function __refreshCache() {
         $this->cache->refresh();
     }
-    
+
     /**
      * Creates a resource in the Fedora and returns corresponding Resource object
      * 

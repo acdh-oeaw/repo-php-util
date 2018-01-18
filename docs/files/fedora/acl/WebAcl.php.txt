@@ -133,7 +133,8 @@ class WebAcl {
      *   be such) should be saved
      * @return array collection of `WebAclRule` objects
      */
-    static private function initRules(Result $results, Fedora $fedora, string $aclUrl): array {
+    static private function initRules(Result $results, Fedora $fedora,
+                                      string $aclUrl): array {
         $rules = array();
         foreach ($results as $i) {
             $rule = (string) $i->rule;
@@ -414,8 +415,14 @@ class WebAcl {
      * All rules describing resource from ACL currently in effect are 
      * automatically moved to the newly created ACL.
      * 
+     * Resource has to permanently exist in the repository for operation to
+     * succeed (you can not create a resource's ACL within the same transaction
+     * a resource was created). If it is not a case, a `NotFound` exception is
+     * rised.
+     * 
      * If an ACL attached directly to the resource already exists, nothing 
      * happens.
+     * @throws \RuntimeException
      */
     public function createAcl(): WebAcl {
         $resMeta = $this->res->getMetadata();
@@ -440,17 +447,29 @@ class WebAcl {
 
         // Link to ACL is applied after the transaction commit, so we need 
         // a separate transaction not to affect the current one
+        // As side effect the resource for which an ACL is created has to 
+        // persistently exist in the repository already!
         $fedoraTmp = clone($this->res->getFedora());
         $fedoraTmp->__clearCache();
         $fedoraTmp->begin();
         $aclRes    = $fedoraTmp->createResource($aclMeta, '', $location, 'POST');
         $resMeta->addResource(self::ACL_LINK_PROP, $aclRes->getUri(true));
-        $resTmp    = $fedoraTmp->getResourceByUri($this->res->getUri());
-        $resTmp->setMetadata($resMeta);
-        $resTmp->updateMetadata();
-        $fedoraTmp->commit();
+        try {
+            $resTmp = $fedoraTmp->getResourceByUri($this->res->getUri());
+            $resTmp->setMetadata($resMeta);
+            $resTmp->updateMetadata();
+            $fedoraTmp->commit();
+        } catch (NotFound $e) {
+            $fedoraTmp->rollback();
+        }
 
         $this->res->getMetadata(true);
+        if ($this->res->getAclUrl() !== $aclRes->getUri(true)) {
+            // second try for binary resources which are not handled properly by Fedora
+            if ($this->res->getAclUrl(true) !== $aclRes->getUri(true)) {
+                throw new RuntimeException('ACL creation failed');
+            }
+        }
 
         $fedora = $this->res->getFedora();
         foreach ($this->resRules as $h => $i) {
