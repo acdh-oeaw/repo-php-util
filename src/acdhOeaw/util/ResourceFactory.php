@@ -63,11 +63,13 @@ class ResourceFactory {
      *   property value); 'id', 'title' and 'parent' are handled automatically
      * @param string $location where to create the resource
      * @param string $method creation method (POST or PUT)
+     * @param string $binary resource content (if empty string, an RDF resource
+     *   is created)
      * @return FedoraResource
      */
     static public function create(array $properties = [],
                                   string $location = '/',
-                                  string $method = 'POST'): FedoraResource {
+                                  string $method = 'POST', string $binary = ''): FedoraResource {
         if (isset($properties['id']) && !is_array($properties['id'])) {
             try {
                 return self::$fedora->getResourceById($properties['id']);
@@ -111,7 +113,10 @@ class ResourceFactory {
                 }
             }
         }
-        $res = self::$fedora->createResource($meta, '', $location, $method);
+        if ($binary !== '') {
+            $binary = ['contentType' => 'text/plain', 'data' => $binary, 'filename' => 'sample_file.txt'];
+        }
+        $res = self::$fedora->createResource($meta, $binary, $location, $method);
         return $res;
     }
 
@@ -122,9 +127,9 @@ class ResourceFactory {
      */
     static public function removeAcl(Fedora $fedora, bool $verbose = true) {
         echo $verbose ? "removing ACL rules\n" : '';
-        
+
         $fedora->rollback();
-        
+
         $fedora->begin();
         $resp = $fedora->getResourcesByProperty('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://www.w3.org/ns/auth/acl#Authorization');
         foreach ($resp as $k => $rule) {
@@ -132,7 +137,7 @@ class ResourceFactory {
             $rule->delete(true);
         }
         $fedora->commit();
-        
+
         $fedora->begin();
         $resp = $fedora->getResourcesByProperty('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', 'http://fedora.info/definitions/v4/webac#Acl');
         foreach ($resp as $k => $rule) {
@@ -143,7 +148,7 @@ class ResourceFactory {
             $rule->delete(true, true);
         }
         $fedora->commit();
-        
+
         $fedora->begin();
         $resp = $fedora->getResourcesByProperty('http://www.w3.org/ns/auth/acl#accessControl');
         foreach ($resp as $k => $res) {
@@ -157,7 +162,7 @@ class ResourceFactory {
             $res->updateMetadata(FedoraResource::OVERWRITE);
         }
         $fedora->commit();
-        
+
         echo $verbose ? "  ended\n" : '';
         $fedora->__refreshCache(); // make all cached FedoraResource object aware of the changes made
     }
