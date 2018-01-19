@@ -257,24 +257,6 @@ class Fedora {
     }
 
     /**
-     * Moves resource to another location.
-     * 
-     * It is a Fedora method cause moving requires resource cache update and the
-     * resource cache is Fedora's private property.
-     * @param FedoraResource $res resource to be moved
-     * @param string $destination new location
-     */
-    public function moveResource(FedoraResource $res, string $destination): Response {
-        $uri         = $this->sanitizeUri($res->getUri());
-        $destination = $this->sanitizeUri($destination);
-        $request     = new Request('MOVE', $uri, ['Destination' => $destination]);
-        $response    = $this->sendRequest($request);
-        $this->cache->deleteById($res->getId());
-        $this->cache->add($res);
-        return $response;
-    }
-
-    /**
      * Sends a given HTTP request to the Fedora.
      * 
      * Switches most important errors into specific error classes.
@@ -664,8 +646,10 @@ class Fedora {
      * @see rollback()
      */
     public function commit() {
-        $this->client->post($this->txUrl . '/fcr:tx/fcr:commit');
-        $this->txUrl = null;
+        if ($this->txUrl) {
+            $this->client->post($this->txUrl . '/fcr:tx/fcr:commit');
+            $this->txUrl = null;
+        }
     }
 
     /**
