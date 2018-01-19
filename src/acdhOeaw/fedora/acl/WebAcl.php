@@ -471,9 +471,8 @@ class WebAcl {
             }
         }
 
-        $fedora = $this->res->getFedora();
         foreach ($this->resRules as $h => $i) {
-            $fedora->moveResource($i, $aclRes->getUri(true) . '/' . $h);
+            $i->move($aclRes->getUri(true) . '/' . $h);
         }
 
         return $this;

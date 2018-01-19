@@ -275,6 +275,22 @@ class FedoraResource {
     }
 
     /**
+     * Moves resource to another location.
+     * 
+     * @param string $destination new location
+     */
+    public function move(string $destination): Response {
+        $uri         = $this->fedora->sanitizeUri($this->uri);
+        $destination = $this->fedora->sanitizeUri($destination);
+        $request     = new Request('MOVE', $uri, ['Destination' => $destination]);
+        $response    = $this->fedora->sendRequest($request);
+        $cache       = $this->fedora->getCache();
+        $cache->deleteById($this->getId());
+        $cache->add($this);
+        return $response;
+    }
+
+    /**
      * Returns resource fixity. 
      * @throws Deleted
      * @throws NotFound
@@ -731,6 +747,13 @@ class FedoraResource {
     private function getSparqlTriples(Resource $metadata): string {
         $uri = $this->fedora->sanitizeUri($this->uri);
         $res = $metadata->copy(self::$skipProp, self::$skipPropRegExp, $uri);
+        
+        // make sure the ACL property is in current transaction
+        $aclProp = $res->getResource(WebAcl::ACL_LINK_PROP);
+        if ($aclProp) {
+            $res->deleteResource(WebAcl::ACL_LINK_PROP);
+            $res->addResource(WebAcl::ACL_LINK_PROP, $this->fedora->sanitizeUri($aclProp->getUri()));
+        }
 
         $rdf = $res->getGraph()->serialise('ntriples');
         return $rdf;
