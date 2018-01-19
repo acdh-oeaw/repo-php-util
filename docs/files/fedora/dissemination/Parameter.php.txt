@@ -31,9 +31,9 @@
 namespace acdhOeaw\fedora\dissemination;
 
 use RuntimeException;
-use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
+use acdhOeaw\fedora\dissemination\parameter\iTransformation;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -47,53 +47,69 @@ use acdhOeaw\util\RepoConfig as RC;
 class Parameter extends FedoraResource {
 
     /**
-     * Performs parameter value transformation.
-     * 
-     * Supported transformations are:
-     * - identity (no transformation)
-     * - base64 encoding
-     * - url encoding
-     * @param string $value value to be transformed
-     * @param string $method transformation to be applied (''/'base64'/'url')
-     * @return string
-     * @throws RuntimeException
+     * Stores list of registered transformations
+     * @var array
      */
-    static public function transform(string $value, string $method) {
-        switch ($method) {
-            case '':
-                return $value;
-            case 'base64':
-                return base64_encode($value);
-            case 'url':
-                return rawurlencode($value);
-            default:
-                throw new RuntimeException('unknown transformation');
-        }
+    static private $transformations = [
+        'add'    => 'acdhOeaw\\fedora\\dissemination\\parameter\\AddParam',
+        'base64' => 'acdhOeaw\\fedora\\dissemination\\parameter\\Base64Encode',
+        'part'   => 'acdhOeaw\\fedora\\dissemination\\parameter\\UriPart',
+        'set'    => 'acdhOeaw\\fedora\\dissemination\\parameter\\SetParam',
+        'substr' => 'acdhOeaw\\fedora\\dissemination\\parameter\\Substr',
+        'url'    => 'acdhOeaw\\fedora\\dissemination\\parameter\\UrlEncode',
+    ];
+
+    /**
+     * Registers a new transformation
+     * @param iTransformation $transformation transformation to be registered
+     */
+    static public function registerTransformation(iTransformation $transformation) {
+        self::$transformations[$transformation->getName()] = get_class($transformation);
+
+        print_r(self::$transformations);
     }
 
     /**
      * Returns parameter value for a given resource.
      * @param FedoraResource $res repository resource to return the value for
-     * @param string $valueProp RDF property holding the parameter value
+     * @param string $valueProp RDF property holding the parameter value. If
+     *   empty, the $default value is used.
      * @param string $default parameter default value
-     * @param string $method transformation to be applied on the parameter value
+     * @param string $transformations transformations to be applied to the parameter value
      * @return string
-     * @see transform()
      */
     static public function value(FedoraResource $res, string $valueProp,
-                                 string $default, string $method): string {
+                                 string $default, array $transformations): string {
         $value = $default;
 
-        if ($valueProp === '.') { // special case - resource URI
-            $value = $res->getUri(true);
-        } else if ($valueProp) {
+        if ($valueProp !== '') {
             $matches = $res->getMetadata()->all($valueProp);
             if (count($matches) > 0) {
                 $value = (string) $matches[0];
             }
         }
 
-        return self::transform($value, $method);
+        foreach ($transformations as $i) {
+            $matches = [];
+            preg_match('|^([^(]+)([(].*[)])?$|', $i, $matches);
+            $name    = $matches[1];
+            if (!isset(self::$transformations[$name])) {
+                throw new RuntimeException('unknown transformation');
+            }
+
+            $param = [$value];
+            if (isset($matches[2])) {
+                $tmp = explode(',', substr($matches[2], 1, -1));
+                foreach ($tmp as $j) {
+                    $param[] = trim($j);
+                }
+            }
+
+            $transformation = new self::$transformations[$name]();
+            $value          = $transformation->transform(...$param);
+        }
+
+        return $value;
     }
 
     /**
@@ -123,34 +139,27 @@ class Parameter extends FedoraResource {
     /**
      * Return parameter value for a given repository resource
      * @param FedoraResource $res repository resource to get the value for
-     * @param string $method transformation to be applied on the value
-     * @param string $format format indication to be attached to the resource 
-     *   URI by appending `?format=$format` to them.
-     *   Applied only to URIs.
-     *   Will work only for URIs pointing to a resolver making use of such 
-     *   format indication (but the class is unable to verify that).
-     *   To be used when a dissemination service needs to preprocess a resource
-     *   with other dissemination service.
+     * @param string $transformations transformations to be applied to the value
      * @return string
      * @see transform()
      */
-    public function getValue(FedoraResource $res, string $method,
-                             string $format = ''): string {
-        $meta      = $this->getMetadata();
-        $default   = $meta->all(RC::get('fedoraServiceParamDefaultValueProp'));
-        $default   = count($default) > 0 ? (string) $default[0] : '';
-        $valueProp = $meta->all(RC::get('fedoraServiceParamRdfPropertyProp'));
-        if (count($valueProp) > 0) {
-            $isRes     = $valueProp[0] instanceof Resource;
-            $valueProp = (string) $valueProp[0];
-            if ($isRes && strlen($format) > 0) {
-                $glue      = strpos($valueProp, '?') !== false ? '&' : '?';
-                $valueProp .= $glue . 'format=' . rawurldecode($format);
-            }
-        } else {
+    public function getValue(FedoraResource $res, array $transformations = []): string {
+        $overwrite = filter_input(INPUT_GET, $this->getName());
+        if ($overwrite !== null) {
             $valueProp = '';
+            $default = $overwrite;
+        } else {
+            $meta      = $this->getMetadata();
+            $default   = $meta->all(RC::get('fedoraServiceParamDefaultValueProp'));
+            $default   = count($default) > 0 ? (string) $default[0] : '';
+            $valueProp = $meta->all(RC::get('fedoraServiceParamRdfPropertyProp'));
+            if (count($valueProp) > 0) {
+                $valueProp = (string) $valueProp[0];
+            } else {
+                $valueProp = '';
+            }
         }
-        return self::value($res, $valueProp, $default, $method);
+        return self::value($res, $valueProp, $default, $transformations);
     }
 
 }

@@ -42,21 +42,9 @@ use acdhOeaw\util\RepoConfig as RC;
  * - cfg:fedoraServiceParamRdfPropertyProp - an RDF property used in Fedora
  *   resources to denote given parameter value
  * - cfg:fedoraServiceParamDefaultValueProp - a default parameter value
- * - cfg:fedoraServiceParamRequiredProp - if the parameter is required
- *   (it is not really used by ACDH dissemination services)
- * - cfg:fedoraServiceParamByValueProp - if the parameter value should be
- *   treated as an URI to fetch data from (when "true") or be passed as it is
- *   (when "false").
- *   While it was an important property for Fedora 3, for ACDH dissemination
- *   services only the combination of default value equal to "." and pass by
- *   value equal to "false" is used (as it denotes the current Fedora 4 resource
- *   URI should be used as a parameter value).
  * 
- * There is a special case when a parameter is not passed by value and its
- * default value is ".". In such a case a current resource's URI is taken as the
- * parameter value.
- * This is needed because of the differences between Fedora 3 and Fedora 4 data
- * models.
+ * Parameters are used only to extract a "raw" value which then can be transformed
+ * according to rules set in service's location string.
  * 
  * Typically you shouldn't create the Parameter object on your own but use the
  * `\achdOeaw\schema\dissemination\Service::addParameter()` method instead.
@@ -78,18 +66,6 @@ class Parameter extends Object {
     private $name;
 
     /**
-     * Is parameter passed by value?
-     * @var bool 
-     */
-    private $byValue;
-
-    /**
-     * Is parameter required?
-     * @var bool 
-     */
-    private $required;
-
-    /**
      * Parameter default value.
      * @var string 
      */
@@ -108,21 +84,17 @@ class Parameter extends Object {
      * @param \acdhOeaw\schema\dissemination\Service $service dissemination
      *   service using this parameter
      * @param string $name parameter name
-     * @param bool $byValue is parameter value passed by value?
-     * @param bool $required is parameter required?
      * @param string $defaultValue default parameter value
      * @param string $rdfProperty RDF property storing parameter value in 
      *   resources' metadata
      */
     public function __construct(Fedora $fedora, string $id, Service $service,
-                                string $name, bool $byValue, bool $required,
-                                string $defaultValue, string $rdfProperty) {
+                                string $name, string $defaultValue,
+                                string $rdfProperty) {
         parent::__construct($fedora, $id);
 
         $this->serviceId    = $service->getResource()->getId();
         $this->name         = $name;
-        $this->byValue      = $byValue;
-        $this->required     = $required;
         $this->defaultValue = $defaultValue;
         $this->rdfProperty  = $rdfProperty;
     }
@@ -140,12 +112,6 @@ class Parameter extends Object {
 
         $titleProp = RC::get('fedoraTitleProp');
         $meta->addLiteral($titleProp, $this->name);
-
-        $byValueProp = RC::get('fedoraServiceParamByValueProp');
-        $meta->addLiteral($byValueProp, $this->byValue);
-
-        $requiredProp = RC::get('fedoraServiceParamRequiredProp');
-        $meta->addLiteral($requiredProp, $this->required);
 
         $defaultValueProp = RC::get('fedoraServiceParamDefaultValueProp');
         $meta->addLiteral($defaultValueProp, $this->defaultValue);

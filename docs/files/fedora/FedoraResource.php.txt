@@ -642,7 +642,7 @@ class FedoraResource {
      * @return array
      */
     public function getDissServices(): array {
-        $ret = array();
+        $ret     = $weights = [];
 
         // by metadata propeties match
         $query   = '
@@ -693,7 +693,10 @@ class FedoraResource {
             }
             $service = new Service($this->fedora, $i->uri);
             foreach ($service->getFormats() as $format) {
-                $ret[$format] = $service;
+                if (!isset($weights[$format->format]) || $weights[$format->format] < $format->weight) {
+                    $ret[$format->format]     = $service;
+                    $weights[$format->format] = $format->weight;
+                }
             }
         }
 

@@ -87,7 +87,7 @@ class Service extends FedoraResource {
         $meta    = $this->getMetadata();
         $formats = array();
         foreach ($meta->all(RC::get('fedoraServiceRetFormatProp')) as $i) {
-            $formats[] = (string) $i;
+            $formats[] = new Format((string) $i);
         }
         return $formats;
     }
@@ -102,25 +102,22 @@ class Service extends FedoraResource {
         $meta = $this->getMetadata();
 
         $uri = $meta->getLiteral(RC::get('fedoraServiceLocProp'));
-
+        
         $param = array();
-        preg_match_all('#{[-A-Za-z_0-9]+([|][a-zA-Z0-9]+)?([|][-_a-zA-Z0-9]+)?}#', $uri, $param);
+        preg_match_all('#{[^}]+}#', $uri, $param);
         $param = $param[0];
         foreach ($param as $i) {
-            $ii = explode('|', substr($i, 1, -1));
-            if (count($ii) < 2) {
-                $ii[1] = '';
-            }
-            if (count($ii) < 3) {
-                $ii[2] = '';
-            }
+            $ii   = explode('|', substr($i, 1, -1));
+            $name = array_shift($ii);
 
-            if ($ii[0] === 'RES_URI') {
-                $value = Parameter::value($res, '.', '', $ii[1], $ii[2]);
-            } else if (isset($this->param[$ii[0]])) {
-                $value = $this->param[$ii[0]]->getValue($res, $ii[1], $ii[2]);
+            if ($name === 'RES_URI') {
+                $value = Parameter::value($res, '', $res->getUri(true), $ii);
+            } else if ($name === 'RES_ID') {
+                $value = Parameter::value($res, '', $res->getId(), $ii);
+            } else if (isset($this->param[$name])) {
+                $value = $this->param[$name]->getValue($res, $ii);
             } else {
-                throw new RuntimeException('unknown parameter ' . $i);
+                throw new RuntimeException('unknown parameter ' . $name);
             }
             $uri = str_replace($i, $value, $uri);
         }

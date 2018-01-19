@@ -114,7 +114,11 @@ abstract class Object {
      */
     public function getResource(bool $create = true, bool $uploadBinary = true): FedoraResource {
         if ($this->res === null) {
-            $this->updateRms($create, $uploadBinary);
+            try {
+                $this->findResource(false, false);
+            } catch (NotFound $e) {
+                $this->updateRms($create, $uploadBinary);
+            }
         }
         return $this->res;
     }
@@ -208,8 +212,7 @@ abstract class Object {
      * @return boolean if a repository resource was found
      */
     protected function findResource(bool $create = true,
-                                    bool $uploadBinary = true,
-                                    string $path = ''): bool {
+                                    bool $uploadBinary = true, string $path = ''): bool {
         $ids    = $this->getIds();
         echo self::$debug ? "searching for " . implode(', ', $ids) . "\n" : "";
         $result = '';
