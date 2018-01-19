@@ -648,6 +648,7 @@ class FedoraResource {
         $query   = '
             SELECT ?uri (count(distinct ?prop1) as ?countReq) (count(distinct ?prop2) as ?countOpt) (count(distinct ?match3) as ?baseReq) (count(distinct ?match4) as ?baseOpt)
             WHERE {
+                ?uri a ?@ .
                 OPTIONAL {
                     ?@ ?prop1 ?value1 .
                     ?match1 ?@ / ^?@ ?uri .
@@ -673,18 +674,18 @@ class FedoraResource {
             GROUP BY ?uri
             HAVING (?countReq >= ?baseReq && (?baseOpt = 0 || ?countOpt > 0))
         ';
-        $param1  = array(
+        $param1  = [
             $this->getUri(true),
             RC::relProp(), RC::idProp(),
             RC::get('fedoraServiceMatchProp'),
             RC::get('fedoraServiceMatchValue'),
             RC::get('fedoraServiceMatchRequired'),
-        );
-        $param2  = array(
+        ];
+        $param2  = [
             RC::idProp(), RC::relProp(),
             RC::get('fedoraServiceMatchRequired')
-        );
-        $param   = array_merge($param1, $param1, $param2, $param2);
+        ];
+        $param   = array_merge([RC::get('fedoraServiceClass')], $param1, $param1, $param2, $param2);
         $query   = new SimpleQuery($query, $param);
         $results = $this->fedora->runQuery($query);
         foreach ($results as $i) {
