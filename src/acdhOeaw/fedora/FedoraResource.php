@@ -705,7 +705,10 @@ class FedoraResource {
         foreach ($meta->allResources(RC::get('fedoraHasServiceProp')) as $id) {
             $service = new Service($this->fedora, $this->fedora->getResourceById($id)->getUri(true));
             foreach ($service->getFormats() as $format) {
-                $ret[$format] = $service;
+                if (!isset($weights[$format->format]) || $weights[$format->format] < $format->weight) {
+                    $ret[$format->format]     = $service;
+                    $weights[$format->format] = $format->weight;
+                }
             }
         }
 
