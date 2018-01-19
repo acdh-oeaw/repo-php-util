@@ -43,11 +43,18 @@ use acdhOeaw\util\RepoConfig as RC;
  * RDF properties:
  * 
  * - cfg:fedoraTitleProp - a service name
- * - cfg:fedoraServiceLocProp - a service location containing parameter bindings
- *   (copy of the Fedora 3 wsdl:binding/wsdl:operation/http:operation/@location)
- * - cfg:fedoraServiceRetFormatProp - a MIME type provided by this service
- * - cfg:ciriloIdProp - a Fedora 3 service ID used to match a resource in 
- *   Fedora 4 with a corresponding service deployment method of Fedora 3
+ * - cfg:fedoraServiceLocProp - a service location containing parameter bindings.
+ *   A place where parameter is ingested is marked with the "{param_name}" syntax.
+ *   Transformations can be applied to the parameter value using the
+ *   "{param_name|part(path)|url}" syntax (transformations  can be chained as on 
+ *   the example). Transformations shipped with the repo-php-util are provided
+ *   in the acdhOeaw\fedora\dissemination\parameter namespace. You can register
+ *   other using the acdhOeaw\fedora\dissemination\Parameter::registerTransformation(iTransformation $transformation)
+ *   static method before calling acdhOeaw\fedora\dissmination\Service::getRequest().
+ *   There are two special parameters: RES_URI and RES_ID (latter one being
+ *   resource's repository internal UUID)
+ * - cfg:fedoraServiceRetFormatProp - a MIME type provided by this service.
+ *   It can contain a weight as used in the HTTP Accept header (e.g. "text/plain; q=0.5")
  * 
  * Dissemination service parameters are modeled as its child resources
  * (cfg:fedoraRelProp) - see Parameter class description for details.
@@ -124,18 +131,15 @@ class Service extends Object {
     /**
      * Defines a dissemination service parameter.
      * @param string $name parameter name
-     * @param bool $byValue should parameter be passed by value?
-     * @param bool $required is parameter required?
      * @param string $defaultValue default parameter value
      * @param string $rdfProperty RDF property holding parameter value in
      *   resources' metadata
      */
-    public function addParameter(string $name, bool $byValue, bool $required,
-                                 string $defaultValue = '',
+    public function addParameter(string $name, string $defaultValue = '',
                                  string $rdfProperty = '_') {
         $id             = $this->getId() . '/param/' . $name;
         $this->params[] = new Parameter(
-            $this->fedora, $id, $this, $name, $byValue, $required, $defaultValue, $rdfProperty
+            $this->fedora, $id, $this, $name, $defaultValue, $rdfProperty
         );
     }
 
@@ -190,15 +194,29 @@ class Service extends Object {
                               string $path = '/'): FedoraResource {
         parent::updateRms($create, $uploadBinary, $path);
 
+        $res      = $this->getResource(false, false);
+        $children = [];
+        foreach ($res->getChildren() as $i) {
+            $children[$i->getUri(true)] = $i;
+        }
+        $validChildren = [];
+
         foreach ($this->params as $i) {
-            $i->updateRms($create, $uploadBinary, $path);
+            $tmp             = $i->updateRms($create, $uploadBinary, $path);
+            $validChildren[] = $tmp->getUri(true);
         }
 
         foreach ($this->matches as $i) {
-            $i->updateRms($create, $uploadBinary, $path);
+            $tmp             = $i->updateRms($create, $uploadBinary, $path);
+            $validChildren[] = $tmp->getUri(true);
         }
 
-        return $this->getResource(false, false);
+        $invalidChildren = array_diff(array_keys($children), $validChildren);
+        foreach ($invalidChildren as $i) {
+            $children[$i]->delete(true, true, false);
+        }
+
+        return $res;
     }
 
 }
