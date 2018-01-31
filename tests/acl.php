@@ -37,11 +37,16 @@ $fedora        = new Fedora();
 RF::init($fedora);
 $idBase        = 'https://id.acdh.oeaw.ac.at/';
 
+
 // Prepare test resources
 $fedora->begin();
 $r = [];
 foreach (['c1', 'c1/c2', 'c1/r1', 'c1/r2', 'c1/c2/r1', 'c1/c2/r2'] as $i) {
-    $r[$i] = RF::create(['id' => $idBase . $i], $i, 'PUT', substr($i, -2, 1) === 'r' ? 'sample binary content' : '');
+    try {
+        $r[$i] = $fedora->getResourceById($idBase . $i);
+    } catch (NotFound $ex) {
+        $r[$i] = RF::create(['id' => $idBase . $i], $i, 'PUT', substr($i, -2, 1) === 'r' ? 'sample binary content' : '');
+    }
 }
 $fedora->commit();
 RF::removeAcl($fedora);
@@ -290,7 +295,7 @@ try {
     $fedora->commit();
     assert(1 === count($fedora->runQuery($query)));
 
-    // tricky part - the first reload() will split the compound ACL rule 
+    // tricky part - the first reload() will split the compound ACL rule
     // but an immediate commit() is required for other resources to be able to see the change
     $fedora->begin();
     $acl[0]->reload();
@@ -382,4 +387,40 @@ try {
     assert(AR::READ === $acl->getMode(AR::GROUP, 'group1'));
 } finally {
     RF::removeAcl($fedora, false);
+}
+
+
+echo "\n-------------------------------------------------------------------\n";
+echo "acl survives turning rdf resource into binary one\n";
+$id  = $idBase . 'r0';
+$loc = '/r0';
+try {
+    $fedora->begin();
+    $r   = RF::create(['id' => $id], $loc, 'PUT', '');
+    $fedora->commit();
+    $acl = $r->getAcl();
+    assert(AR::NONE === $acl->getMode(AR::USER, AR::PUBLIC_USER));
+
+    $fedora->begin();
+    $acl = $r->getAcl()->createAcl();
+    $acl->grant(AR::USER, AR::PUBLIC_USER, AR::READ);
+    assert(AR::READ === $acl->getMode(AR::USER, AR::PUBLIC_USER));
+    $fedora->commit();
+
+    $acl = $r->getAcl(true);
+    assert(AR::READ === $acl->getMode(AR::USER, AR::PUBLIC_USER));
+
+    $fedora->begin();
+    $r->updateContent(['contentType' => 'text/plain', 'data' => 'r0 content', 'filename' => 'sample_file.txt'], true);
+    $acl = $r->getAcl(true);
+    assert(AR::READ === $acl->getMode(AR::USER, AR::PUBLIC_USER));
+    $fedora->commit();
+
+    $acl = $r->getAcl(true);
+    assert(AR::READ === $acl->getMode(AR::USER, AR::PUBLIC_USER));
+} finally {
+    RF::removeAcl($fedora, false);
+    $fedora->begin();
+    $r->delete(true, true, true);
+    $fedora->commit();
 }
