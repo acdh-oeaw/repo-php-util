@@ -159,6 +159,14 @@ class Fedora {
     private $defaultCollection = '';
 
     /**
+     * If a resource was deleted and recreated within the same transaction,
+     * the triplestore integration plugin doesn't index it. Therefore such
+     * resources must be forecefully reindexed after transaction commit.
+     * @var array
+     */
+    private $resToReindex = [];
+
+    /**
      * Creates Fedora connection object from a given configuration.
      */
     public function __construct() {
@@ -272,6 +280,14 @@ class Fedora {
         }
         try {
             $response = $this->client->send($request);
+
+            // Fedora triplestore plugin doesn't index resources which were
+            // deleted and recreated within the same transaction so we need
+            // to remember deleted resources and try to reindex them at the end
+            // of a transaction.
+            if ($request->getMethod() === 'DELETE') {
+                $this->resToReindex[] = preg_replace('|/fcr:[-a-zA-Z0-9]+$|', '', $request->getUri());
+            }
         } catch (RequestException $e) {
             switch ($e->getCode()) {
                 case 410:
@@ -649,9 +665,36 @@ class Fedora {
         if ($this->txUrl) {
             $this->client->post($this->txUrl . '/fcr:tx/fcr:commit');
             $this->txUrl = null;
+
+            $this->reindexResources();
         }
     }
 
+    /**
+     * Reindexes resources scheduled for reindexing by issuing a dummy metadata
+     * update.
+     */
+    private function reindexResources() {
+        if (count($this->resToReindex) == 0) {
+            return;
+        }
+        
+        $this->begin();
+        foreach (array_unique($this->resToReindex) as $i) {
+            try {
+                $res = $this->getResourceByUri($i);
+                $res->setMetadata($res->getMetadata());
+                $res->updateMetadata();
+            } catch (Deleted $e) {
+                
+            } catch (NotFound $e) {
+                
+            }
+        }
+        $this->resToReindex = [];
+        $this->commit();
+    }    
+    
     /**
      * Returns true if a Fedora transaction is opened and false otherwise.
      * 
