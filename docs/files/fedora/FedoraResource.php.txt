@@ -509,9 +509,15 @@ class FedoraResource {
             $request = Fedora::attachData($request, $data);
             $this->fedora->sendRequest($request);
         } else if ($convert) {
-            $this->fedora->sendRequest(new Request('DELETE', $this->getUri()));
-            $newRes    = $this->fedora->createResource($this->metadata, $data);
+            $aclRules  = $this->getAcl()->getRules(false);
+            $this->uri = $this->fedora->sanitizeUri($this->uri);
+            $this->delete(true);
+            $newRes    = $this->fedora->createResource($this->metadata, $data, $this->uri, 'PUT');
             $this->uri = $newRes->getUri();
+            // restore acl rules
+            foreach ($aclRules as $rule) {
+                $rule->save();
+            }
         } else {
             throw new RuntimeException('Resource is not a binary one. Turn on the $convert parameter if you are sure what you are doing.');
         }
@@ -688,7 +694,7 @@ class FedoraResource {
                 }
             }
             GROUP BY ?uri
-            HAVING (?countReq >= ?baseReq && (?baseOpt = 0 || ?countOpt > 0))
+            HAVING (?countReq >= ?baseReq && (?baseOpt = 0 || ?countOpt > 0) && ?baseOpt + ?baseReq > 0)
         ';
         $param1  = [
             $this->getUri(true),
@@ -747,7 +753,7 @@ class FedoraResource {
     private function getSparqlTriples(Resource $metadata): string {
         $uri = $this->fedora->sanitizeUri($this->uri);
         $res = $metadata->copy(self::$skipProp, self::$skipPropRegExp, $uri);
-        
+
         // make sure the ACL property is in current transaction
         $aclProp = $res->getResource(WebAcl::ACL_LINK_PROP);
         if ($aclProp) {

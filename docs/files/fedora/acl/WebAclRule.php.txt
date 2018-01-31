@@ -100,7 +100,7 @@ class WebAclRule extends FedoraResource {
      * @var int 
      */
     private $mode = self::NONE;
-    
+
     /**
      * Returns an object representing a FedoraResource containg ACL rules.
      * 
@@ -226,6 +226,16 @@ class WebAclRule extends FedoraResource {
     }
 
     /**
+     * Returns list of users/groups defined in the rule.
+     * @param string $type WebAclRule::USER or WebAclRule::GROUP
+     * @return array
+     */
+    public function getRoles(string $type): array {
+        self::checkRoleType($type);
+        return $this->roles[$type];
+    }
+
+    /**
      * Sets value of the webacl:mode triple.
      * @param string $mode WebAclRule::READ or WebAclRule::WRITE
      * @return \acdhOeaw\fedora\acl\WebAclRule
@@ -322,13 +332,15 @@ class WebAclRule extends FedoraResource {
      */
     public function save(string $location = null): FedoraResource {
         if ($this->uri != '') {
-            $this->setMetadata($this->getAclMetadata());
+            $meta = $this->getMetadata();
+            $meta->merge($this->getAclMetadata(), [RC::idProp()]);
+            $this->setMetadata($meta);
             $this->updateMetadata();
         } else {
             if ($location === null) {
                 throw new InvalidArgumentException('location parameter missing');
             }
-            
+
             $meta      = $this->getAclMetadata();
             $meta->addResource(RC::idProp(), 'https://id.acdh.oeaw.ac.at/acl/' . microtime(true) . rand(0, 1000));
             $res       = $this->fedora->createResource($meta, '', $location, 'POST');
@@ -421,6 +433,6 @@ class WebAclRule extends FedoraResource {
             }
         }
     }
-    
+
 }
 
