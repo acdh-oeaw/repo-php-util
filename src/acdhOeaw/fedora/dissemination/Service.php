@@ -127,7 +127,8 @@ class Service extends FedoraResource {
      */
     public function getRevProxy(): bool {
         $meta = $this->getMetadata();
-        return $meta->getLiteral(RC::get('fedoraServiceRevProxyProp')) ?? false;
+        $value = $meta->getLiteral(RC::get('fedoraServiceRevProxyProp'))->getValue();
+        return $value ?? false;
     }
     
     /**
