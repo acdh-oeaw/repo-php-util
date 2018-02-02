@@ -94,6 +94,12 @@ class Service extends Object {
     private $format = array();
 
     /**
+     * Should calls to the diss service be reverse proxied?
+     * @var bool
+     */
+    private $revProxy;
+    
+    /**
      * Parameters used by the service
      * @var array
      */
@@ -113,10 +119,11 @@ class Service extends Object {
      *   `$location` property description)
      * @param array $format list of return types provided by the dissemination
      *   service
+     * @param bool $revProxy should calls to the diss service be reverse proxied?
      * @throws InvalidArgumentException
      */
     public function __construct(Fedora $fedora, string $id, string $location,
-                                array $format) {
+                                array $format, bool $revProxy) {
         parent::__construct($fedora, $id);
 
         if ($id == '' || $location == '' || $format == '') {
@@ -126,6 +133,7 @@ class Service extends Object {
         $this->location = $location;
         $this->format   = $format;
         $this->fedora   = $fedora;
+        $this->revProxy = $revProxy;
     }
 
     /**
@@ -174,6 +182,8 @@ class Service extends Object {
         foreach ($this->format as $i) {
             $meta->addLiteral($retProp, $i);
         }
+        
+        $meta->addLiteral(RC::get('fedoraServiceRevProxyProp'), $this->revProxy);
 
         return $meta;
     }
