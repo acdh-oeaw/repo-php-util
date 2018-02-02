@@ -177,7 +177,7 @@ class MetadataCollection extends Graph {
             $uri       = $res->getUri();
             $fedoraRes = $fedoraResources[$uri];
 
-            echo self::$debug ? "Importing " . $uri . " (" . $n . "/" . count($toBeImported) . ")\n" : "";
+            echo self::$debug ? "Importing " . $uri . " (" . ($n + 1) . "/" . count($toBeImported) . ")\n" : "";
             $this->sanitizeResource($res, $namespace);
 
             echo self::$debug ? "\tupdating " . $fedoraRes->getUri(true) . "\n" : "";

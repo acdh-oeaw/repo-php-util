@@ -494,7 +494,7 @@ class FedoraResource {
      * to denote resources in your metadata, your metadata consistency will be preserved.
      * 
      * @param mixed $data resource data as a string, file name 
-     *   or an array: ['content-type' => 'foo', 'data' => 'bar']
+     *   or an array: ['content-type' => 'foo', 'data' => 'bar', 'filename' => 'baz.txt']
      * @param bool $convert should not binary resource be converted
      * @throws \DomainException
      * @see init()

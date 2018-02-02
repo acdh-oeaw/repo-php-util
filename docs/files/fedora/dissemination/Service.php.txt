@@ -99,13 +99,57 @@ class Service extends FedoraResource {
      * @throws RuntimeException
      */
     public function getRequest(FedoraResource $res): Request {
-        $meta = $this->getMetadata();
+        $uri    = $this->getLocation();
 
-        $uri = $meta->getLiteral(RC::get('fedoraServiceLocProp'));
-        
-        $param = array();
+        $param  = $this->getParameters();
+        $values = $this->getParameterValues($param, $res);
+        foreach ($values as $k => $v) {
+            $uri = str_replace($k, $v, $uri);
+        }
+
+        return new Request('GET', $uri);
+    }
+
+    /**
+     * Gets disseminations service's URL (before parameters subsitution)
+     * @return string
+     */
+    public function getLocation(): string {
+        $meta = $this->getMetadata();
+        return $meta->getLiteral(RC::get('fedoraServiceLocProp'));
+    }
+
+    /**
+     * Should the dissemination service request be reverse-proxied?
+     * 
+     * If it's not set in the metadata, false is assumed.
+     * @return bool
+     */
+    public function getRevProxy(): bool {
+        $meta = $this->getMetadata();
+        return $meta->getLiteral(RC::get('fedoraServiceRevProxyProp')) ?? false;
+    }
+    
+    /**
+     * Returns list of all parameters of a given dissemination service
+     * @return array
+     */
+    private function getParameters(): array {
+        $uri    = $this->getLocation();
+        $param  = [];
         preg_match_all('#{[^}]+}#', $uri, $param);
-        $param = $param[0];
+        return $param[0];
+    }
+
+    /**
+     * Evaluates parameter values for a given resource.
+     * @param array $param list of parameters
+     * @param FedoraResource $res repository resource to be disseminated
+     * @return array associative array with parameter values
+     * @throws RuntimeException
+     */
+    private function getParameterValues(array $param, FedoraResource $res): array {
+        $values = [];
         foreach ($param as $i) {
             $ii   = explode('|', substr($i, 1, -1));
             $name = array_shift($ii);
@@ -119,10 +163,10 @@ class Service extends FedoraResource {
             } else {
                 throw new RuntimeException('unknown parameter ' . $name);
             }
-            $uri = str_replace($i, $value, $uri);
+            $values[$i] = $value;
         }
 
-        return new Request('GET', $uri);
+        return $values;
     }
 
 }
