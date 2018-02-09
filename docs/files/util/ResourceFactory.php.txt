@@ -31,6 +31,7 @@
 namespace acdhOeaw\util;
 
 use EasyRdf\Graph;
+use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\fedora\exceptions\NotFound;
@@ -58,30 +59,24 @@ class ResourceFactory {
     }
 
     /**
-     * Creates a new resource
-     * @param array $properties list of RDF properties (key - property, value - 
-     *   property value); 'id', 'title' and 'parent' are handled automatically
-     * @param string $location where to create the resource
-     * @param string $method creation method (POST or PUT)
-     * @param string $binary resource content (if empty string, an RDF resource
-     *   is created)
-     * @return FedoraResource
+     * Generates metadata from an associative array (keys as properties, values
+     * as values).
+     * @param array $properties array of metadata properties; keys should be
+     *   fully-qualified URIs with two exceptions - 'title' is automatically 
+     *   mapped to the config:fedoraTitleProp and 'id' to config:fedoraIdProp
+     * @param bool $addId should an id property be generated if it's not 
+     *   provided in $properties?
+     * @param bool $addTitle should a title property be generated if it's not
+     *   provided in $properties?
+     * @return Resource
      */
-    static public function create(array $properties = [],
-                                  string $location = '/',
-                                  string $method = 'POST', string $binary = ''): FedoraResource {
-        if (isset($properties['id']) && !is_array($properties['id'])) {
-            try {
-                return self::$fedora->getResourceById($properties['id']);
-            } catch (NotFound $e) {
-                
-            }
-        }
-
-        if (!isset($properties['id'])) {
+    static public function createMeta(array $properties = [],
+                                      bool $addId = false,
+                                      bool $addTitle = false): Resource {
+        if (!isset($properties['id']) && $addId) {
             $properties['id'] = 'https://random.id/' . microtime(true);
         }
-        if (!isset($properties['title'])) {
+        if (!isset($properties['title']) && $addTitle) {
             $properties['title'] = 'dummy title';
         }
 
@@ -113,6 +108,31 @@ class ResourceFactory {
                 }
             }
         }
+        return $meta;
+    }
+
+    /**
+     * Creates a new resource
+     * @param array $properties list of RDF properties (key - property, value - 
+     *   property value); 'id', 'title' and 'parent' are handled automatically
+     * @param string $location where to create the resource
+     * @param string $method creation method (POST or PUT)
+     * @param string $binary resource content (if empty string, an RDF resource
+     *   is created)
+     * @return FedoraResource
+     */
+    static public function create(array $properties = [],
+                                  string $location = '/',
+                                  string $method = 'POST', string $binary = ''): FedoraResource {
+        if (isset($properties['id']) && !is_array($properties['id'])) {
+            try {
+                return self::$fedora->getResourceById($properties['id']);
+            } catch (NotFound $e) {
+                
+            }
+        }
+
+        $meta = self::createMeta($properties, true, true);
         if ($binary !== '') {
             $binary = ['contentType' => 'text/plain', 'data' => $binary, 'filename' => 'sample_file.txt'];
         }

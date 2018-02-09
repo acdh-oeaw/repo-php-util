@@ -64,14 +64,16 @@ abstract class Object {
     private $id;
 
     /**
-     *
+     * External metadata to be merged with automatically generated one.
      * @var \EasyRdf\Resource
      */
     private $metadata;
 
     /**
-     *
+     * List of automaticaly generated metadata properties to be preserved while
+     * merging with external metadata.
      * @var array
+     * @see $metadata
      */
     private $metadataPreserve = array();
 
