@@ -64,6 +64,18 @@ abstract class Object {
     private $id;
 
     /**
+     *
+     * @var \EasyRdf\Resource
+     */
+    private $metadata;
+
+    /**
+     *
+     * @var array
+     */
+    private $metadataPreserve = array();
+
+    /**
      * Allows to keep track of the corresponding repository resource state:
      * - null - unknown
      * - true - recent call to updateRms() created the repository resource
@@ -171,6 +183,9 @@ abstract class Object {
         // if it has just been created it would be a waste of time to update it
         if (!$this->created) {
             $meta = $this->getMetadata();
+            if ($this->metadata) {
+                $meta->merge($this->metadata, $this->metadataPreserve);
+            }
             $this->fedora->fixMetadataReferences($meta);
             $meta = $this->mergeMetadata($this->res->getMetadata(), $meta);
             $this->res->setMetadata($meta);
@@ -196,6 +211,24 @@ abstract class Object {
      */
     public function getCreated(): bool {
         return $this->created;
+    }
+
+    /**
+     * Sets an external metadata to be appended to automatically generated ones.
+     * 
+     * If a given metatada property exists both in automatically generated and
+     * provided metadata, then the final result depends on the $preserve parameter:
+     * - if the property is listed in the $preserve array, both automatically
+     *   generated and provided values will be kept
+     * - if not, only values from provided metadata will be kept and automatically
+     *   generated ones will be skipped
+     * 
+     * @param Resource $meta external metadata
+     * @param array $preserve list of metadata properties to be kept - see above
+     */
+    public function setMetadata(Resource $meta, array $preserve = array()) {
+        $this->metadata         = $meta;
+        $this->metadataPreserve = $preserve;
     }
 
     /**
