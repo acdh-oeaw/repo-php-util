@@ -341,8 +341,10 @@ class WebAcl {
         $this->checkParam($type, $mode);
 
         $toDel = array();
+        $hasSomeRights = false;
         foreach ($this->resRules as $i) {
             if ($i->hasRole($type, $name) && $i->getMode() >= $mode) {
+                $hasSomeRights = true;
                 if ($i->getRolesCount() == 1) {
                     $toDel[] = $i;
                 } else {
@@ -359,7 +361,7 @@ class WebAcl {
             $i->delete(true);
         }
 
-        if ($mode === WebAclRule::WRITE) {
+        if ($mode === WebAclRule::WRITE && $hasSomeRights) {
             $this->grant($type, $name, WebAclRule::READ, 0);
         }
     }
@@ -447,7 +449,7 @@ class WebAcl {
 
         // Link to ACL is applied after the transaction commit, so we need 
         // a separate transaction not to affect the current one
-        // As side effect the resource for which an ACL is created has to 
+        // As a side effect the resource for which an ACL is created has to 
         // persistently exist in the repository already!
         $fedoraTmp = clone($this->res->getFedora());
         $fedoraTmp->__clearCache();

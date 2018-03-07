@@ -396,31 +396,64 @@ $id  = $idBase . 'r0';
 $loc = '/r0';
 try {
     $fedora->begin();
-    $r   = RF::create(['id' => $id], $loc, 'PUT', '');
+    $r1   = RF::create(['id' => $id], $loc, 'PUT', '');
     $fedora->commit();
-    $acl = $r->getAcl();
+    $acl = $r1->getAcl();
     assert(AR::NONE === $acl->getMode(AR::USER, AR::PUBLIC_USER));
 
     $fedora->begin();
-    $acl = $r->getAcl()->createAcl();
+    $acl = $r1->getAcl()->createAcl();
     $acl->grant(AR::USER, AR::PUBLIC_USER, AR::READ);
     assert(AR::READ === $acl->getMode(AR::USER, AR::PUBLIC_USER));
     $fedora->commit();
 
-    $acl = $r->getAcl(true);
+    $acl = $r1->getAcl(true);
     assert(AR::READ === $acl->getMode(AR::USER, AR::PUBLIC_USER));
 
     $fedora->begin();
-    $r->updateContent(['contentType' => 'text/plain', 'data' => 'r0 content', 'filename' => 'sample_file.txt'], true);
-    $acl = $r->getAcl(true);
+    $r1->updateContent(['contentType' => 'text/plain', 'data' => 'r0 content', 'filename' => 'sample_file.txt'], true);
+    $acl = $r1->getAcl(true);
     assert(AR::READ === $acl->getMode(AR::USER, AR::PUBLIC_USER));
     $fedora->commit();
 
-    $acl = $r->getAcl(true);
+    $acl = $r1->getAcl(true);
     assert(AR::READ === $acl->getMode(AR::USER, AR::PUBLIC_USER));
 } finally {
     RF::removeAcl($fedora, false);
     $fedora->begin();
-    $r->delete(true, true, true);
+    $r1->delete(true, true, true);
     $fedora->commit();
 }
+
+
+echo "\n-------------------------------------------------------------------\n";
+echo "revoking write doesn't escalate privileges\n";
+try {
+    $fedora->begin();
+    $acl = $r['c1/r1']->getAcl();
+    assert(AR::NONE === $acl->getMode(AR::USER, AR::PUBLIC_USER) && AR::NONE === $acl->getMode(AR::USER, 'user1') && AR::NONE === $acl->getMode(AR::GROUP, 'group1'));
+    $acl->createAcl();
+    $acl->grant(AR::USER, 'user1', AR::WRITE);
+    $fedora->commit();
+
+    $acl = $r['c1/r1']->getAcl(true);
+    assert(AR::WRITE === $acl->getMode(AR::USER, 'user1'));
+    
+    $fedora->begin();
+    $acl = $r['c1/r1']->getAcl();
+    $acl->revoke(AR::USER, AR::PUBLIC_USER, AR::WRITE);
+    $acl->revoke(AR::USER, 'user1', AR::WRITE);
+    $acl->revoke(AR::USER, 'group1', AR::WRITE);
+    assert(AR::NONE === $acl->getMode(AR::USER, AR::PUBLIC_USER));
+    assert(AR::READ === $acl->getMode(AR::USER, 'user1'));
+    assert(AR::NONE === $acl->getMode(AR::GROUP, 'group1'));
+    $fedora->commit();
+
+    $acl = $r['c1/r1']->getAcl(true);
+    assert(AR::NONE === $acl->getMode(AR::USER, AR::PUBLIC_USER));
+    assert(AR::READ === $acl->getMode(AR::USER, 'user1'));
+    assert(AR::NONE === $acl->getMode(AR::GROUP, 'group1'));
+} finally {
+    RF::removeAcl($fedora, false);
+}
+
