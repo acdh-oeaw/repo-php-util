@@ -63,7 +63,8 @@ class ResourceFactory {
      * as values).
      * @param array $properties array of metadata properties; keys should be
      *   fully-qualified URIs with two exceptions - 'title' is automatically 
-     *   mapped to the config:fedoraTitleProp and 'id' to config:fedoraIdProp
+     *   mapped to the config:fedoraTitleProp, 'id' to config:fedoraIdProp,
+     *   'type' to rdfs:type and 'parent' to config:relProp()
      * @param bool $addId should an id property be generated if it's not 
      *   provided in $properties?
      * @param bool $addTitle should a title property be generated if it's not
@@ -88,6 +89,9 @@ class ResourceFactory {
                     break;
                 case 'title':
                     $p = RC::titleProp();
+                    break;
+                case 'type':
+                    $p = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
                     break;
                 case 'parent':
                     $p = RC::relProp();
@@ -114,7 +118,7 @@ class ResourceFactory {
     /**
      * Creates a new resource
      * @param array $properties list of RDF properties (key - property, value - 
-     *   property value); 'id', 'title' and 'parent' are handled automatically
+     *   property value); 'id', 'title', type' and 'parent' are handled automatically
      * @param string $location where to create the resource
      * @param string $method creation method (POST or PUT)
      * @param string $binary resource content (if empty string, an RDF resource
