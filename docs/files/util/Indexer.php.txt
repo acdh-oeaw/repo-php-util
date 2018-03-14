@@ -276,6 +276,10 @@ class Indexer {
     /**
      * Sets file name filter for child resources.
      * 
+     * Only files matching the filter will be ingested.
+     * 
+     * Filter is applied only to file names but NOT to directory names.
+     * 
      * @param string $filter regular expression conformant with preg_replace()
      * @return \acdhOeaw\util\Indexer
      */

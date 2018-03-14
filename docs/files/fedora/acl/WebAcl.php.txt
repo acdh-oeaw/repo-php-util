@@ -40,6 +40,7 @@ use acdhOeaw\fedora\metadataQuery\SimpleQuery;
 use acdhOeaw\fedora\exceptions\AlreadyInCache;
 use acdhOeaw\fedora\exceptions\Deleted;
 use acdhOeaw\fedora\exceptions\NotFound;
+use acdhOeaw\fedora\exceptions\NoAcdhId;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -340,7 +341,7 @@ class WebAcl {
                            int $mode = WebAclRule::READ) {
         $this->checkParam($type, $mode);
 
-        $toDel = array();
+        $toDel         = array();
         $hasSomeRights = false;
         foreach ($this->resRules as $i) {
             if ($i->hasRole($type, $name) && $i->getMode() >= $mode) {
@@ -444,7 +445,7 @@ class WebAcl {
         $aclMeta = (new Graph())->resource('.');
         $aclMeta->addType(self::ACL_CLASS);
         $aclMeta->addLiteral(RC::titleProp(), 'ACL');
-        $id      = preg_replace('|^[^:]+|', 'acl', $this->res->getId());
+        $id      = preg_replace('|^[^:]+|', 'acl', $this->res->getUri(true));
         $aclMeta->addResource(RC::idProp(), $id);
 
         // Link to ACL is applied after the transaction commit, so we need 
@@ -465,6 +466,7 @@ class WebAcl {
             $fedoraTmp->rollback();
         }
 
+        //sleep(1); //TODO
         $this->res->getMetadata(true);
         if ($this->res->getAclUrl() !== $aclRes->getUri(true)) {
             // second try for binary resources which are not handled properly by Fedora
