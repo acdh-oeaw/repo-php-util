@@ -626,18 +626,14 @@ class FedoraResource {
             $response = $this->fedora->sendRequest($request);
             $this->extractAcl($response);
 
-            // Fedora 4.7.4 doesn't provide ACL link header for binary resources
+            // Fedora 4.7.5 doesn't provide ACL link header for binary resources
             // if the ACL id directly attached to the resource (sic!).
-            // As a fallback we can try to run a sparql query.
+            // As a fallback we can try to extract it from the metadata.
             if ($this->aclUrl == '') {
-                $query  = new SimpleQuery("SELECT ?aclUri WHERE { ?@ ?@ ?aclUri . }");
-                $query->setValues([
-                    $this->fedora->standardizeUri($this->uri),
-                    WebAcl::ACL_LINK_PROP
-                ]);
-                $result = $this->fedora->runQuery($query);
-                if (count($result) > 0) {
-                    $this->aclUrl = $result[0]->aclUri->getUri();
+                $meta = $this->getMetadata(true);
+                $tmp = $meta->getResource(WebAcl::ACL_LINK_PROP);
+                if ($tmp !== null) {
+                    $this->aclUrl = $this->fedora->standardizeUri($tmp->getUri());
                 }
             }
         }
