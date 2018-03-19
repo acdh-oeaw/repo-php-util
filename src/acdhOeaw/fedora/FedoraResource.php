@@ -62,10 +62,11 @@ use acdhOeaw\util\RepoConfig as RC;
  */
 class FedoraResource {
 
-    const ADD         = 'ADD';
-    const UPDATE      = 'UPDATE';
-    const OVERWRITE   = 'OVERWRITE';
-    const PARENT_PROP = 'http://fedora.info/definitions/v4/repository#hasParent';
+    const ADD           = 'ADD';
+    const UPDATE        = 'UPDATE';
+    const OVERWRITE     = 'OVERWRITE';
+    const PARENT_PROP   = 'http://fedora.info/definitions/v4/repository#hasParent';
+    const CONTAINS_PROP = 'http://www.w3.org/ns/ldp#contains';
 
     /**
      * List of metadata properties managed exclusively by the Fedora.
@@ -577,7 +578,11 @@ class FedoraResource {
      * @return array
      */
     public function getChildren(): array {
-        return $this->fedora->getResourcesByQuery($this->getChildrenQuery());
+        $children = [];
+        foreach ($this->getMetadata()->allResources(self::CONTAINS_PROP) as $i) {
+            $children[] = $this->fedora->getResourceByUri($i->getUri());
+        }
+        return $children;
     }
 
     /**
@@ -631,7 +636,7 @@ class FedoraResource {
             // As a fallback we can try to extract it from the metadata.
             if ($this->aclUrl == '') {
                 $meta = $this->getMetadata(true);
-                $tmp = $meta->getResource(WebAcl::ACL_LINK_PROP);
+                $tmp  = $meta->getResource(WebAcl::ACL_LINK_PROP);
                 if ($tmp !== null) {
                     $this->aclUrl = $this->fedora->standardizeUri($tmp->getUri());
                 }
