@@ -94,7 +94,7 @@ class Fedora {
         } elseif (is_array($body) && isset($body['contentType']) && isset($body['data']) && isset($body['filename'])) {
             $headers['Content-Type']        = $body['contentType'];
             $headers['Content-Disposition'] = 'attachment; filename="' . rawurldecode($body['filename']) . '"';
-            $body                           = file_exists($body['data']) ? fopen($body, 'rb') : $body['data'];
+            $body                           = file_exists($body['data']) ? fopen($body['data'], 'rb') : $body['data'];
         } elseif (is_string($body) && preg_match('|^[a-z0-9]+://|i', $body)) {
             $headers['Content-Type'] = 'message/external-body; access-type=URL; URL="' . $body . '"';
             $body                    = null;
