@@ -246,6 +246,12 @@ class FedoraResource {
             $this->fedora->sendRequest($request);
         }
 
+        try {
+            $this->getAcl()->deleteAcl();
+        } catch (NotFound $e) {
+            
+        }
+
         if ($children) {
             foreach ($this->getChildren() as $i) {
                 $i->delete($deep, $children, $references);
