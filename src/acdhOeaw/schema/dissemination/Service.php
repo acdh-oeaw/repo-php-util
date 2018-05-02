@@ -35,7 +35,7 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
-use acdhOeaw\schema\Object;
+use acdhOeaw\schema\SchemaObject;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -68,7 +68,7 @@ use acdhOeaw\util\RepoConfig as RC;
  *
  * @author zozlak
  */
-class Service extends Object {
+class Service extends SchemaObject {
 
     /**
      * Dissemination service location (URL).

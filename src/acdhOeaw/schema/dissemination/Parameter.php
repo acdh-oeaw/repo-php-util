@@ -32,7 +32,7 @@ namespace acdhOeaw\schema\dissemination;
 
 use EasyRdf\Graph;
 use EasyRdf\Resource;
-use acdhOeaw\schema\Object;
+use acdhOeaw\schema\SchemaObject;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\util\RepoConfig as RC;
 
@@ -51,7 +51,7 @@ use acdhOeaw\util\RepoConfig as RC;
  * 
  * @author zozlak
  */
-class Parameter extends Object {
+class Parameter extends SchemaObject {
 
     /**
      * Dissemination service parameter id

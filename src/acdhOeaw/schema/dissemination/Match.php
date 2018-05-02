@@ -33,7 +33,7 @@ namespace acdhOeaw\schema\dissemination;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
-use acdhOeaw\schema\Object;
+use acdhOeaw\schema\SchemaObject;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -66,7 +66,7 @@ use acdhOeaw\util\RepoConfig as RC;
  * 
  * @author zozlak
  */
-class Match extends Object {
+class Match extends SchemaObject {
 
     /**
      * Identifier of a dissemination service given rule is applied to

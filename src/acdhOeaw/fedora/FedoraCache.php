@@ -38,7 +38,7 @@ use acdhOeaw\fedora\exceptions\CacheInconsistent;
 use acdhOeaw\fedora\exceptions\Deleted;
 use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\fedora\exceptions\NotInCache;
-use acdhOeaw\schema\Object;
+use acdhOeaw\schema\SchemaObject;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -204,11 +204,11 @@ class FedoraCache {
 
     /**
      * Gets resource from cache matchin on any identifier (metadata id property).
-     * @param Object $obj object able to provide metadata using a 
+     * @param SchemaObject $obj object able to provide metadata using a 
      *   `getMetadata()` method.
      * @return FedoraResource
      */
-    public function getByObj(Object $obj): FedoraResource {
+    public function getByObj(SchemaObject $obj): FedoraResource {
         return $this->getByMeta($obj->getMetadata());
     }
 

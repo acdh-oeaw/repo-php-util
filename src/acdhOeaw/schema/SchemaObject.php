@@ -43,7 +43,7 @@ use acdhOeaw\util\RepoConfig as RC;
  *
  * @author zozlak
  */
-abstract class Object {
+abstract class SchemaObject {
 
     /**
      * Debug mode switch.

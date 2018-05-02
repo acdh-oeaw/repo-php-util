@@ -35,7 +35,7 @@ use InvalidArgumentException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
-use acdhOeaw\schema\Object;
+use acdhOeaw\schema\SchemaObject;
 use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\util\metaLookup\MetaLookupInterface;
 
@@ -44,7 +44,7 @@ use acdhOeaw\util\metaLookup\MetaLookupInterface;
  *
  * @author zozlak
  */
-class File extends Object {
+class File extends SchemaObject {
 
     /**
      * Detected operating system path enconding.
