@@ -3,7 +3,7 @@
 /**
  * The MIT License
  *
- * Copyright 2018 zozlak.
+ * Copyright 2018 nczirjak.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,28 +31,28 @@
 namespace acdhOeaw\fedora\dissemination\parameter;
 
 /**
- * Returns value's substring
- *
+ * URL encodes given value
+ * 
  * @author zozlak
  */
-class Substr implements iTransformation {
+class RawUrlDecode implements iTransformation {
 
     /**
      * Returns transformation name
      */
     public function getName(): string {
-        return 'substr';
+        return 'rawurldecode';
     }
 
     /**
-     * Returns substring  of a given value by simply calling substr().
+     * Returns raw URL decoded value from the acdh identifier.
      * @param string $value value to be transformed
-     * @param int $start index of the first character to be returned
-     * @param int $length returned value length
      * @return string
      */
-    public function transform(string $value, int $start = 0, int $length = null): string {
-        return $length === null ? substr($value, $start) : substr($value, $start, $length);
+    public function transform(string $value): string {
+        $value = str_replace(" ", "/", rawurldecode($value));
+        $value = "https://".$value;
+        return $value;
     }
 
 }
