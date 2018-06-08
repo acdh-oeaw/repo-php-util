@@ -205,6 +205,7 @@ class Service extends SchemaObject {
         parent::updateRms($create, $uploadBinary, $path);
 
         $res      = $this->getResource(false, false);
+        $chPath = $res->getUri(true) . '/';
         $children = [];
         foreach ($res->getChildren() as $i) {
             $children[$i->getUri(true)] = $i;
@@ -212,12 +213,12 @@ class Service extends SchemaObject {
         $validChildren = [];
 
         foreach ($this->params as $i) {
-            $tmp             = $i->updateRms($create, $uploadBinary, $path);
+            $tmp             = $i->updateRms($create, $uploadBinary, $chPath);
             $validChildren[] = $tmp->getUri(true);
         }
 
         foreach ($this->matches as $i) {
-            $tmp             = $i->updateRms($create, $uploadBinary, $path);
+            $tmp             = $i->updateRms($create, $uploadBinary, $chPath);
             $validChildren[] = $tmp->getUri(true);
         }
 
