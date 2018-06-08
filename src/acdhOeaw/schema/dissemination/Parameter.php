@@ -54,7 +54,7 @@ use acdhOeaw\util\RepoConfig as RC;
 class Parameter extends SchemaObject {
 
     /**
-     * Dissemination service parameter id
+     * A dissemination service object given rule is applied to
      * @var string 
      */
     private $serviceId;
@@ -93,7 +93,7 @@ class Parameter extends SchemaObject {
                                 string $rdfProperty) {
         parent::__construct($fedora, $id);
 
-        $this->serviceId    = $service->getResource()->getId();
+        $this->service      = $service;
         $this->name         = $name;
         $this->defaultValue = $defaultValue;
         $this->rdfProperty  = $rdfProperty;
@@ -106,7 +106,7 @@ class Parameter extends SchemaObject {
     public function getMetadata(): Resource {
         $meta = (new Graph())->resource('.');
 
-        $meta->addResource(RC::relProp(), $this->serviceId);
+        $meta->addResource(RC::relProp(), $this->service->getResource()->getId());
         $meta->addResource(RC::idProp(), $this->getId());
         $meta->addType(RC::get('fedoraServiceParamClass'));
 

@@ -69,10 +69,10 @@ use acdhOeaw\util\RepoConfig as RC;
 class Match extends SchemaObject {
 
     /**
-     * Identifier of a dissemination service given rule is applied to
+     * A dissemination service object given rule is applied to
      * @var string
      */
-    private $serviceId;
+    private $service;
 
     /**
      * RDF property name to match against
@@ -106,7 +106,7 @@ class Match extends SchemaObject {
                                 string $property, string $value, bool $required) {
         parent::__construct($fedora, $id);
 
-        $this->serviceId = $service->getResource()->getId();
+        $this->service   = $service;
         $this->property  = $property;
         $this->value     = $value;
         $this->required  = $required;
@@ -119,7 +119,7 @@ class Match extends SchemaObject {
     public function getMetadata(): Resource {
         $meta = (new Graph())->resource('.');
 
-        $meta->addResource(RC::relProp(), $this->serviceId);
+        $meta->addResource(RC::relProp(), $this->service->getResource()->getId());
         $meta->addResource(RC::idProp(), $this->getId());
         $meta->addLiteral(RC::titleProp(), 'A dissemination service matching rule');
 
