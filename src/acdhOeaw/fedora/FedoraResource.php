@@ -595,7 +595,7 @@ class FedoraResource {
      * 
      * @return array
      */
-    public function getNodes(): array {
+    public function getFedoraChildren(): array {
         $children = [];
         foreach ($this->getMetadata()->allResources(self::CONTAINS_PROP) as $i) {
             $children[] = $this->fedora->getResourceByUri($i->getUri());
