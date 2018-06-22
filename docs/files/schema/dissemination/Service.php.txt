@@ -35,7 +35,7 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
-use acdhOeaw\schema\Object;
+use acdhOeaw\schema\SchemaObject;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -68,7 +68,7 @@ use acdhOeaw\util\RepoConfig as RC;
  *
  * @author zozlak
  */
-class Service extends Object {
+class Service extends SchemaObject {
 
     /**
      * Dissemination service location (URL).
@@ -205,6 +205,7 @@ class Service extends Object {
         parent::updateRms($create, $uploadBinary, $path);
 
         $res      = $this->getResource(false, false);
+        $chPath = $res->getUri(true) . '/';
         $children = [];
         foreach ($res->getChildren() as $i) {
             $children[$i->getUri(true)] = $i;
@@ -212,12 +213,12 @@ class Service extends Object {
         $validChildren = [];
 
         foreach ($this->params as $i) {
-            $tmp             = $i->updateRms($create, $uploadBinary, $path);
+            $tmp             = $i->updateRms($create, $uploadBinary, $chPath);
             $validChildren[] = $tmp->getUri(true);
         }
 
         foreach ($this->matches as $i) {
-            $tmp             = $i->updateRms($create, $uploadBinary, $path);
+            $tmp             = $i->updateRms($create, $uploadBinary, $chPath);
             $validChildren[] = $tmp->getUri(true);
         }
 

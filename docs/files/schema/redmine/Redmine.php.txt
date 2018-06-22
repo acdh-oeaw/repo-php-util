@@ -36,7 +36,7 @@ use BadMethodCallException;
 use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
-use acdhOeaw\schema\Object;
+use acdhOeaw\schema\SchemaObject;
 use acdhOeaw\util\RepoConfig as RC;
 use zozlak\util\ProgressBar;
 
@@ -46,7 +46,7 @@ use zozlak\util\ProgressBar;
  *
  * @author zozlak
  */
-abstract class Redmine extends Object {
+abstract class Redmine extends SchemaObject {
 
     /**
      * RDF property used to store Redmine entity URI

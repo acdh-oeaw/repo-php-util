@@ -41,7 +41,7 @@ class Substr implements iTransformation {
      * Returns transformation name
      */
     public function getName(): string {
-        
+        return 'substr';
     }
 
     /**

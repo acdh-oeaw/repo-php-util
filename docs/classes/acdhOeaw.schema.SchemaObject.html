@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">92</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">2</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-917056633"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-917056633" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-850693925"></a>
+                                <a href="../namespaces/acdhOeaw.html" style="margin-left: 30px; padding-left: 0">acdhOeaw</a>
+            </div>
+            <div id="namespace-850693925" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-828034145"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.html" style="margin-left: 30px; padding-left: 0">fedora</a>
+            </div>
+            <div id="namespace-828034145" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1085057380"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.acl.html" style="margin-left: 30px; padding-left: 0">acl</a>
+            </div>
+            <div id="namespace-1085057380" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.acl.WebAcl.html">WebAcl</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.acl.WebAclRule.html">WebAclRule</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-570927722"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.dissemination.html" style="margin-left: 30px; padding-left: 0">dissemination</a>
+            </div>
+            <div id="namespace-570927722" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2134818831"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.dissemination.parameter.html" style="margin-left: 30px; padding-left: 0">parameter</a>
+            </div>
+            <div id="namespace-2134818831" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/acdhOeaw.fedora.dissemination.parameter.iTransformation.html">iTransformation</a></li>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.parameter.AddParam.html">AddParam</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.parameter.Base64Encode.html">Base64Encode</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.parameter.RawUrlDecode.html">RawUrlDecode</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.parameter.RawUrlEncode.html">RawUrlEncode</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.parameter.SetParam.html">SetParam</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.parameter.Substr.html">Substr</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.parameter.UriPart.html">UriPart</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.parameter.UrlEncode.html">UrlEncode</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.Format.html">Format</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.Parameter.html">Parameter</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.dissemination.Service.html">Service</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-201450445"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.exceptions.html" style="margin-left: 30px; padding-left: 0">exceptions</a>
+            </div>
+            <div id="namespace-201450445" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.AclException.html">AclException</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.AlreadyInCache.html">AlreadyInCache</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.AmbiguousMatch.html">AmbiguousMatch</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.CacheInconsistent.html">CacheInconsistent</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.Deleted.html">Deleted</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.ManyAcdhIds.html">ManyAcdhIds</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.NoAcdhId.html">NoAcdhId</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.NotFound.html">NotFound</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.exceptions.NotInCache.html">NotInCache</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-652210524"></a>
+                                <a href="../namespaces/acdhOeaw.fedora.metadataQuery.html" style="margin-left: 30px; padding-left: 0">metadataQuery</a>
+            </div>
+            <div id="namespace-652210524" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html">HasProperty</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasTriple.html">HasTriple</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.HasValue.html">HasValue</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.MatchesRegEx.html">MatchesRegEx</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.Query.html">Query</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.QueryParameter.html">QueryParameter</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.metadataQuery.SimpleQuery.html">SimpleQuery</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.Fedora.html">Fedora</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.FedoraCache.html">FedoraCache</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.FedoraResource.html">FedoraResource</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.fedora.SparqlClient.html">SparqlClient</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-601592753"></a>
+                                <a href="../namespaces/acdhOeaw.schema.html" style="margin-left: 30px; padding-left: 0">schema</a>
+            </div>
+            <div id="namespace-601592753" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-10785555"></a>
+                                <a href="../namespaces/acdhOeaw.schema.dissemination.html" style="margin-left: 30px; padding-left: 0">dissemination</a>
+            </div>
+            <div id="namespace-10785555" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.dissemination.CiriloService.html">CiriloService</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.dissemination.Match.html">Match</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.dissemination.Parameter.html">Parameter</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.dissemination.Service.html">Service</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-962242922"></a>
+                                <a href="../namespaces/acdhOeaw.schema.file.html" style="margin-left: 30px; padding-left: 0">file</a>
+            </div>
+            <div id="namespace-962242922" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.file.CmdiFile.html">CmdiFile</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.file.File.html">File</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1680060335"></a>
+                                <a href="../namespaces/acdhOeaw.schema.redmine.html" style="margin-left: 30px; padding-left: 0">redmine</a>
+            </div>
+            <div id="namespace-1680060335" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.Issue.html">Issue</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.Project.html">Project</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.Redmine.html">Redmine</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.schema.redmine.User.html">User</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.schema.SchemaObject.html">SchemaObject</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2140950038"></a>
+                                <a href="../namespaces/acdhOeaw.util.html" style="margin-left: 30px; padding-left: 0">util</a>
+            </div>
+            <div id="namespace-2140950038" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1193293783"></a>
+                                <a href="../namespaces/acdhOeaw.util.metadataValidator.html" style="margin-left: 30px; padding-left: 0">metadataValidator</a>
+            </div>
+            <div id="namespace-1193293783" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.metadataValidator.Error.html">Error</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.metadataValidator.MetadataValidator.html">MetadataValidator</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.metadataValidator.OntologyProperty.html">OntologyProperty</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-498761872"></a>
+                                <a href="../namespaces/acdhOeaw.util.metaLookup.html" style="margin-left: 30px; padding-left: 0">metaLookup</a>
+            </div>
+            <div id="namespace-498761872" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/acdhOeaw.util.metaLookup.MetaLookupInterface.html">MetaLookupInterface</a></li>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.metaLookup.MetaLookupException.html">MetaLookupException</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.metaLookup.MetaLookupFile.html">MetaLookupFile</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.metaLookup.MetaLookupGraph.html">MetaLookupGraph</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/acdhOeaw.util.Indexer.html">Indexer</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.IndexerException.html">IndexerException</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.MetadataCollection.html">MetadataCollection</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.RepoConfig.html">RepoConfig</a></li>
+                                                    <li class="class"><a href="../classes/acdhOeaw.util.ResourceFactory.html">ResourceFactory</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/acdhOeaw.schema.html">\acdhOeaw\schema</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\acdhOeaw\schema</small>SchemaObject</h1>
+                    <p><em>Basic class for representing real-world entities to be imported into
+the repository.</em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method_getMetadata" class="">getMetadata()</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method_getResource" class="">getResource()</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method_getId" class="">getId()</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method_getIds" class="">getIds()</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method_updateRms" class="">updateRms()</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method_getCreated" class="">getCreated()</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method_setMetadata" class="">setMetadata()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#property_debug" class="">$debug</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method_findResource" class="">findResource()</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method_getBinaryData" class="">getBinaryData()</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#method_mergeMetadata" class="">mergeMetadata()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#property_created" class="">$created</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#property_fedora" class="">$fedora</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#property_res" class="">$res</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#property_id" class="">$id</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#property_metadata" class="">$metadata</a><br />
+                                                                    <a href="../classes/acdhOeaw.schema.SchemaObject.html#property_metadataPreserve" class="">$metadataPreserve</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                            <span class="label label-info">abstract</span>
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/schema.SchemaObject.html"><div class="path-wrapper">schema/SchemaObject.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">repo-php-util</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\acdhOeaw\schema\SchemaObject</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                author
+                            </th>
+                            <td>
+                                                                    <p>zozlak</p>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_debug" name="property_debug" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$debug</h3>
+                <pre class="signature">$debug : boolean</pre>
+                <p><em>Debug mode switch.</em></p>
+                
+
+                                <h4>Type</h4>
+                boolean
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_created" name="property_created" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$created</h3>
+                <pre class="signature">$created : boolean</pre>
+                <p><em>Allows to keep track of the corresponding repository resource state:
+- null - unknown
+- true - recent call to updateRms() created the repository resource
+- false - repository resource already existed uppon last updateRms() call</em></p>
+                
+
+                                <h4>Type</h4>
+                boolean
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_fedora" name="property_fedora" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$fedora</h3>
+                <pre class="signature">$fedora : \acdhOeaw\fedora\Fedora</pre>
+                <p><em>Fedora connection object.</em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/acdhOeaw.fedora.Fedora.html">\acdhOeaw\fedora\Fedora</a>
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_res" name="property_res" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$res</h3>
+                <pre class="signature">$res : \acdhOeaw\fedora\FedoraResource</pre>
+                <p><em>Repository resource representing given entity.</em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a>
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_id" name="property_id" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$id</h3>
+                <pre class="signature">$id : string</pre>
+                <p><em>Entity id.</em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_metadata" name="property_metadata" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$metadata</h3>
+                <pre class="signature">$metadata : \EasyRdf\Resource</pre>
+                <p><em>External metadata to be merged with automatically generated one.</em></p>
+                
+
+                                <h4>Type</h4>
+                \EasyRdf\Resource
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_metadataPreserve" name="property_metadataPreserve" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$metadataPreserve</h3>
+                <pre class="signature">$metadataPreserve : array</pre>
+                <p><em>List of automaticaly generated metadata properties to be preserved while
+merging with external metadata.</em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            <dt>See also</dt>
+                                                                <dd><a href="../classes/acdhOeaw.schema.SchemaObject.html#property_metadata"><span class="namespace-wrapper">\acdhOeaw\schema\SchemaObject::metadata</span></a></dd>
+                                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct(\acdhOeaw\fedora\Fedora  <span class="argument">$fedora</span>, string  <span class="argument">$id</span>) </pre>
+                <p><em>Creates an object representing a real-world entity.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.Fedora.html">\acdhOeaw\fedora\Fedora</a></td>
+                                <td>$fedora </td>
+                                <td><p>repository connection object</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$id </td>
+                                <td><p>entity identifier (derived class-specific)</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getMetadata" name="method_getMetadata" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getMetadata()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getMetadata() </pre>
+                <p><em>Creates RDF metadata from the real-world entity stored in this object.</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                        <span class="label label-info">abstract</span>
+                                                <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getResource" name="method_getResource" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getResource()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getResource(boolean  <span class="argument">$create = true</span>, boolean  <span class="argument">$uploadBinary = true</span>) : \acdhOeaw\fedora\FedoraResource</pre>
+                <p><em>Returns repository resource representing given real-world entity.</em></p>
+                <p>If it does not exist, it can be created.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$create </td>
+                                <td><p>should repository resource be created if it does not
+exist?</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$uploadBinary </td>
+                                <td><p>should binary data of the real-world entity
+be uploaded uppon repository resource creation?</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getId" name="method_getId" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getId()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getId() : string</pre>
+                <p><em>Returns primary id of the real-world entity stored in this object
+(as it was set up in the object contructor).</em></p>
+                <p>Please do not confuse this id with the random internal ACDH repo id.</p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getIds" name="method_getIds" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getIds()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getIds() : array</pre>
+                <p><em>Returns all known ids</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>list of all ids</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_updateRms" name="method_updateRms" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">updateRms()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">updateRms(boolean  <span class="argument">$create = true</span>, boolean  <span class="argument">$uploadBinary = true</span>, string  <span class="argument">$path = &#039;/&#039;</span>) : \acdhOeaw\fedora\FedoraResource</pre>
+                <p><em>Updates repository resource representing a real-world entity stored in
+this object.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$create </td>
+                                <td><p>should repository resource be created if it does not
+exist?</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$uploadBinary </td>
+                                <td><p>should binary data of the real-world entity
+be uploaded uppon repository resource creation?</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$path </td>
+                                <td><p>where to create a resource (if it does not exist).
+If it it ends with a &quot;/&quot;, the resource will be created as a child of
+a given collection). All the parents in the Fedora resource tree have
+to exist (you can not create &quot;/foo/bar&quot; if &quot;/foo&quot; does not exist already).</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getCreated" name="method_getCreated" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getCreated()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getCreated() : boolean</pre>
+                <p><em>Informs about the corresponding repository resource state uppon last call
+to the `updateRms()` method:
+- null - the updateRms() was not called yet
+- true - repository resource was created by last call to the updateRms()
+- false - repository resource already existed uppoin last call to the
+  updateRms()</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setMetadata" name="method_setMetadata" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setMetadata()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setMetadata(Resource  <span class="argument">$meta</span>, array  <span class="argument">$preserve = array()</span>) </pre>
+                <p><em>Sets an external metadata to be appended to automatically generated ones.</em></p>
+                <p>If a given metatada property exists both in automatically generated and
+provided metadata, then the final result depends on the $preserve parameter:</p>
+<ul>
+<li>if the property is listed in the $preserve array, both automatically
+generated and provided values will be kept</li>
+<li>if not, only values from provided metadata will be kept and automatically
+generated ones will be skipped</li>
+</ul>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>Resource</td>
+                                <td>$meta </td>
+                                <td><p>external metadata</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$preserve </td>
+                                <td><p>list of metadata properties to be kept - see above</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_findResource" name="method_findResource" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">findResource()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">findResource(boolean  <span class="argument">$create = true</span>, boolean  <span class="argument">$uploadBinary = true</span>, string  <span class="argument">$path = &#039;&#039;</span>) : boolean</pre>
+                <p><em>Tries to find a repository resource representing a given object.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$create </td>
+                                <td><p>should repository resource be created if it was not
+found?</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$uploadBinary </td>
+                                <td><p>should binary data of the real-world entity
+be uploaded uppon repository resource creation?</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$path </td>
+                                <td><p>where to create a resource (if it does not exist).
+If it it ends with a &quot;/&quot;, the resource will be created as a child of
+a given collection). All the parents in the Fedora resource tree have
+to exist (you can not create &quot;/foo/bar&quot; if &quot;/foo&quot; does not exist already).</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                            &mdash; <p>if a repository resource was found</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getBinaryData" name="method_getBinaryData" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">getBinaryData()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getBinaryData() : \acdhOeaw\schema\type</pre>
+                <p><em>Provides entity binary data.</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    \acdhOeaw\schema\type
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_mergeMetadata" name="method_mergeMetadata" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">mergeMetadata()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">mergeMetadata(Resource  <span class="argument">$current</span>, Resource  <span class="argument">$new</span>) : Resource</pre>
+                <p><em>Merges metadata coming from the Fedora and generated by the class.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>Resource</td>
+                                <td>$current </td>
+                                <td><p>current Fedora resource metadata</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>Resource</td>
+                                <td>$new </td>
+                                <td><p>metadata generated by the class</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    Resource
+                                            &mdash; <p>final metadata</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">SchemaObject.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/schema/SchemaObject.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/acdhOeaw.html">\acdhOeaw</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on June 22nd, 2018 at 18:46.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>
