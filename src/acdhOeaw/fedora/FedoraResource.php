@@ -233,7 +233,7 @@ class FedoraResource {
     public function delete(bool $deep = false, bool $children = false,
                            bool $references = false) {
         $this->uri      = $this->fedora->sanitizeUri($this->getUri());
-        $fedoraChildren = $this->getMetadata()->allResources('http://www.w3.org/ns/ldp#contains');
+        $fedoraChildren = $this->getMetadata()->allResources(self::CONTAINS_PROP);
         if (count($fedoraChildren) > 0) {
             throw new RuntimeException("A resource has Fedora children");
         }
@@ -558,7 +558,11 @@ class FedoraResource {
     }
 
     /**
-     * Returns the SPARQL query object returning resource's children
+     * Returns the SPARQL query object returning resource's children.
+     * 
+     * It is assumed that child-parent relations are denoted by:
+     *   `child -> config::relProp -> id <- config::idProp <- parent`
+     * metadata properties scheme.
      * 
      * @return Query
      */
@@ -579,21 +583,46 @@ class FedoraResource {
     }
 
     /**
-     * Returns all resource's children
+     * Returns all resource's Fedora children.
+     * 
+     * A Fedora child is a resource pointed by the ldp:contains triple.
+     * All Fedora children URIs are nested in the parent's URI path but the
+     * deepness of such nesting can vary (e.g. both http://a/b and http://a/b/c/d
+     * can be Fedora children of the http://a depenging on how they were created).
+     * 
+     * Fedora's parent-child relation is automatically maintained by the Fedora
+     * and depends on the way Fedora resources are created.
      * 
      * @return array
      */
-    public function getChildren(): array {
+    public function getNodes(): array {
         $children = [];
         foreach ($this->getMetadata()->allResources(self::CONTAINS_PROP) as $i) {
             $children[] = $this->fedora->getResourceByUri($i->getUri());
         }
         return $children;
     }
+    
+    /**
+     * Returns all resource's children.
+     * 
+     * It is assumed that child-parent relations are denoted by:
+     *   `child -> config::relProp -> id <- config::idProp <- parent`
+     * metadata properties scheme.
+     * 
+     * @return array
+     */
+    public function getChildren(): array {
+        return $this->fedora->runQuery($this->getChildrenQuery());
+    }
 
     /**
      * Returns all resource's children having a given property or a given value
      * of a given property.
+     * 
+     * It is assumed that child-parent relations are denoted by:
+     *   `child -> config::relProp -> id <- config::idProp <- parent`
+     * metadata properties scheme.
      * 
      * @param string $property fully qualified URI of the property
      * @param string $value property value (optional)
@@ -613,6 +642,10 @@ class FedoraResource {
     /**
      * Returns all resource's children with a given property matching a given
      * regular expression
+     * 
+     * It is assumed that child-parent relations are denoted by:
+     *   `child -> config::relProp -> id <- config::idProp <- parent`
+     * metadata properties scheme.
      * 
      * @param string $property fully qualified URI of the property
      * @param string $regEx regular expression to match
