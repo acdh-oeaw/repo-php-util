@@ -253,7 +253,7 @@ class FedoraResource {
         }
 
         if ($children) {
-            foreach ($this->getChildren() as $i) {
+            foreach ($this->getChildrenByProperty(RC::relProp(), $this->getId()) as $i) {
                 $i->delete($deep, $children, $references);
             }
         }
