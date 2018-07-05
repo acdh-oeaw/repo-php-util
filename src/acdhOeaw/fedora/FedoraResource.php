@@ -688,7 +688,7 @@ class FedoraResource {
      * Returns a WebAcl object for access rules manipulation.
      * @param bool $refresh should the ACL collection and rules be refreshed or
      *   read from cache (there are many scenarios when reading requiring
-     *   ACL data to be outdated so the default beahviour is to refresh)
+     *   ACL data to be outdated so the default behaviour is to refresh)
      * @return WebAcl
      */
     public function getAcl(bool $refresh = true): WebAcl {
