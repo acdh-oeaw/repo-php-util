@@ -243,7 +243,7 @@ class MetadataCollection extends Graph {
         $result = array();
         $map    = array();
         foreach ($resources as $n => $res) {
-            echo self::$debug ? "\t" . $res->getUri() . " (" . $n . "/" . count($resources) . ")\n" : '';
+            echo self::$debug ? "\t" . $res->getUri() . " (" . ($n + 1) . "/" . count($resources) . ")\n" : '';
 
             $ids = array();
             foreach ($res->allResources(RC::idProp()) as $id) {
