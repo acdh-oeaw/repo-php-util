@@ -40,7 +40,6 @@ use acdhOeaw\fedora\metadataQuery\SimpleQuery;
 use acdhOeaw\fedora\exceptions\AlreadyInCache;
 use acdhOeaw\fedora\exceptions\Deleted;
 use acdhOeaw\fedora\exceptions\NotFound;
-use acdhOeaw\fedora\exceptions\NoAcdhId;
 use acdhOeaw\util\RepoConfig as RC;
 
 /**
@@ -428,7 +427,7 @@ class WebAcl {
      * @throws \RuntimeException
      */
     public function createAcl(): WebAcl {
-        $resMeta = $this->res->getMetadata();
+        $resMeta = $this->res->getMetadata(true);
         $acls    = $resMeta->allResources(self::ACL_LINK_PROP);
         if (count($acls) > 1) {
             throw new RuntimeException('Resource has many ACLs');

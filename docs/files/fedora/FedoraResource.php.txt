@@ -253,7 +253,7 @@ class FedoraResource {
         }
 
         if ($children) {
-            foreach ($this->getChildrenByProperty(RC::relProp(), $this->getId()) as $i) {
+            foreach ($this->getChildren() as $i) {
                 $i->delete($deep, $children, $references);
             }
         }
@@ -595,7 +595,7 @@ class FedoraResource {
      * 
      * @return array
      */
-    public function getNodes(): array {
+    public function getFedoraChildren(): array {
         $children = [];
         foreach ($this->getMetadata()->allResources(self::CONTAINS_PROP) as $i) {
             $children[] = $this->fedora->getResourceByUri($i->getUri());
@@ -613,7 +613,7 @@ class FedoraResource {
      * @return array
      */
     public function getChildren(): array {
-        return $this->fedora->runQuery($this->getChildrenQuery());
+        return $this->fedora->getResourcesByQuery($this->getChildrenQuery());
     }
 
     /**
@@ -688,7 +688,7 @@ class FedoraResource {
      * Returns a WebAcl object for access rules manipulation.
      * @param bool $refresh should the ACL collection and rules be refreshed or
      *   read from cache (there are many scenarios when reading requiring
-     *   ACL data to be outdated so the default beahviour is to refresh)
+     *   ACL data to be outdated so the default behaviour is to refresh)
      * @return WebAcl
      */
     public function getAcl(bool $refresh = true): WebAcl {
