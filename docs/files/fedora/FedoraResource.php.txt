@@ -250,6 +250,8 @@ class FedoraResource {
             $this->getAcl()->deleteAcl();
         } catch (NotFound $e) {
             
+        } catch (Deleted $e) {
+            
         }
 
         if ($children) {
