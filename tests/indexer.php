@@ -76,9 +76,11 @@ try {
 }
 
 echo "\n-------------------------------------------------------------------\n";
-echo "simple reindexing\n";
+echo "reindexing in update only mode\n";
 try {
     $fedora->begin();
+    $ind->setFilter('', Indexer::SKIP);
+    $ind->setUpdateOnly(true);
     $indRes = $ind->index();
     assert(count($indRes) === 5, new Exception("resources count doesn't match " . count($indRes)));
     foreach ($indRes as $i) {

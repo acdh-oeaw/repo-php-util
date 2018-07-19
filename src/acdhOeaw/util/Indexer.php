@@ -32,6 +32,7 @@ namespace acdhOeaw\util;
 
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
+use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\schema\file\File;
 use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\util\metaLookup\MetaLookupInterface;
@@ -157,6 +158,13 @@ class Indexer {
     private $includeEmpty = false;
 
     /**
+     * Should file be skipped if a corresponding Fedora resource doesn't exist?
+     * 
+     * @var bool
+     */
+    private $updateOnly = false;
+
+    /**
      * An object providing metadata when given a resource file path
      * @var \acdhOeaw\util\metaLookup\MetaLookupInterface
      */
@@ -252,9 +260,26 @@ class Indexer {
      * don't want to do that for performance reasons).
      * @param int $count number of resource automatically triggering a commit 
      *   (0 - no auto commit)
+     * @return \acdhOeaw\util\Indexer
      */
-    public function setAutoCommit(int $count) {
+    public function setAutoCommit(int $count): Indexer {
         $this->autoCommit = $count;
+        return $this;
+    }
+
+    /**
+     * Allows to turn on/off the "update only" mode. In the "update only" mode
+     * files which don't have corresponding Fedora resources are skipped.
+     * 
+     * By default the "update only" mode is disabled.
+     * 
+     * @param bool $updateOnly should files be skipped by the Indexer if
+     *   corresponding Fedora resources don't exist?
+     * @return \acdhOeaw\util\Indexer
+     */
+    public function setUpdateOnly(bool $updateOnly): Indexer {
+        $this->updateOnly = $updateOnly;
+        return $this;
     }
 
     /**
@@ -461,13 +486,19 @@ class Indexer {
                 $file->setMetaLookup($this->metaLookup, $this->metaLookupRequire);
             }
             try {
-                $res = $file->updateRms(true, $upload, $this->fedoraLoc);
+                $res = $file->updateRms(!$this->updateOnly, $upload, $this->fedoraLoc);
 
                 $this->indexedRes[$i->getPathname()] = $res;
                 echo self::$debug ? ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") : '';
                 $this->handleAutoCommit();
             } catch (MetaLookupException $e) {
                 if ($this->metaLookupRequire) {
+                    $skip = true;
+                } else {
+                    throw $e;
+                }
+            } catch (NotFound $e) {
+                if ($this->updateOnly) {
                     $skip = true;
                 } else {
                     throw $e;
