@@ -36,6 +36,7 @@ use acdhOeaw\schema\file\File;
 use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\util\metaLookup\MetaLookupInterface;
 use acdhOeaw\util\metaLookup\MetaLookupException;
+use BadMethodCallException;
 use DirectoryIterator;
 use RuntimeException;
 
@@ -45,6 +46,9 @@ use RuntimeException;
  * @author zozlak
  */
 class Indexer {
+
+    const MATCH = 1;
+    const SKIP  = 2;
 
     /**
      * Turns debug messages on
@@ -84,6 +88,12 @@ class Indexer {
      * @var string 
      */
     private $filter = '//';
+
+    /**
+     * Regular expression for excluding child resource file names.
+     * @var string 
+     */
+    private $filterNot = '';
 
     /**
      * Should children be directly attached to the FedoraResource or maybe
@@ -276,15 +286,29 @@ class Indexer {
     /**
      * Sets file name filter for child resources.
      * 
-     * Only files matching the filter will be ingested.
+     * You can choose if file names must match or must not match (skip) the 
+     * filter using the $type parameter. You can set both match and skip
+     * filters by calling setFilter() two times (once with 
+     * `$type = Indexer::MATCH` and second time with `$type = Indexer::SKIP`).
      * 
      * Filter is applied only to file names but NOT to directory names.
      * 
      * @param string $filter regular expression conformant with preg_replace()
+     * @param int $type decides if $filter is a match or skip filter (can be
+     *   one of Indexer::MATCH and Indexer::SKIP)
      * @return \acdhOeaw\util\Indexer
      */
-    public function setFilter(string $filter): Indexer {
-        $this->filter = $filter;
+    public function setFilter(string $filter, int $type = self::MATCH): Indexer {
+        switch ($type) {
+            case self::MATCH:
+                $this->filter    = $filter;
+                break;
+            case self::SKIP:
+                $this->filterNot = $filter;
+                break;
+            default:
+                throw new BadMethodCallException('wrong $type parameter');
+        }
         return $this;
     }
 
@@ -492,8 +516,10 @@ class Indexer {
                 }
             }
         }
-        $skipDir  = (!$this->includeEmpty && ($this->depth == 0 || $isEmptyDir) || $this->flatStructure);
-        $skipFile = !preg_match($this->filter, $i->getFilename());
+        $skipDir         = (!$this->includeEmpty && ($this->depth == 0 || $isEmptyDir) || $this->flatStructure);
+        $filenameInclude = preg_match($this->filter, $i->getFilename());
+        $filenameExclude = strlen($this->filterNot) > 0 && preg_match($this->filterNot, $i->getFilename());
+        $skipFile        = !$filenameInclude || $filenameExclude;
         return $i->isDir() && $skipDir || !$i->isDir() && $skipFile;
     }
 

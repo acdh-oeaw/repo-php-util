@@ -61,7 +61,8 @@ try {
     $fedora->begin();
     $ind    = new Indexer($res);
     $ind->setUploadSizeLimit(10000000);
-    $ind->setFilter('/txt|xml/');
+    $ind->setFilter('/txt|xml/', Indexer::MATCH);
+    $ind->setFilter('/^skiptest.txt$/', Indexer::SKIP);
     $ind->setFedoraLocation('/test/');
     $indRes = $ind->index();
 
