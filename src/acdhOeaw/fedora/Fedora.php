@@ -88,9 +88,13 @@ class Fedora {
         $headers = $request->getHeaders();
         if (is_string($body) && file_exists($body)) {
             $filename                       = rawurldecode(basename($body)); // lucky guess - unfortunately it is not clear how to escape header values
-            $headers['Content-Type']        = mime_content_type($body);
             $headers['Content-Disposition'] = 'attachment; filename="' . $filename . '"';
-            $body                           = fopen($body, 'rb');
+
+            $mime = @mime_content_type($body);
+            if ($mime) {
+                $headers['Content-Type'] = $mime;
+            }
+            $body = fopen($body, 'rb');
         } elseif (is_array($body) && isset($body['contentType']) && isset($body['data']) && isset($body['filename'])) {
             $headers['Content-Type']        = $body['contentType'];
             $headers['Content-Disposition'] = 'attachment; filename="' . rawurldecode($body['filename']) . '"';
@@ -678,7 +682,7 @@ class Fedora {
         if (count($this->resToReindex) == 0) {
             return;
         }
-        
+
         $this->begin();
         foreach (array_unique($this->resToReindex) as $i) {
             try {
@@ -693,8 +697,8 @@ class Fedora {
         }
         $this->resToReindex = [];
         $this->commit();
-    }    
-    
+    }
+
     /**
      * Returns true if a Fedora transaction is opened and false otherwise.
      * 
