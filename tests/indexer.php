@@ -272,8 +272,10 @@ try {
     $fedora->commit();
 } finally {
     $fedora->rollback();
+    if (is_dir('tests/tmp')) {
+        system('rm -fR tests/tmp');
+    }
 }
-
 
 echo "\n-------------------------------------------------------------------\n";
 echo "autocommit works\n";
@@ -286,7 +288,7 @@ try {
     $ind->setFedoraLocation('/test/');
     $ind->setAutoCommit(2);
     $indRes = $ind->index();
-    assert(count($indRes) === 5, new Exception("resources count doesn't match " . count($indRes)));
+    assert(count($indRes) === 6, new Exception("resources count doesn't match " . count($indRes)));
     $fedora->commit();
 } finally {
     $fedora->rollback();
