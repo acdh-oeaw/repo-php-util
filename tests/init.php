@@ -26,7 +26,6 @@
 
 require_once 'vendor/autoload.php';
 
-use acdhOeaw\fedora\Fedora;
 use acdhOeaw\util\RepoConfig;
 use zozlak\util\ClassLoader;
 

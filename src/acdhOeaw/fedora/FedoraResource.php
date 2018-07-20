@@ -333,6 +333,8 @@ class FedoraResource {
         $this->metadata = $metadata;
         $this->updated  = false;
 
+        $this->extractAclFromMetadata();
+        
         $this->fedora->getCache()->reload($this);
 
         if ($fixReferences) {
@@ -604,7 +606,7 @@ class FedoraResource {
         }
         return $children;
     }
-    
+
     /**
      * Returns all resource's children.
      * 
@@ -674,13 +676,11 @@ class FedoraResource {
 
             // Fedora 4.7.5 doesn't provide ACL link header for binary resources
             // if the ACL id directly attached to the resource (sic!).
-            // As a fallback we can try to extract it from the metadata.
+            // As a fallback we can try to extract it from the metadata (which
+            // is done automatically in the setMetadata() method being called
+            // by the getMetadata(true) method).
             if ($this->aclUrl == '') {
-                $meta = $this->getMetadata(true);
-                $tmp  = $meta->getResource(WebAcl::ACL_LINK_PROP);
-                if ($tmp !== null) {
-                    $this->aclUrl = $this->fedora->standardizeUri($tmp->getUri());
-                }
+                $this->getMetadata(true);
             }
         }
         return $this->aclUrl;
@@ -834,6 +834,18 @@ class FedoraResource {
         $this->acl    = null;
     }
 
+    /**
+     * Tries to extract ACL URL from the metadata and update the `$aclUrl` 
+     * property.
+     */
+    private function extractAclFromMetadata() {
+        $tmp = $this->metadata->getResource(WebAcl::ACL_LINK_PROP);
+        if ($tmp !== null) {
+            $this->aclUrl = $this->fedora->standardizeUri($tmp->getUri());
+        }
+    }
+
+    
     /**
      * Returns serialized metadata (primarly for debugging)
      * @return string
