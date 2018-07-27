@@ -32,6 +32,7 @@ namespace acdhOeaw\fedora;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Exception\RequestException;
 use EasyRdf\Sparql\Result;
 
 /**
@@ -48,6 +49,7 @@ class SparqlClient {
      * @var string
      */
     private $url;
+
     /**
      * Guzzle client object
      * @var GuzzleHttp\Client
@@ -61,15 +63,16 @@ class SparqlClient {
      * @param string $user HTTP basic authentication user name
      * @param string $password HTTP basic authentication password
      */
-    public function __construct(string $url, string $user = '', string $password = '') {
+    public function __construct(string $url, string $user = '',
+                                string $password = '') {
         $this->url = $url;
 
         $headers = array(
             'Content-Type' => 'application/x-www-form-urlencoded',
-            'Accept' => 'application/sparql-results+json'
+            'Accept'       => 'application/sparql-results+json'
         );
         if ($user != '' && $password != '') {
-            $authHeader = 'Basic ' . base64_encode($user . ':' . $password);
+            $authHeader               = 'Basic ' . base64_encode($user . ':' . $password);
             $headers['Authorization'] = $authHeader;
         }
         $this->client = new Client(['headers' => $headers, 'verify' => false]);
@@ -81,15 +84,27 @@ class SparqlClient {
      * There is no support for UPDATE queries.
      * 
      * @param string $query SPARQL query to be run
+     * @param int $nTries how many times request should be repeated in case of
+     *   error before giving up
      * @return \EasyRdf\Sparql\Result
      */
-    public function query(string $query): Result {
+    public function query(string $query, int $nTries = 1): Result {
         $headers = array('Content-Type' => 'application/x-www-form-urlencoded');
-        $body = 'query=' . rawurlencode($query);
+        $body    = 'query=' . rawurlencode($query);
         $request = new Request('POST', $this->url, $headers, $body);
-        $response = $this->client->send($request);
-        $body = $response->getBody();
-        $result = new Result($body, 'application/sparql-results+json');
+        while ($nTries > 0) {
+            $nTries--;
+            try {
+                $response = $this->client->send($request);
+                $body     = $response->getBody();
+                $result   = new Result($body, 'application/sparql-results+json');
+                break;
+            } catch (RequestException $ex) {
+                if ($nTries <= 0) {
+                    throw $ex;
+                }
+            }
+        }
         return $result;
     }
 

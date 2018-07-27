@@ -171,6 +171,12 @@ class Fedora {
     private $resToReindex = [];
 
     /**
+     * Number of attempts to execute a SPARQL query
+     * @var int
+     */
+    private $sparqlNTries;
+    
+    /**
      * Creates Fedora connection object from a given configuration.
      */
     public function __construct() {
@@ -181,6 +187,7 @@ class Fedora {
             'headers' => ['Authorization' => $authHeader]
         ]);
         $this->sparqlClient = new SparqlClient(RC::get('sparqlUrl'), RC::get('fedoraUser'), RC::get('fedoraPswd'));
+        $this->sparqlNTries = RC::get('sparqlNTries', true) ?? 1;
         $this->cache        = new FedoraCache();
 
         try {
@@ -546,10 +553,12 @@ class Fedora {
      * Runs a SPARQL against repository triplestore.
      * 
      * @param string $query SPARQL query to run
+     * @param int $nTries how many times request should be repeated in case of
+     *   error before giving up
      * @return \EasyRdf\Sparql\Result
      */
-    public function runSparql(string $query): Result {
-        return $this->sparqlClient->query($query);
+    public function runSparql(string $query, int $nTries = null): Result {
+        return $this->sparqlClient->query($query, $nTries ?? $this->sparqlNTries);
     }
 
     /**

@@ -17,6 +17,7 @@ fedoraPswd="***"
 fedoraAclUri="https://fedora.localhost/rest/acl"
 
 sparqlUrl="https://fedora.localhost/blazegraph/sparql"
+sparqlNTries=2
 
 containerDir="/mnt/acdh_resources/container/"
 
