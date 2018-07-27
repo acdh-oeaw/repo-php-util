@@ -63,12 +63,14 @@ class RepoConfig {
      * Property value can be a literal as well as an composed object (e.g. array
      * depending on the parsed ini file content).
      * @param string $property configuration property name
+     * @param bool $noException should exception be avoided when property is not 
+     *   defined?
      * @return mixed configuration property value
      * @throws InvalidArgumentException
      */
-    static public function get(string $property) {
+    static public function get(string $property, bool $noException = false) {
         $value = @self::$config->get($property);
-        if ($value === null) {
+        if ($value === null && $noException === false) {
             throw new InvalidArgumentException('configuration property ' . $property . ' does not exist');
         }
         return $value;
