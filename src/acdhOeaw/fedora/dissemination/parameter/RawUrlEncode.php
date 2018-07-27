@@ -52,12 +52,15 @@ class RawUrlEncode implements iTransformation {
     public function transform(string $value): string {
         if (strpos($value, 'hdl.handle.net') !== false) {
             $value = str_replace("http://", "", $value);
-            $value = str_replace("/", " ", $value);
+            $value = str_replace("/", "+", $value);
             $value = rawurlencode($value);
         }else {
-            $value = str_replace("https://", "", $value);
-            $value = str_replace("/", " ", $value);
-            $value = rawurlencode($value);
+            if (strpos($value, RC::get('fedoraUuidNamespace')) !== false) {
+                $value = str_replace(RC::get('fedoraIdNamespace'), "", $value);
+                $value = str_replace("/", "+", $value);
+                //we need to use the double urlencode, otherwise the + will be a space...
+                $value = rawurlencode(rawurlencode($value));
+            }
         }
         return $value;
     }
