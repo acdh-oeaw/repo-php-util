@@ -475,6 +475,8 @@ class Indexer {
             return;
         }
 
+        echo self::$debug ? $i->getPathname() . "\n" : "";
+        
         $skip   = $this->isSkipped($i);
         $upload = $i->isFile() && ($this->uploadSizeLimit > $i->getSize() || $this->uploadSizeLimit === -1);
 
@@ -489,7 +491,7 @@ class Indexer {
                 $res = $file->updateRms(!$this->updateOnly, $upload, $this->fedoraLoc);
 
                 $this->indexedRes[$i->getPathname()] = $res;
-                echo self::$debug ? ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") : '';
+                echo self::$debug ? "\t" . ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") . "\n" : '';
                 $this->handleAutoCommit();
             } catch (MetaLookupException $e) {
                 if ($this->metaLookupRequire) {
@@ -506,10 +508,9 @@ class Indexer {
             }
         }
         if ($skip) {
-            echo self::$debug ? "skip " : "";
+            echo self::$debug ? "\tskip\n" : "";
         }
 
-        echo self::$debug ? $i->getPathname() . "\n" : "";
         echo self::$debug && !$skip ? "\t" . $res->getId() . "\n\t" . $res->getUri() . "\n" : "";
 
         // recursion
