@@ -175,7 +175,7 @@ class Fedora {
      * @var int
      */
     private $sparqlNTries;
-    
+
     /**
      * Creates Fedora connection object from a given configuration.
      */
@@ -194,6 +194,10 @@ class Fedora {
             $this->defaultCollection = RC::get('fedoraDefaultCollection');
         } catch (InvalidArgumentException $e) {
             
+        }
+
+        if (\PHP_INT_SIZE < 8) {
+            throw new RuntimeException('You are running 32-bit PHP build which can cause problems with files/resources bigger then 2GB. Please obtain a 64-bit PHP build.');
         }
     }
 
