@@ -349,7 +349,7 @@ class MetadataCollection extends Graph {
         echo self::$debug ? "Promoting URIs to ids...\n" : '';
         foreach ($this->resources() as $i) {
             if (!$i->isBNode()) {
-                echo "\t" . $i->getUri() . "\n";
+                echo self::$debug ? "\t" . $i->getUri() . "\n" : '';
                 $i->addResource(RC::idProp(), $i->getUri());
             }
         }
