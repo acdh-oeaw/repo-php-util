@@ -50,10 +50,25 @@ class RawUrlDecode implements iTransformation {
      * @return string
      */
     public function transform(string $value): string {
-        $value = str_replace(" ", "+", rawurldecode($value));
-        $value = str_replace("+", "/", rawurldecode($value));
-        $value = RC::get('fedoraIdNamespace').$value;
-        return $value;
+        
+        $data = explode(":", $value);
+        $identifier = "";
+
+        foreach($data as $ra) {
+            if (strpos($ra, '&') !== false) {
+                $pos = strpos($ra, '&');
+                $ra = substr($ra, 0, $pos);
+                $identifier .= $ra."/";
+            }else {
+                $identifier .= $ra."/";
+            }
+        }
+        
+        $identifier = "https://".$identifier;
+        if(substr($identifier, -1) == "/") { 
+            $identifier = substr_replace($identifier, "", -1); 
+        }
+        return $identifier;
     }
 
 }
