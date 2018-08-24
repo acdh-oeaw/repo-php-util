@@ -177,6 +177,12 @@ class Fedora {
     private $sparqlNTries;
 
     /**
+     * PID of the process keeping transaction alive
+     * @var int
+     */
+    private $txProcPid;
+
+    /**
      * Creates Fedora connection object from a given configuration.
      */
     public function __construct() {
@@ -630,6 +636,13 @@ class Fedora {
             throw new RuntimeException('wrong response from fedora');
         }
         $this->txUrl = $loc[0];
+
+        if (function_exists('pcntl_fork')) {
+            $this->txProcPid = pcntl_fork();
+            if ($this->txProcPid === 0) {
+                $this->keepTransactionAlive();
+            }
+        }
     }
 
     /**
@@ -642,6 +655,7 @@ class Fedora {
         if ($this->txUrl) {
             $this->client->post($this->txUrl . '/fcr:tx/fcr:rollback');
             $this->txUrl = null;
+            $this->killKeepTransactionAlive();
         }
     }
 
@@ -683,6 +697,7 @@ class Fedora {
             $this->client->post($this->txUrl . '/fcr:tx/fcr:commit');
             $this->txUrl = null;
 
+            $this->killKeepTransactionAlive();
             $this->reindexResources();
         }
     }
@@ -710,6 +725,27 @@ class Fedora {
         }
         $this->resToReindex = [];
         $this->commit();
+    }
+
+    /**
+     * Keeps transaction alive (used in separate process)
+     */
+    private function keepTransactionAlive() {
+        while (true) {
+            sleep($this->txKeepAlive);
+            $this->prolong();
+        }
+    }
+
+    /**
+     * Ends process keeping transaction alive
+     */
+    private function killKeepTransactionAlive() {
+        if ($this->txProcPid > 0) {
+            posix_kill($this->txProcPid, \SIGKILL);
+            $status = null;
+            pcntl_wait($status);
+        }
     }
 
     /**
