@@ -1,9 +1,9 @@
 <?php
 
-/*
+/* 
  * The MIT License
  *
- * Copyright 2017 Austrian Centre for Digital Humanities.
+ * Copyright 2018 zozlak.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +24,3 @@
  * THE SOFTWARE.
  */
 
-/*
- * Tests for \acdhOeaw\fedora\FedoraCache
- */
-
-use EasyRdf\Graph;
-use acdhOeaw\util\RepoConfig as RC;
-use acdhOeaw\fedora\Fedora;
-require_once 'init.php';
-$fedora = new Fedora();
-
-$p1 = 'http://some.property/#p1';
-$p2 = 'http://some.property/#p2';
-
-try {
-    $fedora->begin();
-} finally {
-    $fedora->rollback();
-}
