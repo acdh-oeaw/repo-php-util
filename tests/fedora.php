@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 zozlak.
+ * Copyright 2017 Austrian Centre for Digital Humanities.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,3 +50,9 @@ try {
 } finally {
     $fedora->rollback();
 }
+
+echo "\n-------------------------------------------------------------------\n";
+echo "keeps transaction alive\n";
+$fedora->begin();
+sleep(200);
+$fedora->commit();
