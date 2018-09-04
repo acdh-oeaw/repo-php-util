@@ -57,8 +57,8 @@ class Parameter extends FedoraResource {
         'set'    => 'acdhOeaw\\fedora\\dissemination\\parameter\\SetParam',
         'substr' => 'acdhOeaw\\fedora\\dissemination\\parameter\\Substr',
         'url'    => 'acdhOeaw\\fedora\\dissemination\\parameter\\UrlEncode',
-        'rawurldecode'    => 'acdhOeaw\\fedora\\dissemination\\parameter\\RawUrlDecode',
         'rawurlencode'    => 'acdhOeaw\\fedora\\dissemination\\parameter\\RawUrlEncode',
+        'removeProtocol'    => 'acdhOeaw\\fedora\\dissemination\\parameter\\RemoveProtocol',
     ];
 
     /**
