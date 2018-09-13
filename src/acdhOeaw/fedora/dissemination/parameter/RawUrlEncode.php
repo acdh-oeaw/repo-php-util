@@ -50,16 +50,8 @@ class RawUrlEncode implements iTransformation {
      * @return string
      */
     public function transform(string $value): string {
-        
-        if (strpos($value, 'hdl.handle.net') !== false) {
-            $value = str_replace("http://", "", $value);
-        }else if(strpos($value, 'https') !== false) {
-            $value = str_replace("https://", "", $value);
-        }else {
-            $value = str_replace("http://", "", $value);
-        }
+        $value = rawurlencode($value);
         return $value;
-        
     }
 
 }
