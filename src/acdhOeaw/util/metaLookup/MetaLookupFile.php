@@ -30,7 +30,6 @@
 
 namespace acdhOeaw\util\metaLookup;
 
-use RuntimeException;
 use InvalidArgumentException;
 use EasyRdf\Resource;
 use EasyRdf\Graph;

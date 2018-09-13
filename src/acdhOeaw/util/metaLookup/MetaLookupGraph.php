@@ -30,7 +30,6 @@
 
 namespace acdhOeaw\util\metaLookup;
 
-use RuntimeException;
 use EasyRdf\Resource;
 use EasyRdf\Graph;
 use acdhOeaw\util\RepoConfig as RC;
