@@ -24,14 +24,12 @@
  * THE SOFTWARE.
  */
 
-require_once 'vendor/autoload.php';
+$composer = require_once __DIR__ . '/../vendor/autoload.php';
+$composer->addPsr4('acdhOeaw\\', __DIR__ . '/../src/acdhOeaw');
 
 use acdhOeaw\util\RepoConfig;
-use zozlak\util\ClassLoader;
 
-$loader = new ClassLoader('src');
-
-RepoConfig::init('tests/config.ini');
+RepoConfig::init(__DIR__ . '/config.ini');
 
 ini_set('assert.exception', 1);
 if (ini_get('zend.assertions') !== '1') {
