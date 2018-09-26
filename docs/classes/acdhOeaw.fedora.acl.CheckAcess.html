@@ -21,54 +21,54 @@
     <script src="../js/jquery.smooth-scroll.js"></script>
     <script src="../js/prism.min.js"></script>
     <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
-        <script type="text/javascript">
-        function loadExternalCodeSnippets() {
-            Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
-                var src = pre.getAttribute('data-src');
-                var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
-                var language = 'php';
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
 
-                var code = document.createElement('code');
-                code.className = 'language-' + language;
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
 
-                pre.textContent = '';
+            pre.textContent = '';
 
-                code.textContent = 'Loading…';
+            code.textContent = 'Loading…';
 
-                pre.appendChild(code);
+            pre.appendChild(code);
 
-                var xhr = new XMLHttpRequest();
+            var xhr = new XMLHttpRequest();
 
-                xhr.open('GET', src, true);
+            xhr.open('GET', src, true);
 
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState == 4) {
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
 
-                        if (xhr.status < 400 && xhr.responseText) {
-                            code.textContent = xhr.responseText;
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
 
-                            Prism.highlightElement(code);
-                        }
-                        else if (xhr.status >= 400) {
-                            code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
-                        }
-                        else {
-                            code.textContent = '✖ Error: File does not exist or is empty';
-                        }
+                        Prism.highlightElement(code);
                     }
-                };
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
 
-                xhr.send(null);
-            });
-        }
-
-        $(document).ready(function(){
-            loadExternalCodeSnippets();
+            xhr.send(null);
         });
-        $('#source-view').on('shown', function () {
-            loadExternalCodeSnippets();
-        })
-    </script>
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
 
     <link rel="shortcut icon" href="../images/favicon.ico"/>
     <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
@@ -144,37 +144,37 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-732515660"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-186166707"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-732515660" class="accordion-body collapse in">
+            <div id="namespace-186166707" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1077017046"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-20209140"></a>
                                 <a href="../namespaces/acdhOeaw.html" style="margin-left: 30px; padding-left: 0">acdhOeaw</a>
             </div>
-            <div id="namespace-1077017046" class="accordion-body collapse ">
+            <div id="namespace-20209140" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-895598970"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1994139549"></a>
                                 <a href="../namespaces/acdhOeaw.fedora.html" style="margin-left: 30px; padding-left: 0">fedora</a>
             </div>
-            <div id="namespace-895598970" class="accordion-body collapse ">
+            <div id="namespace-1994139549" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1534349803"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-72643399"></a>
                                 <a href="../namespaces/acdhOeaw.fedora.acl.html" style="margin-left: 30px; padding-left: 0">acl</a>
             </div>
-            <div id="namespace-1534349803" class="accordion-body collapse ">
+            <div id="namespace-72643399" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -191,19 +191,19 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1305606676"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-954230887"></a>
                                 <a href="../namespaces/acdhOeaw.fedora.dissemination.html" style="margin-left: 30px; padding-left: 0">dissemination</a>
             </div>
-            <div id="namespace-1305606676" class="accordion-body collapse ">
+            <div id="namespace-954230887" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-820888993"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1354450230"></a>
                                 <a href="../namespaces/acdhOeaw.fedora.dissemination.parameter.html" style="margin-left: 30px; padding-left: 0">parameter</a>
             </div>
-            <div id="namespace-820888993" class="accordion-body collapse ">
+            <div id="namespace-1354450230" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -237,10 +237,10 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2002010934"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1043823137"></a>
                                 <a href="../namespaces/acdhOeaw.fedora.exceptions.html" style="margin-left: 30px; padding-left: 0">exceptions</a>
             </div>
-            <div id="namespace-2002010934" class="accordion-body collapse ">
+            <div id="namespace-1043823137" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -263,10 +263,10 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-134644577"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-930885074"></a>
                                 <a href="../namespaces/acdhOeaw.fedora.metadataQuery.html" style="margin-left: 30px; padding-left: 0">metadataQuery</a>
             </div>
-            <div id="namespace-134644577" class="accordion-body collapse ">
+            <div id="namespace-930885074" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -299,19 +299,19 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1181923366"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-781190819"></a>
                                 <a href="../namespaces/acdhOeaw.schema.html" style="margin-left: 30px; padding-left: 0">schema</a>
             </div>
-            <div id="namespace-1181923366" class="accordion-body collapse ">
+            <div id="namespace-781190819" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-481004604"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-81558970"></a>
                                 <a href="../namespaces/acdhOeaw.schema.dissemination.html" style="margin-left: 30px; padding-left: 0">dissemination</a>
             </div>
-            <div id="namespace-481004604" class="accordion-body collapse ">
+            <div id="namespace-81558970" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -329,10 +329,10 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-891129274"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-423537677"></a>
                                 <a href="../namespaces/acdhOeaw.schema.file.html" style="margin-left: 30px; padding-left: 0">file</a>
             </div>
-            <div id="namespace-891129274" class="accordion-body collapse ">
+            <div id="namespace-423537677" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -348,10 +348,10 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1120559149"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-17263195"></a>
                                 <a href="../namespaces/acdhOeaw.schema.redmine.html" style="margin-left: 30px; padding-left: 0">redmine</a>
             </div>
-            <div id="namespace-1120559149" class="accordion-body collapse ">
+            <div id="namespace-17263195" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -378,19 +378,19 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1232602294"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-47300030"></a>
                                 <a href="../namespaces/acdhOeaw.util.html" style="margin-left: 30px; padding-left: 0">util</a>
             </div>
-            <div id="namespace-1232602294" class="accordion-body collapse ">
+            <div id="namespace-47300030" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-901935038"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-645221814"></a>
                                 <a href="../namespaces/acdhOeaw.util.metadataValidator.html" style="margin-left: 30px; padding-left: 0">metadataValidator</a>
             </div>
-            <div id="namespace-901935038" class="accordion-body collapse ">
+            <div id="namespace-645221814" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -407,10 +407,10 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1984136521"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-43236782"></a>
                                 <a href="../namespaces/acdhOeaw.util.metaLookup.html" style="margin-left: 30px; padding-left: 0">metaLookup</a>
             </div>
-            <div id="namespace-1984136521" class="accordion-body collapse ">
+            <div id="namespace-43236782" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -459,83 +459,191 @@
     <section class="row-fluid">
         <div class="span10 offset2">
             <div class="row-fluid">
-                <div class="span8 content file">
+                <div class="span8 content class">
                     <nav>
-                                                                    </nav>
-
+                                                <a href="../namespaces/acdhOeaw.fedora.acl.html">\acdhOeaw\fedora\acl</a> <i class="icon-level-up"></i>
+                                            </nav>
                     <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
-                    <h1><small>fedora/metadataQuery</small>HasProperty.php</h1>
-                    <p><em>The MIT License</em></p>
-                    <p>Copyright 2017 Austrian Centre for Digital Humanities.</p>
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the &quot;Software&quot;), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:</p>
-<p>The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.</p>
-<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.</p>
 
+                    <h1><small>\acdhOeaw\fedora\acl</small>CheckAcess</h1>
+                    <p><em>Checks if credentials provided with a currently handled request allow
+access to a given Fedora resource</em></p>
                     
                     
-                                        <h2>Classes</h2>
-                    <table class="table table-hover">
-                                            <tr>
-                            <td><a href="../classes/acdhOeaw.fedora.metadataQuery.HasProperty.html">HasProperty</a></td>
-                            <td><em>Description of hasParameter</em></td>
-                        </tr>
-                                        </table>
-                                    </div>
-
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.fedora.acl.CheckAcess.html#method_check" class="">check()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/acdhOeaw.fedora.acl.CheckAcess.html#property_client" class="">$client</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
                 <aside class="span4 detailsbar">
+                                        
+                    
                     <dl>
-                                                    <dt>Package</dt>
-                            <dd><div class="namespace-wrapper">\repo-php-util</div></dd>
+                        <dt>File</dt>
+                            <dd><a href="../files/fedora.acl.CheckAcess.html"><div class="path-wrapper">fedora/acl/CheckAcess.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\acdhOeaw\fedora\acl\CheckAcess</div>
+                            </dd>
+
                         
                         
-                    </dl>
+                        
+                        
+                                                                        </dl>
                     <h2>Tags</h2>
                     <table class="table table-condensed">
-                                                    <tr>
-                                <th>
-                                    copyright
-                                </th>
-                                <td>
-                                                                            <p>(c) 2017, Austrian Centre for Digital Humanities</p>
-                                                                    </td>
-                            </tr>
-                                                    <tr>
-                                <th>
-                                    license
-                                </th>
-                                <td>
-                                                                            <p><a href="https://opensource.org/licenses/MIT">https://opensource.org/licenses/MIT</a></p>
-                                                                    </td>
-                            </tr>
-                                            </table>
-
+                                            <tr>
+                            <th>
+                                author
+                            </th>
+                            <td>
+                                                                    <p>zozlak</p>
+                                                            </td>
+                        </tr>
+                                        </table>
                 </aside>
             </div>
 
-            
-            
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_client" name="property_client" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$client</h3>
+                <pre class="signature">$client : \GuzzleHttp\Client</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                \GuzzleHttp\Client
+                                            </article>
         </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_check" name="method_check" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">check()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">check(\acdhOeaw\fedora\FedoraResource  <span class="argument">$res</span>) : boolean</pre>
+                <p><em>Checks if a given resource is accessible with same credentials as ones
+provided in the current request.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/acdhOeaw.fedora.FedoraResource.html">\acdhOeaw\fedora\FedoraResource</a></td>
+                                <td>$res </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\GuzzleHttp\Exception\RequestException</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    </div>
     </section>
 
     <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="source-view-label"></h3>
+            <h3 id="source-view-label">CheckAcess.php</h3>
         </div>
         <div class="modal-body">
-            <pre data-src="../files/fedora/metadataQuery/HasProperty.php.txt" class="language-php line-numbers"></pre>
+            <pre data-src="../files/fedora/acl/CheckAcess.php.txt" class="language-php line-numbers"></pre>
         </div>
     </div>
 

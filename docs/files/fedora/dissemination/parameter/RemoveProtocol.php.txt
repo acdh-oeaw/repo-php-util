@@ -35,13 +35,13 @@ namespace acdhOeaw\fedora\dissemination\parameter;
  * 
  * @author zozlak
  */
-class RawUrlEncode implements iTransformation {
+class RemoveProtocol implements iTransformation {
 
     /**
      * Returns transformation name
      */
     public function getName(): string {
-        return 'rawurlencode';
+        return 'removeprotocol';
     }
 
     /**
@@ -50,8 +50,16 @@ class RawUrlEncode implements iTransformation {
      * @return string
      */
     public function transform(string $value): string {
-        $value = rawurlencode($value);
+        
+        if (strpos($value, 'hdl.handle.net') !== false) {
+            $value = str_replace("http://", "", $value);
+        }else if(strpos($value, 'https') !== false) {
+            $value = str_replace("https://", "", $value);
+        }else {
+            $value = str_replace("http://", "", $value);
+        }
         return $value;
+        
     }
 
 }

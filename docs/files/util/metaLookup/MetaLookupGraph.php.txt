@@ -30,7 +30,6 @@
 
 namespace acdhOeaw\util\metaLookup;
 
-use RuntimeException;
 use EasyRdf\Resource;
 use EasyRdf\Graph;
 use acdhOeaw\util\RepoConfig as RC;
@@ -60,6 +59,11 @@ class MetaLookupGraph implements MetaLookupInterface {
      */
     public function __construct(Graph $graph) {
         $this->graph = $graph;
+        foreach ($this->graph->resources() as $i) {
+            if (!$i->isBNode()) {
+                $i->addResource(RC::idProp(), $i->getUri());
+            }
+        }
     }
 
     /**

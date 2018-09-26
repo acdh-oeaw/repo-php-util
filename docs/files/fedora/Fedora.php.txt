@@ -733,7 +733,11 @@ class Fedora {
     private function keepTransactionAlive() {
         while (true) {
             sleep($this->txKeepAlive);
-            $this->prolong();
+            try {
+                $this->prolong();
+            } catch (RequestException $ex) {
+                // it's possible that the transaction is closed on the Fedora side but the doorkeeper is still processing post-transaction handles
+            }
         }
     }
 
