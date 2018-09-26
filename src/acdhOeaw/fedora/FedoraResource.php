@@ -800,7 +800,9 @@ class FedoraResource {
         $aclProp = $res->getResource(WebAcl::ACL_LINK_PROP);
         if ($aclProp) {
             $res->deleteResource(WebAcl::ACL_LINK_PROP);
-            $res->addResource(WebAcl::ACL_LINK_PROP, $this->fedora->sanitizeUri($aclProp->getUri()));
+            if ($aclProp->getUri() !== 'http://fedora.info/definitions/v4/repository#inaccessibleResource') {
+                $res->addResource(WebAcl::ACL_LINK_PROP, $this->fedora->sanitizeUri($aclProp->getUri()));
+            }
         }
 
         $rdf = $res->getGraph()->serialise('ntriples');
