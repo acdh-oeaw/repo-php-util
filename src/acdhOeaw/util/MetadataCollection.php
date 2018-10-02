@@ -85,6 +85,18 @@ class MetadataCollection extends Graph {
     private $fedoraLoc = '/';
 
     /**
+     * Number of resource automatically triggering a commit (0 - no auto commit)
+     * @var int
+     */
+    private $autoCommit = 0;
+
+    /**
+     * Used to determine when the autocommit should tak place
+     * @var int
+     */
+    private $autoCommitCounter;
+
+    /**
      * Creates a new metadata parser.
      * 
      * @param Fedora $fedora
@@ -104,10 +116,12 @@ class MetadataCollection extends Graph {
      * graph imported by the import() method.
      * 
      * @param FedoraResource $res
+     * @return \acdhOeaw\util\MetadataCollection
      * @see import()
      */
-    public function setResource(FedoraResource $res) {
+    public function setResource(FedoraResource $res): MetadataCollection {
         $this->resource = $res;
+        return $this;
     }
 
     /**
@@ -122,9 +136,27 @@ class MetadataCollection extends Graph {
      * If it exists already, its location is not changed.
      * 
      * @param string $fedoraLoc fedora location 
+     * @return \acdhOeaw\util\MetadataCollection
      */
-    public function setFedoraLocation(string $fedoraLoc) {
+    public function setFedoraLocation(string $fedoraLoc): MetadataCollection {
         $this->fedoraLoc = $fedoraLoc;
+        return $this;
+    }
+
+    /**
+     * Controls the automatic commit behaviour.
+     * 
+     * Even when you use autocommit, you should commit your transaction after
+     * `Indexer::index()` (the only exception is when you set auto commit to 1
+     * forcing commiting each and every resource separately but you probably 
+     * don't want to do that for performance reasons).
+     * @param int $count number of resource automatically triggering a commit 
+     *   (0 - no auto commit)
+     * @return \acdhOeaw\util\MetadataCollection
+     */
+    public function setAutoCommit(int $count): MetadataCollection {
+        $this->autoCommit = $count;
+        return $this;
     }
 
     /**
@@ -167,6 +199,7 @@ class MetadataCollection extends Graph {
         if (!in_array($singleOutNmsp, $dict)) {
             throw new InvalidArgumentException('singleOutNmsp parameters must be one of MetadataCollection::SKIP, MetadataCollection::CREATE');
         }
+        $this->autoCommitCounter = 0;
 
         $this->removeLiteralIds();
         $this->promoteUrisToIds();
@@ -185,6 +218,7 @@ class MetadataCollection extends Graph {
             $meta->merge($res, array(RC::idProp()));
             $fedoraRes->setMetadata($meta, false);
             $fedoraRes->updateMetadata();
+            $this->handleAutoCommit();
         }
         return array_values($fedoraResources);
     }
@@ -265,6 +299,7 @@ class MetadataCollection extends Graph {
                 $meta->addLiteral(RC::titleProp(), $title);
                 $fedoraRes = $this->fedora->createResource($meta);
                 $found     = 'new';
+                $this->handleAutoCommit();
             }
             echo self::$debug ? "\t\t" . $found . ' ' . $fedoraRes->getId() . "\n" : '';
 
@@ -406,6 +441,20 @@ class MetadataCollection extends Graph {
                 }
             }
         }
+    }
+
+    private function handleAutoCommit(): bool {
+        if ($this->autoCommit > 0) {
+            $this->autoCommitCounter++;
+            if ($this->autoCommitCounter >= $this->autoCommit) {
+                echo self::$debug ? "Autocommit\n" : '';
+                $this->fedora->commit();
+                $this->autoCommitCounter = 0;
+                $this->fedora->begin();
+                return true;
+            }
+        }
+        return false;
     }
 
 }
