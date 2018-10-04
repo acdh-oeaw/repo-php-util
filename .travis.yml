@@ -7,13 +7,11 @@ sudo: required
 services:
   - docker
   
-before-install:
+install:
   - docker build -t acdh/fcrepo tests/docker
   - docker run -d -p 8080:8080 acdh/fcrepo
   - sleep 5
   - cp config.ini.sample tests/config.ini
-  
-install:
   - composer update
 
 script:
