@@ -1,5 +1,7 @@
 # repo-php-util
 
+Travis build demo
+
 Set of classes for working with the ACDH repository stack.
 
 # Installation
