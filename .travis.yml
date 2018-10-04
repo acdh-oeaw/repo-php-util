@@ -1,0 +1,17 @@
+language: php
+php:
+  - 7.2
+
+services:
+  - docker
+  
+before-install:
+  - docker build -t acdh/fcrepo tests/docker
+  - docker run -d -p 8080:8080 acdh/fcrepo
+  - sleep 5
+  
+install:
+  - composer update
+
+script:
+  - php -f tests/fedora-weak-transactions.php
