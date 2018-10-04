@@ -12,4 +12,4 @@ RUN cd /usr/local/tomcat/webapps &&\
 
 EXPOSE 8080
 EXPOSE 61616
-ENV CATALINA_OPTS="-Dfile.encoding=UTF-8 -Xms1024m -Xmx2048m -XX:MaxHeapFreeRatio=20 -XX:MinHeapFreeRatio=10 -XX:GCTimeRatio=20 -XX:MaxMetaspaceSize=512M" JAVA_OPTS="${JAVA_OPTS} -Djava.net.preferIPv4Stack=true -Dfcrepo.bnode.hash-uri=true -Dfcrepo.streaming.parallel=true"
+ENV CATALINA_OPTS="-Dfile.encoding=UTF-8 -Xms1024m -Xmx2048m -XX:MaxHeapFreeRatio=20 -XX:MinHeapFreeRatio=10 -XX:GCTimeRatio=20 -XX:MaxMetaspaceSize=512M" JAVA_OPTS="${JAVA_OPTS} -Djava.net.preferIPv4Stack=true -Dfcrepo.bnode.hash-uri=true -Dfcrepo.streaming.parallel=true -Dfcrepo.modeshape.configuration=classpath:/config/file-simple/repository.json"
