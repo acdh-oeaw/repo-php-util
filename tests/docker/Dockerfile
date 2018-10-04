@@ -4,11 +4,11 @@ MAINTAINER Mateusz Żółtak <mateusz.zoltak@oeaw.ac.at>
 ENV FEDORA_VERSION="4.7.5" FEDORA_VARIANT=""
 
 RUN cd /usr/local/tomcat/webapps &&\
-  curl -s https://github.com/fcrepo4-exts/fcrepo-webapp-plus/releases/download/fcrepo-webapp-plus-${FEDORA_VERSION}/fcrepo-webapp-plus${FEDORA_VARIANT}-${FEDORA_VERSION}.war > /tmp/ROOT.war &&\
+  wget -nv -O ROOT.war https://github.com/fcrepo4-exts/fcrepo-webapp-plus/releases/download/fcrepo-webapp-plus-${FEDORA_VERSION}/fcrepo-webapp-plus${FEDORA_VARIANT}-${FEDORA_VERSION}.war &&\
   rm -fR /usr/local/tomcat/webapps/ROOT &&\
   mkdir /usr/local/tomcat/webapps/ROOT &&\
-  unzip /tmp/ROOT.war -d /usr/local/tomcat/webapps/ROOT &&\
-  rm /tmp/ROOT.war
+  unzip ROOT.war -d ROOT &&\
+  rm ROOT.war
 
 EXPOSE 8080
 EXPOSE 61616
