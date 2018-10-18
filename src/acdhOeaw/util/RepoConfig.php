@@ -32,6 +32,7 @@ namespace acdhOeaw\util;
 
 use zozlak\util\Config;
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Provides access to repository configuration properties in a form of
@@ -136,4 +137,23 @@ class RepoConfig {
         return self::get('fedoraVocabsNamespace');
     }
 
+	/**
+	 * Displays Fedora and SPARQL endpoint URLs to the user and asks for confirmation.
+	 * @param bool $throwException should an exception be thrown on lack of confirmation?
+	 * @return bool
+	 */
+	static public function askForUserConfirmation(bool $throwException = false): bool {
+		echo "\n######################################################\n\n";
+		echo "Are you sure that you want to import data to the following instance?! \n\n ";
+		echo "Type 'yes' to continue! \n\n";
+		echo self::get('sparqlUrl') . "\n";
+		echo self::get('fedoraApiUrl') . "\n";
+		$handle = fopen ("php://stdin","r");
+		$line = trim(fgets($handle));
+		fclose($handle);
+		if ($line !== 'yes' && $throwException) {
+			throw new RuntimeException('Configuration revoked by the user');
+		}
+		return $line === 'yes';
+	}
 }
