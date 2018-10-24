@@ -658,6 +658,9 @@ class Fedora {
                 $this->keepTransactionAlive();
             }
         } else if (defined('STDIN')) {
+            if (!function_exists('curl_init')) {
+                throw new RuntimeException('Please enable the curl extension in your php.ini');
+            }
             $this->txProc = new KeepTransactionAlive($this->txUrl, RC::get('fedoraUser'), RC::get('fedoraPswd'), $this->txKeepAlive);
         }
     }

@@ -78,14 +78,10 @@ class KeepTransactionAlive {
      * Ends corresponding bin/keepTransactionAlive.php script
      */
     public function __destruct() {
-        fwrite($this->pipes[0], "end\n");
-        echo stream_get_contents($this->pipes[1]) . "\n";
-        echo stream_get_contents($this->pipes[2]) . "\n";
         fclose($this->pipes[0]);
         fclose($this->pipes[1]);
         fclose($this->pipes[2]);
-        $ret = proc_close($this->process);
-        echo "KeepTransactionAlive ended with code $ret \n";
+        $ret = proc_terminate($this->process, 9); 
     }
 
 }

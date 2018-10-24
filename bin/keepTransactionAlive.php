@@ -31,9 +31,9 @@ if ($argc < 4) {
     exit();
 }
 
-$refreshTime = $argv[4] ?? 9;
+$refreshTime = (int) $argv[4] ?? 90;
 $input       = fopen('php://stdin', 'r');
-stream_set_blocking($input, false);
+$nonBlocking = stream_set_blocking($input, false);
 
 $ch = curl_init();
 curl_setopt_array($ch, [
@@ -47,7 +47,7 @@ curl_setopt_array($ch, [
 ]);
 
 $t = 0;
-while (fgetc($input) === false) {
+while (!$nonBlocking || fgetc($input) === false) {
     sleep(1);
     $t++;
     if ($t >= $refreshTime) {
