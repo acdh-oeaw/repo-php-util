@@ -48,8 +48,11 @@ use RuntimeException;
  */
 class Indexer {
 
-    const MATCH = 1;
-    const SKIP  = 2;
+    const MATCH          = 1;
+    const SKIP           = 2;
+    const SKIP_NONE      = 1;
+    const SKIP_NOT_EXIST = 2;
+    const SKIP_EXIST     = 3;
 
     /**
      * Turns debug messages on
@@ -158,11 +161,11 @@ class Indexer {
     private $includeEmpty = false;
 
     /**
-     * Should file be skipped if a corresponding Fedora resource doesn't exist?
-     * 
+     * Should files (not)existing in the Fedora should be skipped?
+     * @see setSkip()
      * @var bool
      */
-    private $updateOnly = false;
+    private $skipMode = self::SKIP_NONE;
 
     /**
      * An object providing metadata when given a resource file path
@@ -268,17 +271,18 @@ class Indexer {
     }
 
     /**
-     * Allows to turn on/off the "update only" mode. In the "update only" mode
-     * files which don't have corresponding Fedora resources are skipped.
+     * Allows to turn on skipping of already existing resource or resources 
+     * which don't exist in the Fedora already.
      * 
-     * By default the "update only" mode is disabled.
-     * 
-     * @param bool $updateOnly should files be skipped by the Indexer if
-     *   corresponding Fedora resources don't exist?
+     * @param int $skipMode mode either Indexer::SKIP_NONE (default), 
+     *   Indexer::SKIP_NOT_EXIST or Indexer::SKIP_EXIST
      * @return \acdhOeaw\util\Indexer
      */
-    public function setUpdateOnly(bool $updateOnly): Indexer {
-        $this->updateOnly = $updateOnly;
+    public function setSkip(int $skipMode): Indexer {
+        if (!in_array($skipMode, [self::SKIP_NONE, self::SKIP_NOT_EXIST, self::SKIP_EXIST])) {
+            throw new BadMethodCallException('Wrong skip mode');
+        }
+        $this->skipMode = $skipMode;
         return $this;
     }
 
@@ -476,10 +480,11 @@ class Indexer {
         }
 
         echo self::$debug ? $i->getPathname() . "\n" : "";
-        
+
         $skip   = $this->isSkipped($i);
         $upload = $i->isFile() && ($this->uploadSizeLimit > $i->getSize() || $this->uploadSizeLimit === -1);
 
+        $skip2 = false; // to be able to recursively go into directory we can't reuse $skip
         if (!$skip) {
             $class  = $i->isDir() ? $this->collectionClass : $this->binaryClass;
             $parent = $this->parent === null ? null : $this->parent->getId();
@@ -487,8 +492,12 @@ class Indexer {
             if ($this->metaLookup) {
                 $file->setMetaLookup($this->metaLookup, $this->metaLookupRequire);
             }
+            $skip2 = $this->isSkippedExisting($file);
+        }
+        if (!$skip && !$skip2) {
+            $skipNotExist = $this->skipMode === self::SKIP_NOT_EXIST;
             try {
-                $res = $file->updateRms(!$this->updateOnly, $upload, $this->fedoraLoc);
+                $res = $file->updateRms(!$skipNotExist, $upload, $this->fedoraLoc);
 
                 $this->indexedRes[$i->getPathname()] = $res;
                 echo self::$debug ? "\t" . ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") . "\n" : '';
@@ -500,18 +509,20 @@ class Indexer {
                     throw $e;
                 }
             } catch (NotFound $e) {
-                if ($this->updateOnly) {
+                if ($skipNotExist) {
                     $skip = true;
                 } else {
                     throw $e;
                 }
             }
+        } else if ($skip2) {
+            $res = $file->getResource(false, false);
         }
-        if ($skip) {
-            echo self::$debug ? "\tskip\n" : "";
+        if ($skip || $skip2) {
+            echo self::$debug ? "\tskip" . ($skip2 ? '2' : '') . "\n" : "";
         }
 
-        echo self::$debug && !$skip ? "\t" . $res->getId() . "\n\t" . $res->getUri() . "\n" : "";
+        echo self::$debug && !$skip && !$skip2 ? "\t" . $res->getId() . "\n\t" . $res->getUri() . "\n" : "";
 
         // recursion
         if ($i->isDir() && (!$skip || $this->flatStructure && $this->depth > 0)) {
@@ -529,6 +540,31 @@ class Indexer {
             echo self::$debug ? "going back from " . $path : "";
             $this->handleAutoCommit();
             echo self::$debug ? "\n" : "";
+        }
+    }
+
+    /**
+     * Checks if a given file should be skipped because it already exists in the
+     * repository while the Indexer skip mode is set to SKIP_EXIST.
+     * @param File $file file to be checked
+     * @return bool
+     * @throws MetaLookupException
+     */
+    private function isSkippedExisting(File $file): bool {
+        if ($this->skipMode !== self::SKIP_EXIST) {
+            return false;
+        }
+        try {
+            $file->getResource(false, false);
+            return true;
+        } catch (MetaLookupException $e) {
+            if ($this->metaLookupRequire) {
+                return true;
+            } else {
+                throw $e;
+            }
+        } catch (NotFound $e) {
+            return false;
         }
     }
 

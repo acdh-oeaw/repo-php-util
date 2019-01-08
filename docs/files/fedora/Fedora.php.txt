@@ -51,6 +51,7 @@ use acdhOeaw\fedora\metadataQuery\HasProperty;
 use acdhOeaw\fedora\metadataQuery\HasValue;
 use acdhOeaw\fedora\metadataQuery\MatchesRegEx;
 use acdhOeaw\util\RepoConfig as RC;
+use acdhOeaw\util\KeepTransactionAlive;
 
 /**
  * Represents a Fedora connection.
@@ -183,6 +184,13 @@ class Fedora {
     private $txProcPid;
 
     /**
+     * KeepTransactionAlive object (used when pcntl_fork() is not available, e.g.
+     * on Windows).
+     * @var \acdhOeaw\util\KeepTransactionAlive
+     */
+    private $txProc;
+
+    /**
      * Creates Fedora connection object from a given configuration.
      */
     public function __construct() {
@@ -205,6 +213,13 @@ class Fedora {
         if (\PHP_INT_SIZE < 8) {
             throw new RuntimeException('You are running 32-bit PHP build which can cause problems with files/resources bigger then 2GB. Please obtain a 64-bit PHP build.');
         }
+    }
+
+    /**
+     * Clean up
+     */
+    public function __destruct() {
+        $this->killKeepTransactionAlive();
     }
 
     /**
@@ -642,6 +657,11 @@ class Fedora {
             if ($this->txProcPid === 0) {
                 $this->keepTransactionAlive();
             }
+        } else if (defined('STDIN')) {
+            if (!function_exists('curl_init')) {
+                throw new RuntimeException('Please enable the curl extension in your php.ini');
+            }
+            $this->txProc = new KeepTransactionAlive($this->txUrl, RC::get('fedoraUser'), RC::get('fedoraPswd'), $this->txKeepAlive);
         }
     }
 
@@ -663,12 +683,17 @@ class Fedora {
      * Fedora transactions automatically expire after 3 minutes. If you want 
      * a transaction to be kept longer it must be manually prolonged. This
      * method does it for you.
+     * @param string $txUrl optional transaction URL. If not provided, current
+     *   transaction URL is used.
      * @see begin()
      */
-    public function prolong() {
-        if ($this->txUrl) {
-            $this->txTimestamp = time();
-            $this->client->post($this->txUrl . '/fcr:tx');
+    public function prolong(string $txUrl = null) {
+        $url = $txUrl ?? $this->txUrl;
+        if ($url) {
+            if ($url === $this->txUrl) {
+                $this->txTimestamp = time();
+            }
+            $this->client->post($url . '/fcr:tx');
         }
     }
 
@@ -747,8 +772,12 @@ class Fedora {
     private function killKeepTransactionAlive() {
         if ($this->txProcPid > 0) {
             posix_kill($this->txProcPid, \SIGKILL);
-            $status = null;
+            $status          = null;
             pcntl_wait($status);
+            $this->txProcPid = null;
+        }
+        if ($this->txProc) {
+            $this->txProc = null;
         }
     }
 
