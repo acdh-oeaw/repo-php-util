@@ -35,11 +35,11 @@ use acdhOeaw\fedora\Fedora;
 require_once 'init.php';
 $fedora = new Fedora();
 
-acdhOeaw\schema\SchemaObject::$debug       = true;
-acdhOeaw\fedora\Fedora::$debug = true;
+acdhOeaw\schema\SchemaObject::$debug = true;
+acdhOeaw\fedora\Fedora::$debug       = true;
 MetaLookupFile::$debug               = true;
 MetaLookupGraph::$debug              = true;
-Indexer::$debug = true;
+Indexer::$debug                      = true;
 
 $fedora->begin();
 $id = 'http://my.test/id';
@@ -76,11 +76,11 @@ try {
 }
 
 echo "\n-------------------------------------------------------------------\n";
-echo "reindexing in update only mode\n";
+echo "reindexing in SKIP_NOT_EXIST mode\n";
 try {
     $fedora->begin();
     $ind->setFilter('', Indexer::SKIP);
-    $ind->setUpdateOnly(true);
+    $ind->setSkip(Indexer::SKIP_NOT_EXIST);
     $indRes = $ind->index();
     assert(count($indRes) === 5, new Exception("resources count doesn't match " . count($indRes)));
     foreach ($indRes as $i) {
@@ -88,6 +88,36 @@ try {
     }
 } finally {
     foreach ($indRes as $i) {
+        $i->delete(true, false, true);
+    }
+    $fedora->commit();
+}
+
+echo "\n-------------------------------------------------------------------\n";
+echo "reindexing in SKIP_EXIST mode\n";
+try {
+    $indRes1 = $indRes2 = [];
+
+    $fedora->begin();
+    $ind     = new Indexer($res);
+    $ind->setUploadSizeLimit(10000000);
+    $ind->setFilter('/txt/', Indexer::MATCH);
+    $ind->setFedoraLocation('/test/');
+    $indRes1 = $ind->index();
+    assert(count($indRes1) === 3, new Exception("resources count doesn't match " . count($indRes1)));
+    $fedora->commit();
+
+    echo "---\n";
+    $fedora->begin();
+    $ind->setSkip(Indexer::SKIP_EXIST);
+    $ind->setFilter('/(txt|xml)$/', Indexer::MATCH);
+    $indRes2 = $ind->index();
+    assert(count($indRes2) === 2, new Exception("resources count doesn't match " . count($indRes2)));
+} finally {
+    foreach ($indRes1 as $i) {
+        $i->delete(true, false, true);
+    }
+    foreach ($indRes2 as $i) {
         $i->delete(true, false, true);
     }
     $fedora->commit();
