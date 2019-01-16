@@ -124,6 +124,40 @@ try {
 }
 
 echo "\n-------------------------------------------------------------------\n";
+echo "reindexing in SKIP_BINARY_EXIST mode\n";
+try {
+    $indRes1 = $indRes2 = [];
+
+    $fedora->begin();
+    $ind     = new Indexer($res);
+    $ind->setUploadSizeLimit(10000000);
+    $ind->setFilter('/txt/', Indexer::MATCH);
+    $ind->setFedoraLocation('/test/');
+    $indRes1 = $ind->index();
+    assert(count($indRes1) === 3, new Exception("resources count doesn't match " . count($indRes1)));
+    $fedora->commit();
+
+    echo "---\n";
+    $fedora->begin();
+    $ind->setSkip(Indexer::SKIP_BINARY_EXIST);
+    $ind->setFilter('/(txt|xml)$/', Indexer::MATCH);
+    $indRes2 = $ind->index();
+    assert(count($indRes2) === 3, new Exception("resources count doesn't match " . count($indRes2)));
+} finally {
+    $uris = [];
+    foreach ($indRes1 as $i) {
+        $uris[] = $i->getUri(true);
+        $i->delete(true, false, true);
+    }
+    foreach ($indRes2 as $i) {
+        if (!in_array($i->getUri(true), $uris)) {
+            $i->delete(true, false, true);
+        }
+    }
+    $fedora->commit();
+}
+
+echo "\n-------------------------------------------------------------------\n";
 echo "automatic metadata fetching from file\n";
 try {
     $fedora->__clearCache();
