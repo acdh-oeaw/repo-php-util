@@ -48,11 +48,12 @@ use RuntimeException;
  */
 class Indexer {
 
-    const MATCH          = 1;
-    const SKIP           = 2;
-    const SKIP_NONE      = 1;
-    const SKIP_NOT_EXIST = 2;
-    const SKIP_EXIST     = 3;
+    const MATCH             = 1;
+    const SKIP              = 2;
+    const SKIP_NONE         = 1;
+    const SKIP_NOT_EXIST    = 2;
+    const SKIP_EXIST        = 3;
+    const SKIP_BINARY_EXIST = 4;
 
     /**
      * Turns debug messages on
@@ -163,7 +164,7 @@ class Indexer {
     /**
      * Should files (not)existing in the Fedora should be skipped?
      * @see setSkip()
-     * @var bool
+     * @var int
      */
     private $skipMode = self::SKIP_NONE;
 
@@ -275,11 +276,12 @@ class Indexer {
      * which don't exist in the Fedora already.
      * 
      * @param int $skipMode mode either Indexer::SKIP_NONE (default), 
-     *   Indexer::SKIP_NOT_EXIST or Indexer::SKIP_EXIST
+     *   Indexer::SKIP_NOT_EXIST, Indexer::SKIP_EXIST or 
+     *   Indexer::SKIP_BINARY_EXIST
      * @return \acdhOeaw\util\Indexer
      */
     public function setSkip(int $skipMode): Indexer {
-        if (!in_array($skipMode, [self::SKIP_NONE, self::SKIP_NOT_EXIST, self::SKIP_EXIST])) {
+        if (!in_array($skipMode, [self::SKIP_NONE, self::SKIP_NOT_EXIST, self::SKIP_EXIST, self::SKIP_BINARY_EXIST])) {
             throw new BadMethodCallException('Wrong skip mode');
         }
         $this->skipMode = $skipMode;
@@ -545,18 +547,18 @@ class Indexer {
 
     /**
      * Checks if a given file should be skipped because it already exists in the
-     * repository while the Indexer skip mode is set to SKIP_EXIST.
+     * repository while the Indexer skip mode is set to SKIP_EXIST or SKIP_BINARY_EXIST.
      * @param File $file file to be checked
      * @return bool
      * @throws MetaLookupException
      */
     private function isSkippedExisting(File $file): bool {
-        if ($this->skipMode !== self::SKIP_EXIST) {
+        if (!in_array($this->skipMode, [self::SKIP_EXIST, self::SKIP_BINARY_EXIST])) {
             return false;
         }
         try {
-            $file->getResource(false, false);
-            return true;
+            $res = $file->getResource(false, false);
+            return $res->isBinary() || $this->skipMode === self::SKIP_EXIST;
         } catch (MetaLookupException $e) {
             if ($this->metaLookupRequire) {
                 return true;

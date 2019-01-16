@@ -237,7 +237,6 @@ class FedoraResource {
         if (count($fedoraChildren) > 0) {
             throw new RuntimeException("A resource has Fedora children");
         }
-
         $request = new Request('DELETE', $this->uri);
         $this->fedora->sendRequest($request);
         $this->fedora->getCache()->delete($this);
@@ -334,7 +333,7 @@ class FedoraResource {
         $this->updated  = false;
 
         $this->extractAclFromMetadata();
-        
+
         $this->fedora->getCache()->reload($this);
 
         if ($fixReferences) {
@@ -559,6 +558,15 @@ class FedoraResource {
      */
     public function isA(string $class): bool {
         return in_array($class, $this->getClasses());
+    }
+
+    /**
+     * Checks if a given resource is a binary one (if not, it's a purely
+     * metadata one).
+     * @return bool
+     */
+    public function isBinary(): bool {
+        return $this->isA('http://fedora.info/definitions/v4/repository#Binary');
     }
 
     /**
@@ -847,7 +855,6 @@ class FedoraResource {
         }
     }
 
-    
     /**
      * Returns serialized metadata (primarly for debugging)
      * @return string
