@@ -36,6 +36,12 @@ use acdhOeaw\util\RepoConfig as RC;
  * Fetching full ontology (resolving class and property inheritance) from a 
  * triplestore is time consuming. At the same time the ontology changes rarely.
  * Thus caching is a perfect solution.
+ * 
+ * The ontology is cached in a JSON file (path is taken from the 
+ * `repoConfig:ontologyCacheFile` config property). It is automatically refreshed
+ * if the repository resource storing the ontology owl (as set in the
+ * `repoConfig:ontologyResId`) modification date is newer then the cache file
+ * modification time.
  *
  * @author zozlak
  */
@@ -43,9 +49,9 @@ class Ontology {
 
     const FEDORA_LAT_MOD = '<http://fedora.info/definitions/v4/repository#lastModified>';
 
-    private $classes        = [];
-    private $properties     = [];
-    private $repoResClasses = [];
+    private $classes           = [];
+    private $properties        = [];
+    private $repoObjectClasses = [];
 
     /**
      * 
@@ -76,8 +82,8 @@ class Ontology {
      * Returns list of classes inheriting from `repoConfig:fedoraRepoObjectClass`
      * @return array
      */
-    public function getRepoResClasses(): array {
-        return $this->repoResClasses;
+    public function getRepoObjectClasses(): array {
+        return $this->repoObjectClasses;
     }
 
     /**
@@ -97,7 +103,7 @@ class Ontology {
     public function getClass(string $class) {
         return $this->classes->$class ?? null;
     }
-    
+
     /**
      * Returns property description. It is an object containing following properties:
      * 
@@ -109,7 +115,7 @@ class Ontology {
     public function getProperty(string $property) {
         return $this->properties->$property ?? null;
     }
-    
+
     /**
      * 
      * @param string $file
@@ -238,14 +244,14 @@ class Ontology {
 
         foreach ($this->classes as $i) {
             if (in_array(RC::get('fedoraRepoObjectClass'), $i->classes)) {
-                $this->repoResClasses[] = $i->class;
+                $this->repoObjectClasses[] = $i->class;
             }
         }
 
         file_put_contents($file, json_encode([
-            'classes'        => $this->classes,
-            'properties'     => $this->properties,
-            'repoObjClasses' => $this->repoResClasses
+            'classes'           => $this->classes,
+            'properties'        => $this->properties,
+            'repoObjectClasses' => $this->repoObjectClasses
         ]));
         $this->getFromFile($file); // to make sure 
     }
