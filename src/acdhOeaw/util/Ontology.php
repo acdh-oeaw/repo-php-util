@@ -193,8 +193,10 @@ class Ontology {
             SELECT DISTINCT ?classId ?superClassId
             WHERE {
               ?superClass (?@ / ^rdfs:subClassOf)* ?class .
-              ?class ?@ ?classId .
-              ?superClass ?@ ?superClassId .
+              OPTIONAL {
+                ?class ?@ ?classId .
+                ?superClass ?@ ?superClassId .
+              }
               filter(regex(str(?classId), ?#) && !regex(str(?superClassId), ?#))
             }
             ORDER BY ?class ?superClass
