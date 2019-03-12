@@ -127,7 +127,11 @@ class FedoraCache {
     public function add(FedoraResource $res) {
         $uri = $res->getUri(true);
         if (isset($this->cache[$uri])) {
-            throw new AlreadyInCache();
+            if (get_class($res) === get_class($this->cache[$uri])) {
+                throw new AlreadyInCache();
+            } else {
+                $this->deleteByUri($uri);
+            }
         }
         try {
             $ids                = $res->getIds();
