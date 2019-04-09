@@ -274,9 +274,9 @@ abstract class SchemaObject {
 
     /**
      * Provides entity binary data.
-     * @return type
+     * @return value accepted as the \acdhOeaw\fedora\Fedora::attachData() $body parameter
      */
-    protected function getBinaryData(): string {
+    protected function getBinaryData() {
         return '';
     }
 
