@@ -505,7 +505,8 @@ class FedoraResource {
      * 
      * @param mixed $data resource data as a string, file name 
      *   or an array: ['contentType' => 'foo', 'data' => 'bar', 'filename' => 'baz.txt']
-     * @param bool $convert should not binary resource be converted
+     * @param bool $convert if metadata-only resource be automatically 
+     *   converted to a binary one
      * @throws \DomainException
      * @see init()
      */

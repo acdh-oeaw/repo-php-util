@@ -187,7 +187,7 @@ class File extends SchemaObject {
         $meta->addLiteral(RC::titleProp(), basename($this->path));
         $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#filename', basename($this->path));
         if (is_file($this->path)) {
-            $mime = @mime_content_type($this->path);
+            $mime = $this->getMime();
             if ($mime) {
                 $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType', $mime);
             }
@@ -219,11 +219,36 @@ class File extends SchemaObject {
     }
 
     /**
+     * Returns file's mime type
+     * @return string
+     */
+    public function getMime() {
+        switch(strtolower(pathinfo($this->path, PATHINFO_EXTENSION))) {
+            case 'json':
+                $mime = 'application/json';
+                break;
+            case 'geojson':
+                $mime = 'application/vnd.geo+json';
+                break;
+            default:
+                $mime = @mime_content_type($this->path);
+        }
+        return $mime;
+    }
+    
+    /**
      * Returns file path (cause path is supported by the `Fedora->create()`). 
      * @return string
      */
-    protected function getBinaryData(): string {
-        return is_dir($this->path) ? '' : $this->path;
+    protected function getBinaryData() {
+        if (is_dir($this->path)) {
+            return '';
+        }
+        return [
+            'contentType' => $this->getMime(), 
+            'data' => $this->path,
+            'filename' => basename($this->path)
+        ];
     }
 
     /**
