@@ -51,7 +51,7 @@ class Service extends FedoraResource {
      * Parameters list
      * @var array
      */
-    private $param = array();
+    private $param;
 
     /**
      * Creates a dissemination service object.
@@ -66,14 +66,6 @@ class Service extends FedoraResource {
             
         }
         parent::__construct($fedora, $uri);
-
-        $typeProp = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
-        $type     = RC::get('fedoraServiceParamClass');
-        foreach ($this->getChildrenByProperty($typeProp, $type) as $i) {
-            $param = new Parameter($fedora, $i->getUri(true));
-
-            $this->param[$param->getName()] = $param;
-        }
     }
 
     /**
@@ -101,7 +93,7 @@ class Service extends FedoraResource {
     public function getRequest(FedoraResource $res): Request {
         $uri    = $this->getLocation();
 
-        $param  = $this->getParameters();
+        $param  = $this->getUrlParameters();
         $values = $this->getParameterValues($param, $res);
         foreach ($values as $k => $v) {
             $uri = str_replace($k, $v, $uri);
@@ -135,7 +127,7 @@ class Service extends FedoraResource {
      * Returns list of all parameters of a given dissemination service
      * @return array
      */
-    private function getParameters(): array {
+    private function getUrlParameters(): array {
         $uri    = $this->getLocation();
         $param  = [];
         preg_match_all('#{[^}]+}#', $uri, $param);
@@ -150,6 +142,8 @@ class Service extends FedoraResource {
      * @throws RuntimeException
      */
     private function getParameterValues(array $param, FedoraResource $res): array {
+        $this->getParameters();
+
         $values = [];
         foreach ($param as $i) {
             $ii   = explode('|', substr($i, 1, -1));
@@ -168,6 +162,19 @@ class Service extends FedoraResource {
         }
 
         return $values;
+    }
+
+    private function getParameters() {
+        if ($this->param === null) {
+            $this->param = [];
+            $typeProp = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+            $type     = RC::get('fedoraServiceParamClass');
+            foreach ($this->getChildrenByProperty($typeProp, $type) as $i) {
+                $param = new Parameter($this->fedora, $i->getUri(true));
+
+                $this->param[$param->getName()] = $param;
+            }
+        }
     }
 
 }

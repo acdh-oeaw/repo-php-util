@@ -39,6 +39,7 @@ use EasyRdf\Resource;
 use InvalidArgumentException;
 use RuntimeException;
 use acdhOeaw\fedora\dissemination\Service;
+use acdhOeaw\fedora\dissemination\Format;
 use acdhOeaw\fedora\exceptions\Deleted;
 use acdhOeaw\fedora\exceptions\ManyAcdhIds;
 use acdhOeaw\fedora\exceptions\NoAcdhId;
@@ -712,40 +713,51 @@ class FedoraResource {
 
     /**
      * Returns list of dissemination services available for a resource.
+     * 
+     * @param bool $lazy when false returned array contains instances of
+     *   \acdhOeaw\fedora\dissemination\Service, when true it contains
+     *   dissemination service URIs
      * @return array
      */
-    public function getDissServices(): array {
+    public function getDissServices(bool $lazy = false): array {
         $ret     = $weights = [];
 
         // by metadata propeties match
         $query   = '
-            SELECT ?uri (count(distinct ?prop1) as ?countReq) (count(distinct ?prop2) as ?countOpt) (count(distinct ?match3) as ?baseReq) (count(distinct ?match4) as ?baseOpt)
-            WHERE {
-                ?uri a ?@ .
-                OPTIONAL {
+            SELECT ?uri ?format WHERE {
+              {
+                SELECT ?uri (count(distinct ?prop1) as ?countReq) (count(distinct ?prop2) as ?countOpt) (count(distinct ?match3) as ?baseReq) (count(distinct ?match4) as ?baseOpt)
+                WHERE {
+                  ?uri a ?@ .
+                  OPTIONAL {
                     ?@ ?prop1 ?value1 .
                     ?match1 ?@ / ^?@ ?uri .
                     ?match1 ?@ ?prop1 .
                     ?match1 ?@ ?matchValue1 .
                     ?match1 ?@ "true"^^xsd:boolean .
                     FILTER (str(?value1) = str(?matchValue1))
-                } OPTIONAL {
+                  } OPTIONAL {
                     ?@ ?prop2 ?value2 .
                     ?match2 ?@ / ^?@ ?uri .
                     ?match2 ?@ ?prop2 .
                     ?match2 ?@ ?matchValue2 .
                     ?match2 ?@ "false"^^xsd:boolean .
                     FILTER (str(?value2) = str(?matchValue2))
-                } OPTIONAL {
+                  } OPTIONAL {
                     ?uri ?@ / ^?@ ?match3 .
                     ?match3 ?@ "true"^^xsd:boolean .
-                } OPTIONAL {
+                  } OPTIONAL {
                     ?uri ?@ / ^?@ ?match4 .
                     ?match4 ?@ "false"^^xsd:boolean .
+                  }
                 }
+                GROUP BY ?uri
+                HAVING (?countReq >= ?baseReq && (?baseOpt = 0 || ?countOpt > 0) && ?baseOpt + ?baseReq > 0)
+              }
+              OPTIONAL {
+                ?uri ?@ ?format .
+              }
             }
-            GROUP BY ?uri
-            HAVING (?countReq >= ?baseReq && (?baseOpt = 0 || ?countOpt > 0) && ?baseOpt + ?baseReq > 0)
         ';
         $param1  = [
             $this->getUri(true),
@@ -758,31 +770,39 @@ class FedoraResource {
             RC::idProp(), RC::relProp(),
             RC::get('fedoraServiceMatchRequired')
         ];
-        $param   = array_merge([RC::get('fedoraServiceClass')], $param1, $param1, $param2, $param2);
+        $param   = array_merge([RC::get('fedoraServiceClass')], $param1, $param1, $param2, $param2, [
+            RC::get('fedoraServiceRetFormatProp')]);
         $query   = new SimpleQuery($query, $param);
         $results = $this->fedora->runQuery($query);
         foreach ($results as $i) {
             if (!isset($i->uri)) {
                 continue; // no matching dissemination services
             }
-            $service = new Service($this->fedora, $i->uri);
-            foreach ($service->getFormats() as $format) {
+            $format = new Format((string) $i->format);
+            if (!isset($weights[$format->format]) || $weights[$format->format] < $format->weight) {
+                $ret[$format->format]     = (string) $i->uri;
+                $weights[$format->format] = $format->weight;
+            }
+        }
+
+        // directly attached
+        $services = [];
+        $meta     = $this->getMetadata();
+        foreach ($meta->allResources(RC::get('fedoraHasServiceProp')) as $id) {
+            $uri            = $this->fedora->getResourceById($id)->getUri(true);
+            $services[$uri] = new Service($this->fedora, $uri);
+            foreach ($services[$uri]->getFormats() as $format) {
                 if (!isset($weights[$format->format]) || $weights[$format->format] < $format->weight) {
-                    $ret[$format->format]     = $service;
+                    $ret[$format->format]     = $uri;
                     $weights[$format->format] = $format->weight;
                 }
             }
         }
 
-        // directly attached
-        $meta = $this->getMetadata();
-        foreach ($meta->allResources(RC::get('fedoraHasServiceProp')) as $id) {
-            $service = new Service($this->fedora, $this->fedora->getResourceById($id)->getUri(true));
-            foreach ($service->getFormats() as $format) {
-                if (!isset($weights[$format->format]) || $weights[$format->format] < $format->weight) {
-                    $ret[$format->format]     = $service;
-                    $weights[$format->format] = $format->weight;
-                }
+        // create service objects if not in lazy mode
+        if (!$lazy) {
+            foreach (array_keys($ret) as $k) {
+                $ret[$k] = $services[$ret[$k]] ?? new Service($this->fedora, $ret[$k]);
             }
         }
 
