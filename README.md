@@ -40,7 +40,7 @@ $fedora = new acdhOeaw\fedora\Fedora();
 
 You can find detailed API documentation in the `docs` folder.
 
-To read it on-line go to https://rawgit.com/acdh-oeaw/repo-php-util/master/docs/index.html
+To read it on-line go to https://acdh-oeaw.github.io/repo-php-util/
 
 # Usage
 
