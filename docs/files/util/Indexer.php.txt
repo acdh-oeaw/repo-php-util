@@ -30,6 +30,7 @@
 
 namespace acdhOeaw\util;
 
+use DateTime;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\fedora\exceptions\NotFound;
@@ -54,6 +55,10 @@ class Indexer {
     const SKIP_NOT_EXIST    = 2;
     const SKIP_EXIST        = 3;
     const SKIP_BINARY_EXIST = 4;
+    const VERSIONING_NONE   = 1;
+    const VERSIONING_ALWAYS = 2;
+    const VERSIONING_DIGEST = 3;
+    const VERSIONING_DATE   = 4;
 
     /**
      * Turns debug messages on
@@ -162,11 +167,19 @@ class Indexer {
     private $includeEmpty = false;
 
     /**
-     * Should files (not)existing in the Fedora should be skipped?
+     * Should files (not)existing in the Fedora be skipped?
      * @see setSkip()
      * @var int
      */
     private $skipMode = self::SKIP_NONE;
+
+    /**
+     * Should new versions of binary resources already existing in the Fedora
+     * be created (if not, an existing resource is simply overwritten).
+     * 
+     * @var int
+     */
+    private $versioningMode = self::VERSIONING_NONE;
 
     /**
      * An object providing metadata when given a resource file path
@@ -272,8 +285,8 @@ class Indexer {
     }
 
     /**
-     * Allows to turn on skipping of already existing resource or resources 
-     * which don't exist in the Fedora already.
+     * Defines if (and how) resources should be skipped from indexing based on
+     * their (not)existance in Fedora.
      * 
      * @param int $skipMode mode either Indexer::SKIP_NONE (default), 
      *   Indexer::SKIP_NOT_EXIST, Indexer::SKIP_EXIST or 
@@ -281,10 +294,30 @@ class Indexer {
      * @return \acdhOeaw\util\Indexer
      */
     public function setSkip(int $skipMode): Indexer {
-        if (!in_array($skipMode, [self::SKIP_NONE, self::SKIP_NOT_EXIST, self::SKIP_EXIST, self::SKIP_BINARY_EXIST])) {
+        if (!in_array($skipMode, [self::SKIP_NONE, self::SKIP_NOT_EXIST, self::SKIP_EXIST,
+                self::SKIP_BINARY_EXIST])) {
             throw new BadMethodCallException('Wrong skip mode');
         }
         $this->skipMode = $skipMode;
+        return $this;
+    }
+
+    /**
+     * Defines if new versions of binary resources should be created or if they
+     * should be simply overwritten with a new binary payload.
+     * 
+     * @param int $versioningMode mode either Indexer::VERSIONING_NONE, 
+     *   Indexer::VERSIONING_ALWAYS, Indexer::VERSIONING_CHECKSUM or 
+     *   Indexer::VERSIONING_DATE
+     * @return \acdhOeaw\util\Indexer
+     * @throws BadMethodCallException
+     */
+    public function setVersioning(int $versioningMode): Indexer {
+        if (!in_array($versioningMode, [self::VERSIONING_NONE, self::VERSIONING_ALWAYS,
+                self::VERSIONING_DIGEST, self::VERSIONING_DATE])) {
+            throw new BadMethodCallException('Wrong versioning mode');
+        }
+        $this->versioningMode = $versioningMode;
         return $this;
     }
 
@@ -497,12 +530,9 @@ class Indexer {
             $skip2 = $this->isSkippedExisting($file);
         }
         if (!$skip && !$skip2) {
-            $skipNotExist = $this->skipMode === self::SKIP_NOT_EXIST;
             try {
-                $res = $file->updateRms(!$skipNotExist, $upload, $this->fedoraLoc);
-
+                $res                                 = $this->performUpdate($i, $file, $parent, $upload);
                 $this->indexedRes[$i->getPathname()] = $res;
-                echo self::$debug ? "\t" . ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") . "\n" : '';
                 $this->handleAutoCommit();
             } catch (MetaLookupException $e) {
                 if ($this->metaLookupRequire) {
@@ -511,7 +541,7 @@ class Indexer {
                     throw $e;
                 }
             } catch (NotFound $e) {
-                if ($skipNotExist) {
+                if ($this->skipMode === self::SKIP_NOT_EXIST) {
                     $skip = true;
                 } else {
                     throw $e;
@@ -607,6 +637,61 @@ class Indexer {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Performs file upload taking care of versioning.
+     * @param DirectoryIterator $iter
+     * @param File $file
+     * @param string $parent
+     * @param bool $upload
+     * @return FedoraResource
+     */
+    public function performUpdate(DirectoryIterator $iter, File $file,
+                                  string $parent, bool $upload): FedoraResource {
+        // check versioning conditions
+        $versioning = $this->versioningMode !== self::VERSIONING_NONE && !$iter->isDir();
+        if ($versioning) {
+            try {
+                $res  = $file->getResource(false);
+                $meta = $res->getMetadata();
+                switch ($this->versioningMode) {
+                    case self::VERSIONING_DATE:
+                        $modDate    = (string) $meta->getLiteral(RC::get('fedoraModDateProp'));
+                        $locModDate = (new DateTime())->setTimestamp($iter->getMTime())->format('Y-m-d\TH:i:s');
+                        $versioning = $locModDate > $modDate;
+                        break;
+                    case self::VERSIONING_DIGEST:
+                        $hash       = (string) $meta->getResource(RC::get('fedoraDigestProp'));
+                        $locHash    = sha1_file($iter->getPathname());
+                        $versioning = explode(':', $hash)[2] !== $locHash;
+                        break;
+                    case self::VERSIONING_ALWAYS:
+                        $versioning = true;
+                        break;
+                }
+                // it we decided they are same it makes no sense to upload
+                $upload = $versioning;
+            } catch (NotFound $ex) {
+                $versioning = false;
+            }
+        }
+
+        $skipNotExist = $this->skipMode === self::SKIP_NOT_EXIST;
+        if (!$versioning) {
+            // ordinary update
+            $res = $file->updateRms(!$skipNotExist, $upload, $this->fedoraLoc);
+            echo self::$debug ? "\t" . ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") . "\n" : '';
+            return $res;
+        } else {
+            $oldRes = $file->createNewVersion($upload, $this->fedoraLoc);
+            $newRes = $file->getResource(false);
+            echo self::$debug ? "\tnewVersion" . ($upload ? " + upload " : "") . "\n" : '';
+            echo $oldRes->getUri(true)."\n";
+            echo $newRes->getUri(true)."\n";
+
+            return $newRes;
+        }
     }
 
 }

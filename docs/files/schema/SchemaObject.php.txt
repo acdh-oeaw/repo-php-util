@@ -36,6 +36,7 @@ use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\fedora\exceptions\NotInCache;
 use acdhOeaw\util\RepoConfig as RC;
+use zozlak\util\UUID;
 
 /**
  * Basic class for representing real-world entities to be imported into 
@@ -234,6 +235,62 @@ abstract class SchemaObject {
     }
 
     /**
+     * Creates a new version of the resource. The new version inherits all IDs but
+     * the UUID and epic PIDs. The old version looses all IDs but the UUID and
+     * spic PIDs. It also looses all RC::relProp() connections with collections.
+     * The old and the new resource are linked with `cfg:fedoraIsNewVersionProp`
+     * and `cfg:fedoraIsOldVersionProp`.
+     * 
+     * @param bool $uploadBinary should binary data of the real-world entity
+     *   be uploaded uppon repository resource creation?
+     * @param string $path where to create a resource (if it does not exist).
+     *   If it it ends with a "/", the resource will be created as a child of
+     *   a given collection). All the parents in the Fedora resource tree have
+     *   to exist (you can not create "/foo/bar" if "/foo" does not exist already).
+     * @return FedoraResource old version resource
+     */
+    public function createNewVersion(bool $uploadBinary = true,
+                                      string $path = '/'): FedoraResource {
+        $pidProp  = RC::get('epicPidProp');
+        $idProp   = RC::idProp();
+        $uuidNmsp = RC::get('fedoraUuidNamespace');
+
+        $this->findResource(false, $uploadBinary, $path);
+        $oldMeta = $this->res->getMetadata();
+        $newMeta = $oldMeta->copy([RC::idProp(), $pidProp]);
+        $newMeta->addResource(RC::get('fedoraIsNewVersionProp'), $this->res->getId());
+
+        $idSkip = [];
+        foreach ($oldMeta->allResources($pidProp) as $pid) {
+            $idSkip[] = (string) $pid;
+        }
+        foreach ($oldMeta->allResources($idProp) as $id) {
+            $id = (string) $id;
+            if (!in_array($id, $idSkip) && strpos($id, $uuidNmsp) !== 0) {
+                $newMeta->addResource($idProp, $id);
+                $oldMeta->deleteResource($idProp, $id);
+            }
+        }
+        $oldMeta->deleteResource(RC::relProp());
+        // there is at least one non-UUID ID required; as all are being passed to the new resource, let's create a dummy one
+        $oldMeta->addResource($idProp, RC::get('fedoraVidNamespace') . UUID::v4());
+
+        $oldRes = $this->fedora->getResourceByUri($this->res->getUri(true));
+        $oldRes->setMetadata($oldMeta);
+        $oldRes->updateMetadata();
+        $oldMeta = $oldRes->getMetadata();
+        
+        $oldRes = $this->res;
+        $this->createResource($newMeta, $uploadBinary, $path);
+
+        $oldMeta->addResource(RC::get('fedoraIsPrevVersionProp'), $this->res->getId());
+        $oldRes->setMetadata($oldMeta);
+        $oldRes->updateMetadata();
+
+        return $oldRes;
+    }
+
+    /**
      * Tries to find a repository resource representing a given object.
      * 
      * @param bool $create should repository resource be created if it was not
@@ -260,16 +317,26 @@ abstract class SchemaObject {
                 throw $e;
             }
 
-            $meta      = $this->getMetadata();
-            $this->fedora->fixMetadataReferences($meta);
-            $binary    = $uploadBinary ? $this->getBinaryData() : '';
-            $method    = substr($path, -1) == '/' || $path === '' ? 'POST' : 'PUT';
-            $this->res = $this->fedora->createResource($meta, $binary, $path, $method);
-            $result    = 'not found - created';
+            $meta   = $this->getMetadata();
+            $this->createResource($meta, $uploadBinary, $path);
+            $result = 'not found - created';
         }
 
         echo self::$debug ? "\t" . $result . " - " . $this->res->getUri(true) . "\n" : "";
         return $result == 'not found - created';
+    }
+
+    /**
+     * Creates a Fedora resource
+     * @param Resource $meta
+     * @param bool $uploadBinary
+     * @param string $path
+     */
+    protected function createResource(Resource $meta, bool $uploadBinary, string $path) {
+        $this->fedora->fixMetadataReferences($meta);
+        $binary    = $uploadBinary ? $this->getBinaryData() : '';
+        $method    = substr($path, -1) == '/' || $path === '' ? 'POST' : 'PUT';
+        $this->res = $this->fedora->createResource($meta, $binary, $path, $method);
     }
 
     /**
