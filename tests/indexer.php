@@ -364,3 +364,50 @@ try {
     }
     $fedora->commit();
 }
+
+echo "\n-------------------------------------------------------------------\n";
+echo "indexing with a new resource version creation\n";
+
+try {
+    $indRes1     = $indRes2     = [];
+    $origContent = file_get_contents(__DIR__ . '/data/sample.xml');
+    $ind         = new Indexer($res);
+    $ind->setUploadSizeLimit(10000000);
+    $ind->setFilter('/^sample.xml$/', Indexer::MATCH);
+    $ind->setFedoraLocation('/test/');
+    $ind->setFlatStructure(true);
+
+    $fedora->begin();
+    $indRes1 = $ind->index();
+    $fedora->commit();
+
+    file_put_contents(__DIR__ . '/data/sample.xml', random_int(0, 123456));
+
+    $fedora->begin();
+    $ind->setVersioning(Indexer::VERSIONING_DIGEST);
+    $indRes2 = $ind->index();
+    $fedora->commit();
+
+    assert(count($indRes2) === 1, new Exception('Wrong indexed resources count'));
+    $newRes      = $indRes2[array_keys($indRes2)[0]];
+    $meta        = $newRes->getMetadata();
+    $prevResUuid = (string) $meta->getResource(RC::get('fedoraIsNewVersionProp'));
+    assert(!empty($prevResUuid), new Exception('No link to the previous version'));
+    $prevRes     = $fedora->getResourceById($prevResUuid);
+    $prevMeta    = $prevRes->getMetadata();
+    $newResUuid  = (string) $prevMeta->getResource(RC::get('fedoraIsPrevVersionProp'));
+    assert(!empty($newResUuid), new Exception('No link to the newer version'));
+    $newRes2     = $fedora->getResourceById($newResUuid);
+    assert($newRes2->getUri(true) === $newRes->getUri(true), new Exception('New version link points to a wrong resource'));
+} finally {
+    file_put_contents(__DIR__ . '/data/sample.xml', $origContent);
+    $fedora->rollback();
+    $fedora->begin();
+    foreach ($indRes1 as $res) {
+        $res->delete(true, false, true);
+    }
+    foreach ($indRes2 as $res) {
+        $res->delete(true, false, true);
+    }
+    $fedora->commit();
+}

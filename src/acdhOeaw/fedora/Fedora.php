@@ -383,19 +383,42 @@ class Fedora {
             $res = $this->verifyResources($res);
         }
 
-        switch (count($res)) {
-            case 0:
-                throw new NotFound();
-            case 1:
-                return array_pop($res);
-            default:
-                $res1 = array_pop($res);
-                $res2 = array_pop($res);
-                if ($res1->getUri(true) !== $res2->getUri(true)) {
-                    throw new AmbiguousMatch();
-                }
-                return $res1;
+        if (count($res) === 0) {
+            throw new NotFound();
+        } else if (count($res) === 1) {
+            return array_pop($res);
         }
+
+        $uris = [];
+        foreach ($res as $i) {
+            $uris[] = $i->getUri(true);
+        }
+        $uris = array_unique($uris);
+        if (count($uris) === 1) {
+            return array_pop($res);
+        }
+
+        // ambigous match can be a result of outdated (due to a pending transaction) triplestore
+        // verify candidates in Fedora
+        $checked = [];
+        foreach ($res as $r) {
+            $meta = $r->getMetadata(true);
+            foreach ($meta->allResources(RC::idProp()) as $i) {
+                if ((string) $i === $id) {
+                    $checked[$r->getUri(true)] = $r;
+                    break;
+                }
+            }
+            if (count($checked) > 1) {
+                break;
+            }
+        }
+        if (count($checked) == 0) {
+            throw new NotFound();
+        } else if (count($checked) > 1) {
+            throw new AmbiguousMatch(implode(' or ', array_keys($checked)));
+        }
+        return array_pop($checked);
     }
 
     /**
