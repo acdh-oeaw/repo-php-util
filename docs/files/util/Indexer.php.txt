@@ -59,6 +59,8 @@ class Indexer {
     const VERSIONING_ALWAYS = 2;
     const VERSIONING_DIGEST = 3;
     const VERSIONING_DATE   = 4;
+    const PID_KEEP          = 1;
+    const PID_PASS          = 2;
 
     /**
      * Turns debug messages on
@@ -180,6 +182,13 @@ class Indexer {
      * @var int
      */
     private $versioningMode = self::VERSIONING_NONE;
+
+    /**
+     * Should PIDs (epic handles) be migrated to the new version of a resource
+     * during versioning.
+     * @var int
+     */
+    private $pidPass = self::PID_KEEP;
 
     /**
      * An object providing metadata when given a resource file path
@@ -309,15 +318,19 @@ class Indexer {
      * @param int $versioningMode mode either Indexer::VERSIONING_NONE, 
      *   Indexer::VERSIONING_ALWAYS, Indexer::VERSIONING_CHECKSUM or 
      *   Indexer::VERSIONING_DATE
+     * @param int $migratePid should PIDs (epic handles) be migrated to the new
+     *   version - either Indexer::MIGRATE_NO or Indexer::MIGRATE_YES
      * @return \acdhOeaw\util\Indexer
      * @throws BadMethodCallException
      */
-    public function setVersioning(int $versioningMode): Indexer {
+    public function setVersioning(int $versioningMode,
+                                  int $migratePid = self::PID_KEEP): Indexer {
         if (!in_array($versioningMode, [self::VERSIONING_NONE, self::VERSIONING_ALWAYS,
                 self::VERSIONING_DIGEST, self::VERSIONING_DATE])) {
             throw new BadMethodCallException('Wrong versioning mode');
         }
         $this->versioningMode = $versioningMode;
+        $this->pidPass        = $migratePid;
         return $this;
     }
 
@@ -684,11 +697,10 @@ class Indexer {
             echo self::$debug ? "\t" . ($file->getCreated() ? "create " : "update ") . ($upload ? "+ upload " : "") . "\n" : '';
             return $res;
         } else {
-            $oldRes = $file->createNewVersion($upload, $this->fedoraLoc);
+            $oldRes = $file->createNewVersion($upload, $this->fedoraLoc, $this->pidPass === self::PID_PASS);
             $newRes = $file->getResource(false);
             echo self::$debug ? "\tnewVersion" . ($upload ? " + upload " : "") . "\n" : '';
-            echo $oldRes->getUri(true)."\n";
-            echo $newRes->getUri(true)."\n";
+            echo self::$debug ? "\t" . $oldRes->getUri(true) . " ->\n" : '';
 
             return $newRes;
         }
