@@ -818,10 +818,14 @@ class Fedora {
      * 
      * Changes are done in-place!
      * @param Resource $meta metadata to apply changes to
+     * @param array $skipProperties list of properties which should not be
+     *   processed (other than IDs which are always excluded)
      * @return Resource
      */
-    public function fixMetadataReferences(Resource $meta): Resource {
-        $properties = array_diff($meta->propertyUris(), array(RC::idProp()));
+    public function fixMetadataReferences(Resource $meta,
+                                          array $skipProperties = []): Resource {
+        $skipProperties[] = RC::idProp();
+        $properties = array_diff($meta->propertyUris(), $skipProperties);
         foreach ($properties as $p) {
             foreach ($meta->allResources($p) as $obj) {
                 $id  = null;

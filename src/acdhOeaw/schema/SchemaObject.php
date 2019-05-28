@@ -247,22 +247,33 @@ abstract class SchemaObject {
      *   If it it ends with a "/", the resource will be created as a child of
      *   a given collection). All the parents in the Fedora resource tree have
      *   to exist (you can not create "/foo/bar" if "/foo" does not exist already).
+     * @param bool $pidPass should PIDs (epic handles) be migrated to the new
+     *   version (`true`) or kept by the old one (`false`)
      * @return FedoraResource old version resource
      */
     public function createNewVersion(bool $uploadBinary = true,
-                                      string $path = '/'): FedoraResource {
+                                     string $path = '/', bool $pidPass = false): FedoraResource {
         $pidProp  = RC::get('epicPidProp');
         $idProp   = RC::idProp();
         $uuidNmsp = RC::get('fedoraUuidNamespace');
+        $skipProp = [RC::idProp()];
+        if (!$pidPass) {
+            $skipProp[] = $pidProp;
+        }
 
         $this->findResource(false, $uploadBinary, $path);
-        $oldMeta = $this->res->getMetadata();
-        $newMeta = $oldMeta->copy([RC::idProp(), $pidProp]);
+        $oldMeta = $this->res->getMetadata(true);
+        $newMeta = $oldMeta->copy($skipProp);
         $newMeta->addResource(RC::get('fedoraIsNewVersionProp'), $this->res->getId());
+        if ($pidPass) {
+            $oldMeta->deleteResource($pidProp);
+        }
 
         $idSkip = [];
-        foreach ($oldMeta->allResources($pidProp) as $pid) {
-            $idSkip[] = (string) $pid;
+        if (!$pidPass) {
+            foreach ($oldMeta->allResources($pidProp) as $pid) {
+                $idSkip[] = (string) $pid;
+            }
         }
         foreach ($oldMeta->allResources($idProp) as $id) {
             $id = (string) $id;
@@ -275,12 +286,13 @@ abstract class SchemaObject {
         // there is at least one non-UUID ID required; as all are being passed to the new resource, let's create a dummy one
         $oldMeta->addResource($idProp, RC::get('fedoraVidNamespace') . UUID::v4());
 
-        $oldRes = $this->fedora->getResourceByUri($this->res->getUri(true));
+        $oldRes  = $this->fedora->getResourceByUri($this->res->getUri(true));
         $oldRes->setMetadata($oldMeta);
         $oldRes->updateMetadata();
         $oldMeta = $oldRes->getMetadata();
-        
+
         $oldRes = $this->res;
+
         $this->createResource($newMeta, $uploadBinary, $path);
 
         $oldMeta->addResource(RC::get('fedoraIsPrevVersionProp'), $this->res->getId());
@@ -332,8 +344,9 @@ abstract class SchemaObject {
      * @param bool $uploadBinary
      * @param string $path
      */
-    protected function createResource(Resource $meta, bool $uploadBinary, string $path) {
-        $this->fedora->fixMetadataReferences($meta);
+    protected function createResource(Resource $meta, bool $uploadBinary,
+                                      string $path) {
+        $this->fedora->fixMetadataReferences($meta, [RC::get('epicPidProp')]);
         $binary    = $uploadBinary ? $this->getBinaryData() : '';
         $method    = substr($path, -1) == '/' || $path === '' ? 'POST' : 'PUT';
         $this->res = $this->fedora->createResource($meta, $binary, $path, $method);

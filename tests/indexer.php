@@ -369,7 +369,7 @@ echo "\n-------------------------------------------------------------------\n";
 echo "indexing with a new resource version creation\n";
 
 try {
-    $indRes1     = $indRes2     = [];
+    $indRes1     = $indRes2     = $indRes3     = [];
     $origContent = file_get_contents(__DIR__ . '/data/sample.xml');
     $ind         = new Indexer($res);
     $ind->setUploadSizeLimit(10000000);
@@ -379,26 +379,49 @@ try {
 
     $fedora->begin();
     $indRes1 = $ind->index();
+    $initRes = $indRes1[array_keys($indRes1)[0]];
+    $meta    = $initRes->getMetadata();
+    $meta->addResource(RC::get('epicPidProp'), 'https://sample.pid');
+    $initRes->setMetadata($meta);
+    $initRes->updateMetadata();
     $fedora->commit();
 
     file_put_contents(__DIR__ . '/data/sample.xml', random_int(0, 123456));
 
     $fedora->begin();
-    $ind->setVersioning(Indexer::VERSIONING_DIGEST);
+    $ind->setVersioning(Indexer::VERSIONING_DIGEST, Indexer::PID_PASS);
     $indRes2 = $ind->index();
     $fedora->commit();
 
     assert(count($indRes2) === 1, new Exception('Wrong indexed resources count'));
     $newRes      = $indRes2[array_keys($indRes2)[0]];
     $meta        = $newRes->getMetadata();
+    assert((string) $meta->getResource(RC::get('epicPidProp')) === 'https://sample.pid', 'PID missing in the new resource');
+    assert(in_array('https://sample.pid', $newRes->getIds()), 'PID missing among new resource IDs');
     $prevResUuid = (string) $meta->getResource(RC::get('fedoraIsNewVersionProp'));
     assert(!empty($prevResUuid), new Exception('No link to the previous version'));
     $prevRes     = $fedora->getResourceById($prevResUuid);
-    $prevMeta    = $prevRes->getMetadata();
+    $prevMeta    = $prevRes->getMetadata(true);
+    assert($prevMeta->getResource(RC::get('epicPidProp')) === null, 'PID present in the old resource');
     $newResUuid  = (string) $prevMeta->getResource(RC::get('fedoraIsPrevVersionProp'));
     assert(!empty($newResUuid), new Exception('No link to the newer version'));
     $newRes2     = $fedora->getResourceById($newResUuid);
     assert($newRes2->getUri(true) === $newRes->getUri(true), new Exception('New version link points to a wrong resource'));
+
+    file_put_contents(__DIR__ . '/data/sample.xml', random_int(0, 123456));
+
+    $fedora->begin();
+    $ind->setVersioning(Indexer::VERSIONING_DIGEST, Indexer::PID_KEEP);
+    $indRes3 = $ind->index();
+    $fedora->commit();
+
+    assert(count($indRes3) === 1, new Exception('Wrong indexed resources count'));
+    $newestRes  = $indRes3[array_keys($indRes3)[0]];
+    $newestMeta = $newestRes->getMetadata();
+    assert($newestMeta->getResource(RC::get('epicPidProp')) === null, 'PID present in the new resource');
+    $newMeta    = $newRes->getMetadata(true);
+    assert((string) $newMeta->getResource(RC::get('epicPidProp')) === 'https://sample.pid', 'PID not present in the old resource');
+    assert(in_array('https://sample.pid', $newRes->getIds()), 'PID missing among old resource IDs');
 } finally {
     file_put_contents(__DIR__ . '/data/sample.xml', $origContent);
     $fedora->rollback();
@@ -407,6 +430,9 @@ try {
         $res->delete(true, false, true);
     }
     foreach ($indRes2 as $res) {
+        $res->delete(true, false, true);
+    }
+    foreach ($indRes3 as $res) {
         $res->delete(true, false, true);
     }
     $fedora->commit();
