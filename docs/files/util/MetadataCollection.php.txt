@@ -177,14 +177,6 @@ class MetadataCollection extends Graph {
      * Resources in the graph can denote relationships in any way but all
      * object URIs already existing in the repository and all object URIs in the
      * $namespace will be turned into ACDH ids.
-     * This means graph can not contain circular dependencies between resources
-     * which do not already exist in the repository, like:
-     * ```
-     * _:a some:Prop _:b .
-     * _:b some:Prop _:a .
-     * ```
-     * The $errorOnCycle parameter determines behaviour of the method when such
-     * a cycle exists in the graph.
      * 
      * @param string $namespace repository resources will be created for all
      *   resources in this namespace
@@ -405,7 +397,7 @@ class MetadataCollection extends Graph {
             return $res;
         }
 
-        $this->fedora->fixMetadataReferences($res);
+        $this->fedora->fixMetadataReferences($res, [RC::get('epicPidProp')]);
 
         if ($this->containsWrongRefs($res, $namespace)) {
             echo $res->copy()->getGraph()->serialise('ntriples') . "\n";
