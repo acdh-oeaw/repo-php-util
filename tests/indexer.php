@@ -359,8 +359,8 @@ try {
 } finally {
     $fedora->rollback();
     $fedora->begin();
-    foreach ($indRes as $res) {
-        $res->delete(true, false, true);
+    foreach ($indRes as $resTmp) {
+        $resTmp->delete(true, false, true);
     }
     $fedora->commit();
 }

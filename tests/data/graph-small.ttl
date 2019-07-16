@@ -10,6 +10,7 @@ _:tunico_corpus
     dct:identifier <https://id.acdh.oeaw.ac.at/tunico-corpus-2> ;
     dct:identifier "P02" ;
     dc:title "Tunico Corpus" ;
+    acdh:hasIdentifier <https://geonames.org/123/> ;
     dct:creator <https://some.external/entity>.
 
 _:tunico_text1

@@ -283,6 +283,8 @@ class MetadataCollection extends Graph {
                 $meta  = (new Graph())->resource('.');
                 $title = 'title stub created by the MetadataCollection';
                 foreach ($ids as $id) {
+                    $id = Geonames::standardize((string) $id);
+                    
                     $meta->addResource(RC::idProp(), $id);
                     if (strpos($id, RC::get('fedoraIdNamespace')) === 0) {
                         $title = substr($id, strlen(RC::get('fedoraIdNamespace')));
@@ -396,6 +398,9 @@ class MetadataCollection extends Graph {
             // don't do anything when it's purely-id resource
             return $res;
         }
+        
+        // maintain geonames ids
+        Geonames::standardizeMeta($res);
 
         $this->fedora->fixMetadataReferences($res, [RC::get('epicPidProp')]);
 

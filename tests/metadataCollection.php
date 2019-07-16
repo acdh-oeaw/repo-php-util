@@ -49,7 +49,7 @@ try {
     $fedora->rollback();
     $fedora->begin();
     foreach ($resources as $i) {
-        $i->delete();
+        $i->delete(true, true, true);
     }
     $fedora->commit();
 }
@@ -68,7 +68,7 @@ try {
     $fedora->rollback();
     $fedora->begin();
     foreach ($resources as $i) {
-        $i->delete();
+        $i->delete(true, true, true);
     }
     $fedora->commit();
 }
@@ -90,7 +90,7 @@ try {
     foreach ($resources as $i) {
         $i->delete();
     }
-    $fedora->commit();
+    $fedora->commit(true, true, true);
 }
 
 echo "\n###################################################### graph-cycle\n\n";
