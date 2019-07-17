@@ -370,7 +370,8 @@ abstract class SchemaObject {
      */
     protected function mergeMetadata(Resource $current, Resource $new): Resource {
         $meta = $current->merge($new, array(RC::idProp()));
-        return Geonames::standardizeMeta($meta);
+        Geonames::standardizeMeta($meta);
+        return $meta;
     }
 
 }
