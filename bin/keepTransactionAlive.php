@@ -54,9 +54,9 @@ while (!$nonBlocking || fgetc($input) === false) {
         $t    = 0;
         echo "Extending transaction... ";
         curl_exec($ch);
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         echo $code . "\n";
-        if ($code === 410) {
+        if ($code === 410 || $code === 500) {
             break;
         }
     }

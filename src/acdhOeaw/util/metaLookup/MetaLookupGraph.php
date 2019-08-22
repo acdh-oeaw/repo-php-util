@@ -60,7 +60,7 @@ class MetaLookupGraph implements MetaLookupInterface {
     public function __construct(Graph $graph) {
         $this->graph = $graph;
         foreach ($this->graph->resources() as $i) {
-            if (!$i->isBNode()) {
+            if (!$i->isBNode() && count($i->properties()) > 0) {
                 $i->addResource(RC::idProp(), $i->getUri());
             }
         }
@@ -82,7 +82,7 @@ class MetaLookupGraph implements MetaLookupInterface {
             return(new Graph())->resource('.');
         }
 
-        $candidates = array();
+        $candidates = [];
         foreach ($meta->allResources(RC::idProp()) as $id) {
             foreach ($this->graph->resourcesMatching(RC::idProp(), $id) as $i) {
                 $candidates[$i->getUri()] = $i;

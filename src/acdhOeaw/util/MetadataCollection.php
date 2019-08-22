@@ -37,6 +37,7 @@ use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\util\RepoConfig as RC;
+use acdhOeaw\util\Geonames;
 
 /**
  * Class for importing whole metadata graph into the repository.
@@ -273,7 +274,7 @@ class MetadataCollection extends Graph {
 
             $ids = array();
             foreach ($res->allResources(RC::idProp()) as $id) {
-                $ids[] = $id->getUri();
+                $ids[] = Geonames::standardize((string) $id);
             }
 
             $found = 'found';

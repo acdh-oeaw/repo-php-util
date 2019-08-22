@@ -4,5 +4,5 @@
 /playground.php
 /docs/phpdoc-cache*
 /tests/tmp
+/build
 config.ini
-

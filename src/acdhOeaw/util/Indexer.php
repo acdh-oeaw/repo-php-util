@@ -530,7 +530,7 @@ class Indexer {
         echo self::$debug ? $i->getPathname() . "\n" : "";
 
         $skip   = $this->isSkipped($i);
-        $upload = $i->isFile() && ($this->uploadSizeLimit > $i->getSize() || $this->uploadSizeLimit === -1);
+        $upload = $i->isFile() && ($this->uploadSizeLimit >= $i->getSize() || $this->uploadSizeLimit === -1);
 
         $skip2 = false; // to be able to recursively go into directory we can't reuse $skip
         if (!$skip) {
