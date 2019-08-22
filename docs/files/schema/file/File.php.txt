@@ -36,6 +36,7 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\schema\SchemaObject;
+use acdhOeaw\util\Geonames;
 use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\util\metaLookup\MetaLookupInterface;
 
@@ -278,6 +279,8 @@ class File extends SchemaObject {
             $meta->addLiteral(RC::titleProp(), $oldTitle, $oldTitle->getLang());
         }
 
+        Geonames::standardizeMeta($meta);
+        
         return $meta;
     }
 

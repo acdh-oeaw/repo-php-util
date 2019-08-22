@@ -264,7 +264,7 @@ class Fedora {
      * 
      * @param EasyRdf\Resource $metadata resource metadata
      * @param mixed $data optional resource data as a string, 
-     *   file name or an array: ['content-type' => 'foo', 'data' => 'bar']
+     *   file name or an array: ['contentType' => 'foo', 'data' => 'bar', 'filename' => 'foo.bar']
      * @param string $path optional Fedora resource path (see also the `$method`
      *   parameter)
      * @param string $method creation method to use - POST or PUT, by default POST
@@ -454,8 +454,13 @@ class Fedora {
         $matches = array();
         foreach ($ids as $id) {
             try {
-                $res                         = $this->getResourceById($id, $checkIfExist);
-                $matches[$res->getUri(true)] = $res;
+                try {
+                    $res                         = $this->cache->getById($id);
+                    $matches[$res->getUri(true)] = $res;
+                } catch (NotInCache $e) {
+                    $res                         = $this->getResourceById($id, $checkIfExist);
+                    $matches[$res->getUri(true)] = $res;
+                }
             } catch (NotFound $e) {
                 
             }
@@ -664,7 +669,7 @@ class Fedora {
      * @see commit()
      * @see prolong()
      */
-    public function begin(int $keepAliveTimeout = 90) {
+    public function begin(int $keepAliveTimeout = 30) {
         $this->txKeepAlive = $keepAliveTimeout;
         $this->txTimestamp = time();
 
@@ -825,7 +830,7 @@ class Fedora {
     public function fixMetadataReferences(Resource $meta,
                                           array $skipProperties = []): Resource {
         $skipProperties[] = RC::idProp();
-        $properties = array_diff($meta->propertyUris(), $skipProperties);
+        $properties       = array_diff($meta->propertyUris(), $skipProperties);
         foreach ($properties as $p) {
             foreach ($meta->allResources($p) as $obj) {
                 $id  = null;
