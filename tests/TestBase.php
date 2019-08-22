@@ -26,6 +26,7 @@
 
 namespace acdhOeaw\repoPhpUtil;
 
+use DateTime;
 use GuzzleHttp\Exception\ClientException;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\exceptions\Deleted;
@@ -45,6 +46,7 @@ abstract class TestBase extends \PHPUnit\Framework\TestCase {
      */
     static protected $repo;
     static protected $config;
+    static private $n = 1;
 
     static public function setUpBeforeClass(): void {
         RC::init(__DIR__ . '/config.ini');
@@ -56,13 +58,16 @@ abstract class TestBase extends \PHPUnit\Framework\TestCase {
     }
 
     private $resources;
+    private $time;
 
     public function setUp(): void {
         $this->resources = [];
         self::$repo->__clearCache();
+        $this->startTimer();
     }
 
     public function tearDown(): void {
+        $this->noteTime('test ' . self::$n++);
         self::$repo->rollback();
 
         // delete resources starting with the "most metadata rich" which is a simple heuristic for avoiding 
@@ -94,6 +99,15 @@ abstract class TestBase extends \PHPUnit\Framework\TestCase {
 
     protected function noteResources(array $res): void {
         $this->resources = array_merge($this->resources, array_values($res));
+    }
+
+    protected function startTimer(): void {
+        $this->time = microtime(true);
+    }
+
+    protected function noteTime(string $msg = ''): void {
+        $t = microtime(true) - $this->time;
+        file_put_contents(__DIR__ . '/time.log', (new DateTime())->format('Y-m-d H:i:s.u') . "\t$t\t$msg\n", \FILE_APPEND);
     }
 
 }

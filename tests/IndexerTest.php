@@ -343,7 +343,7 @@ class IndexerTest extends TestBase {
      */
     public function testNewVersionCreation(): void {
         $pidProp = RC::get('epicPidProp');
-        $pid     = 'https://sample.pid';
+        $pid     = 'https://sample.pid/' . rand();
 
         $indRes1 = $indRes2 = $indRes3 = [];
         $this->ind->setFilter('/^sample.xml$/', Indexer::MATCH);
