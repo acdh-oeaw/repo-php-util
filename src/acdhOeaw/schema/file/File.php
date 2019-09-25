@@ -192,7 +192,7 @@ class File extends SchemaObject {
             if ($mime) {
                 $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType', $mime);
             }
-            $meta->addLiteral(RC::get('fedoraSizeProp'), filesize($this->path));
+            $meta->addLiteral(RC::get('fedoraExtentProp'), filesize($this->path));
         }
 
         if ($this->metaLookup) {
