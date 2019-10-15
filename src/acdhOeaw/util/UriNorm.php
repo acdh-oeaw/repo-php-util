@@ -30,23 +30,29 @@ use acdhOeaw\util\RepoConfig as RC;
 use EasyRdf\Resource;
 
 /**
- * A simply utility class standardizing the geonames URIs
+ * A simply utility class standardizing the URIs
  *
  * @author zozlak
  */
-class Geonames {
+class UriNorm {
 
     /**
-     * Returns a standardized geonames URI.
+     * Returns a standardized URIs.
      * 
-     * If the passed URI is not a geonames URI it is returned without any 
-     * modifications.
+     * If the passed URI doesn't match any rule it is returned without
+     * modification.
      * @param string $uri URI to be standardized
      * @return string
      */
     static public function standardize(string $uri): string {
-        $id = preg_replace('|^https?://([^.]+[.])?geonames[.]org/([0-9]+)(/.*)?$|', '\\2', $uri);
-        return $id !== $uri ? 'https://www.geonames.org/' . $id : $uri;
+        foreach (RC::get('uriNorm', true) ?? [] as $match => $replace) {
+            $count = 0;
+            $norm = preg_replace($match, $replace, $uri, 1, $count);
+            if ($count) {
+                return $norm;
+            }
+        }
+        return $uri;
     }
 
     /**
@@ -58,7 +64,7 @@ class Geonames {
     static public function standardizeMeta(Resource $res) {
         foreach ($res->allResources(RC::idProp()) as $id) {
             $res->deleteResource(RC::idProp(), $id);
-            $res->addResource(RC::idProp(), Geonames::standardize((string) $id));
+            $res->addResource(RC::idProp(), self::standardize((string) $id));
         }
     }
 }
