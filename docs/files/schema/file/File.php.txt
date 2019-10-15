@@ -36,7 +36,7 @@ use EasyRdf\Graph;
 use EasyRdf\Resource;
 use acdhOeaw\fedora\Fedora;
 use acdhOeaw\schema\SchemaObject;
-use acdhOeaw\util\Geonames;
+use acdhOeaw\util\UriNorm;
 use acdhOeaw\util\RepoConfig as RC;
 use acdhOeaw\util\metaLookup\MetaLookupInterface;
 
@@ -192,7 +192,7 @@ class File extends SchemaObject {
             if ($mime) {
                 $meta->addLiteral('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#hasMimeType', $mime);
             }
-            $meta->addLiteral(RC::get('fedoraSizeProp'), filesize($this->path));
+            $meta->addLiteral(RC::get('fedoraExtentProp'), filesize($this->path));
         }
 
         if ($this->metaLookup) {
@@ -279,7 +279,7 @@ class File extends SchemaObject {
             $meta->addLiteral(RC::titleProp(), $oldTitle, $oldTitle->getLang());
         }
 
-        Geonames::standardizeMeta($meta);
+        UriNorm::standardizeMeta($meta);
         
         return $meta;
     }

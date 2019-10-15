@@ -49,9 +49,11 @@ class Ontology {
 
     const FEDORA_LAT_MOD = '<http://fedora.info/definitions/v4/repository#lastModified>';
 
-    private $classes           = [];
-    private $properties        = [];
-    private $repoObjectClasses = [];
+    private $classes             = [];
+    private $properties          = [];
+    private $repoObjectClasses   = [];
+    private $sharedObjectClasses = [];
+    private $containerClasses    = [];
 
     /**
      * 
@@ -84,6 +86,14 @@ class Ontology {
      */
     public function getRepoObjectClasses(): array {
         return $this->repoObjectClasses;
+    }
+
+    public function getSharedObjectClasses(): array {
+        return $this->sharedObjectClasses;
+    }
+
+    public function getContainerClasses(): array {
+        return $this->containerClasses;
     }
 
     /**
@@ -248,12 +258,20 @@ class Ontology {
             if (in_array(RC::get('fedoraRepoObjectClass'), $i->classes)) {
                 $this->repoObjectClasses[] = $i->class;
             }
+            if (in_array(RC::get('fedoraSharedObjectClass'), $i->classes)) {
+                $this->sharedObjectClasses[] = $i->class;
+            }
+            if (in_array(RC::get('fedoraContainerClass'), $i->classes)) {
+                $this->containerClasses[] = $i->class;
+            }
         }
 
         file_put_contents($file, json_encode([
-            'classes'           => $this->classes,
-            'properties'        => $this->properties,
-            'repoObjectClasses' => $this->repoObjectClasses
+            'classes'             => $this->classes,
+            'properties'          => $this->properties,
+            'repoObjectClasses'   => $this->repoObjectClasses,
+            'sharedObjectClasses' => $this->sharedObjectClasses,
+            'containerClasses'    => $this->containerClasses,
         ]));
         $this->getFromFile($file); // to make sure 
     }

@@ -37,7 +37,7 @@ use acdhOeaw\fedora\Fedora;
 use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\util\RepoConfig as RC;
-use acdhOeaw\util\Geonames;
+use acdhOeaw\util\UriNorm;
 
 /**
  * Class for importing whole metadata graph into the repository.
@@ -274,7 +274,7 @@ class MetadataCollection extends Graph {
 
             $ids = array();
             foreach ($res->allResources(RC::idProp()) as $id) {
-                $ids[] = Geonames::standardize((string) $id);
+                $ids[] = UriNorm::standardize((string) $id);
             }
 
             $found = 'found';
@@ -284,7 +284,7 @@ class MetadataCollection extends Graph {
                 $meta  = (new Graph())->resource('.');
                 $title = 'title stub created by the MetadataCollection';
                 foreach ($ids as $id) {
-                    $id = Geonames::standardize((string) $id);
+                    $id = UriNorm::standardize((string) $id);
                     
                     $meta->addResource(RC::idProp(), $id);
                     if (strpos($id, RC::get('fedoraIdNamespace')) === 0) {
@@ -401,7 +401,7 @@ class MetadataCollection extends Graph {
         }
         
         // maintain geonames ids
-        Geonames::standardizeMeta($res);
+        UriNorm::standardizeMeta($res);
 
         $this->fedora->fixMetadataReferences($res, [RC::get('epicPidProp')]);
 

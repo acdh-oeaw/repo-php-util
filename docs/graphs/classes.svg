@@ -189,7 +189,7 @@
 <text text-anchor="middle" x="679" y="-2591.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">MetaLookupConstant</text>
 </g>
 <!-- \\acdhOeaw\\util\\metaLookup\\MetaLookupConstant&#45;&gt;\\acdhOeaw\\util\\metaLookup\\MetaLookupInterface -->
-<g id="edge35" class="edge">
+<g id="edge26" class="edge">
 <title>\\acdhOeaw\\util\\metaLookup\\MetaLookupConstant&#45;&gt;\\acdhOeaw\\util\\metaLookup\\MetaLookupInterface</title>
 <path fill="none" stroke="#000000" stroke-dasharray="1,5" d="M609.8374,-2594C588.1514,-2594 563.9904,-2594 541.4533,-2594"/>
 <polygon fill="none" stroke="#000000" points="541.2275,-2590.5001 531.2274,-2594 541.2274,-2597.5001 541.2275,-2590.5001"/>
@@ -261,7 +261,7 @@
 <text text-anchor="middle" x="458.5" y="-68.3" font-family="Times,serif" font-size="14.00" fill="#c0c0c0">\EasyRdf\Graph</text>
 </g>
 <!-- \\acdhOeaw\\util\\MetadataCollection&#45;&gt;\\EasyRdf\\Graph -->
-<g id="edge28" class="edge">
+<g id="edge29" class="edge">
 <title>\\acdhOeaw\\util\\MetadataCollection&#45;&gt;\\EasyRdf\\Graph</title>
 <path fill="none" stroke="#000000" d="M611.7854,-2009.8782C608.4984,-2007.3009 605.523,-2004.3586 603,-2001 521.6419,-1892.6953 541.8636,-919.0223 531,-784 509.5554,-517.4671 472.9305,-195.8919 461.8026,-100.173"/>
 <polygon fill="none" stroke="#000000" points="465.2661,-99.6561 460.6319,-90.1286 458.3132,-100.4665 465.2661,-99.6561"/>
@@ -272,11 +272,11 @@
 <polygon fill="none" stroke="#000000" points="755,-1938 603,-1938 603,-1902 755,-1902 755,-1938"/>
 <text text-anchor="middle" x="679" y="-1917.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">KeepTransactionAlive</text>
 </g>
-<!-- \\acdhOeaw\\util\\Geonames -->
+<!-- \\acdhOeaw\\util\\UriNorm -->
 <g id="node21" class="node">
-<title>\\acdhOeaw\\util\\Geonames</title>
-<polygon fill="none" stroke="#000000" points="714.5,-1884 643.5,-1884 643.5,-1848 714.5,-1848 714.5,-1884"/>
-<text text-anchor="middle" x="679" y="-1863.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">Geonames</text>
+<title>\\acdhOeaw\\util\\UriNorm</title>
+<polygon fill="none" stroke="#000000" points="711,-1884 647,-1884 647,-1848 711,-1848 711,-1884"/>
+<text text-anchor="middle" x="679" y="-1863.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">UriNorm</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\dissemination\\parameter\\UriPart -->
 <g id="node22" class="node">
@@ -351,7 +351,7 @@
 <text text-anchor="middle" x="679" y="-1457.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">RawUrlEncode</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\dissemination\\parameter\\RawUrlEncode&#45;&gt;\\acdhOeaw\\fedora\\dissemination\\parameter\\iTransformation -->
-<g id="edge26" class="edge">
+<g id="edge27" class="edge">
 <title>\\acdhOeaw\\fedora\\dissemination\\parameter\\RawUrlEncode&#45;&gt;\\acdhOeaw\\fedora\\dissemination\\parameter\\iTransformation</title>
 <path fill="none" stroke="#000000" stroke-dasharray="1,5" d="M629.7335,-1476.8798C620.7919,-1480.1198 611.583,-1483.5739 603,-1487 570.4771,-1499.9821 563.8173,-1506.7814 531,-1519 529.7866,-1519.4518 528.5593,-1519.9014 527.3209,-1520.3482"/>
 <polygon fill="none" stroke="#000000" points="525.9519,-1517.1187 517.6591,-1523.7126 528.2539,-1523.7294 525.9519,-1517.1187"/>
@@ -363,7 +363,7 @@
 <text text-anchor="middle" x="679" y="-1403.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">Substr</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\dissemination\\parameter\\Substr&#45;&gt;\\acdhOeaw\\fedora\\dissemination\\parameter\\iTransformation -->
-<g id="edge30" class="edge">
+<g id="edge31" class="edge">
 <title>\\acdhOeaw\\fedora\\dissemination\\parameter\\Substr&#45;&gt;\\acdhOeaw\\fedora\\dissemination\\parameter\\iTransformation</title>
 <path fill="none" stroke="#000000" stroke-dasharray="1,5" d="M650.2248,-1412.3292C635.2377,-1416.5509 617.1407,-1423.168 603,-1433 562.0718,-1461.4574 572.582,-1491.5067 531,-1519 529.5668,-1519.9476 528.091,-1520.8558 526.5809,-1521.7262"/>
 <polygon fill="none" stroke="#000000" points="524.925,-1518.6418 517.6115,-1526.3075 528.1091,-1524.8757 524.925,-1518.6418"/>
@@ -375,7 +375,7 @@
 <text text-anchor="middle" x="679" y="-1349.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">UrlEncode</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\dissemination\\parameter\\UrlEncode&#45;&gt;\\acdhOeaw\\fedora\\dissemination\\parameter\\iTransformation -->
-<g id="edge32" class="edge">
+<g id="edge33" class="edge">
 <title>\\acdhOeaw\\fedora\\dissemination\\parameter\\UrlEncode&#45;&gt;\\acdhOeaw\\fedora\\dissemination\\parameter\\iTransformation</title>
 <path fill="none" stroke="#000000" stroke-dasharray="1,5" d="M640.4721,-1359.5902C627.4426,-1363.6458 613.5402,-1369.7821 603,-1379 550.3313,-1425.061 584.7306,-1474.1823 531,-1519 529.4849,-1520.2638 527.8984,-1521.455 526.2541,-1522.5779"/>
 <polygon fill="none" stroke="#000000" points="524.4719,-1519.5655 517.6139,-1527.6413 528.0112,-1525.6049 524.4719,-1519.5655"/>
@@ -411,7 +411,7 @@
 <text text-anchor="middle" x="679" y="-1187.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">Service</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\dissemination\\Service&#45;&gt;\\acdhOeaw\\fedora\\FedoraResource -->
-<g id="edge31" class="edge">
+<g id="edge32" class="edge">
 <title>\\acdhOeaw\\fedora\\dissemination\\Service&#45;&gt;\\acdhOeaw\\fedora\\FedoraResource</title>
 <path fill="none" stroke="#000000" d="M646.9374,-1182.4388C614.8269,-1174.8662 564.4855,-1162.9943 523.9107,-1153.4257"/>
 <polygon fill="none" stroke="#000000" points="524.6256,-1149.9983 514.0892,-1151.1095 523.0188,-1156.8114 524.6256,-1149.9983"/>
@@ -507,7 +507,7 @@
 <text text-anchor="middle" x="679" y="-623.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">AlreadyInCache</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\exceptions\\AlreadyInCache&#45;&gt;\\Exception -->
-<g id="edge27" class="edge">
+<g id="edge28" class="edge">
 <title>\\acdhOeaw\\fedora\\exceptions\\AlreadyInCache&#45;&gt;\\Exception</title>
 <path fill="none" stroke="#000000" d="M623.23,-614.4353C615.4905,-610.6564 608.3664,-605.6451 603,-599 447.0026,-405.8312 685.5301,-239.3446 531,-45 525.9453,-38.6429 519.2334,-33.7826 511.9294,-30.0666"/>
 <polygon fill="none" stroke="#000000" points="513.0075,-26.719 502.4409,-25.9452 510.2186,-33.1395 513.0075,-26.719"/>
@@ -519,7 +519,7 @@
 <text text-anchor="middle" x="679" y="-569.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">AclException</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\exceptions\\AclException&#45;&gt;\\Exception -->
-<g id="edge33" class="edge">
+<g id="edge34" class="edge">
 <title>\\acdhOeaw\\fedora\\exceptions\\AclException&#45;&gt;\\Exception</title>
 <path fill="none" stroke="#000000" d="M629.904,-563.2473C619.679,-559.2567 609.9203,-553.4496 603,-545 460.7423,-371.3064 671.9383,-219.7659 531,-45 525.9016,-38.6779 519.1667,-33.836 511.8529,-30.1278"/>
 <polygon fill="none" stroke="#000000" points="512.9258,-26.7782 502.3588,-26.011 510.141,-33.2004 512.9258,-26.7782"/>
@@ -610,13 +610,13 @@
 <text text-anchor="middle" x="458.5" y="-811.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">HasTriple</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\metadataQuery\\HasTriple&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasProperty -->
-<g id="edge29" class="edge">
+<g id="edge30" class="edge">
 <title>\\acdhOeaw\\fedora\\metadataQuery\\HasTriple&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\HasProperty</title>
 <path fill="none" stroke="#000000" d="M419.5922,-825.058C391.9658,-832.9097 354.4795,-843.5637 323.7577,-852.2952"/>
 <polygon fill="none" stroke="#000000" points="322.704,-848.956 314.0418,-855.0565 324.6177,-855.6893 322.704,-848.956"/>
 </g>
 <!-- \\acdhOeaw\\fedora\\metadataQuery\\HasProperty&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\QueryParameter -->
-<g id="edge34" class="edge">
+<g id="edge35" class="edge">
 <title>\\acdhOeaw\\fedora\\metadataQuery\\HasProperty&#45;&gt;\\acdhOeaw\\fedora\\metadataQuery\\QueryParameter</title>
 <path fill="none" stroke="#000000" d="M222.5934,-868C203.8395,-868 181.7934,-868 161.3754,-868"/>
 <polygon fill="none" stroke="#000000" points="161.1897,-864.5001 151.1896,-868 161.1896,-871.5001 161.1897,-864.5001"/>

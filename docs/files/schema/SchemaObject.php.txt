@@ -36,7 +36,7 @@ use acdhOeaw\fedora\FedoraResource;
 use acdhOeaw\fedora\exceptions\NotFound;
 use acdhOeaw\fedora\exceptions\NotInCache;
 use acdhOeaw\util\RepoConfig as RC;
-use acdhOeaw\util\Geonames;
+use acdhOeaw\util\UriNorm;
 use zozlak\util\UUID;
 
 /**
@@ -348,7 +348,7 @@ abstract class SchemaObject {
     protected function createResource(Resource $meta, bool $uploadBinary,
                                       string $path) {
         $this->fedora->fixMetadataReferences($meta, [RC::get('epicPidProp')]);
-        Geonames::standardizeMeta($meta);
+        UriNorm::standardizeMeta($meta);
         $binary    = $uploadBinary ? $this->getBinaryData() : '';
         $method    = substr($path, -1) == '/' || $path === '' ? 'POST' : 'PUT';
         $this->res = $this->fedora->createResource($meta, $binary, $path, $method);
@@ -370,7 +370,7 @@ abstract class SchemaObject {
      */
     protected function mergeMetadata(Resource $current, Resource $new): Resource {
         $meta = $current->merge($new, array(RC::idProp()));
-        Geonames::standardizeMeta($meta);
+        UriNorm::standardizeMeta($meta);
         return $meta;
     }
 
