@@ -483,12 +483,14 @@ class FedoraResource {
 
     /**
      * Returns resource's binary content.
+     * @param bool $stream should response body be streamed (true) or 
+     *   downloaded upfront (false)
      * @return Response PSR-7 response containing resource's binary content
      */
-    public function getContent(): Response {
+    public function getContent(bool $stream = false): Response {
         $uri     = $this->fedora->sanitizeUri($this->uri);
         $request = new Request('GET', $uri);
-        return $this->fedora->sendRequest($request);
+        return $this->fedora->sendRequest($request, ['stream' => $stream]);
     }
 
     /**
