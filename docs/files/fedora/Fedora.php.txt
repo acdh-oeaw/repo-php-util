@@ -305,17 +305,19 @@ class Fedora {
      * 
      * Switches most important errors into specific error classes.
      * @param Request $request request to be send
+     * @param array $options Guzzle request options 
+     *   (see http://docs.guzzlephp.org/en/stable/request-options.html)
      * @return Response
      * @throws Deleted
      * @throws NotFound
      * @throws RequestException
      */
-    public function sendRequest(Request $request): Response {
+    public function sendRequest(Request $request, array $options = []): Response {
         if ($this->txUrl && time() - $this->txTimestamp > $this->txKeepAlive) {
             $this->prolong();
         }
         try {
-            $response = $this->client->send($request);
+            $response = $this->client->send($request, $options);
 
             // Fedora triplestore plugin doesn't index resources which were
             // deleted and recreated within the same transaction so we need

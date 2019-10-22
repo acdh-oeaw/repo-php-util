@@ -218,41 +218,47 @@
 <polygon fill="none" stroke="#000000" points="721,-2262 637,-2262 637,-2226 721,-2226 721,-2262"/>
 <text text-anchor="middle" x="679" y="-2241.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">RepoConfig</text>
 </g>
-<!-- \\acdhOeaw\\util\\Ontology -->
+<!-- \\acdhOeaw\\util\\UriNorm -->
 <g id="node15" class="node">
+<title>\\acdhOeaw\\util\\UriNorm</title>
+<polygon fill="none" stroke="#000000" points="711,-2208 647,-2208 647,-2172 711,-2172 711,-2208"/>
+<text text-anchor="middle" x="679" y="-2187.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">UriNorm</text>
+</g>
+<!-- \\acdhOeaw\\util\\Ontology -->
+<g id="node16" class="node">
 <title>\\acdhOeaw\\util\\Ontology</title>
-<polygon fill="none" stroke="#000000" points="714.5,-2208 643.5,-2208 643.5,-2172 714.5,-2172 714.5,-2208"/>
-<text text-anchor="middle" x="679" y="-2187.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">Ontology</text>
+<polygon fill="none" stroke="#000000" points="714.5,-2154 643.5,-2154 643.5,-2118 714.5,-2118 714.5,-2154"/>
+<text text-anchor="middle" x="679" y="-2133.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">Ontology</text>
 </g>
 <!-- \\acdhOeaw\\util\\Indexer -->
-<g id="node16" class="node">
+<g id="node17" class="node">
 <title>\\acdhOeaw\\util\\Indexer</title>
-<polygon fill="none" stroke="#000000" points="711,-2154 647,-2154 647,-2118 711,-2118 711,-2154"/>
-<text text-anchor="middle" x="679" y="-2133.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">Indexer</text>
+<polygon fill="none" stroke="#000000" points="711,-2100 647,-2100 647,-2064 711,-2064 711,-2100"/>
+<text text-anchor="middle" x="679" y="-2079.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">Indexer</text>
 </g>
 <!-- \\acdhOeaw\\util\\ResourceFactory -->
-<g id="node17" class="node">
+<g id="node18" class="node">
 <title>\\acdhOeaw\\util\\ResourceFactory</title>
-<polygon fill="none" stroke="#000000" points="738,-2100 620,-2100 620,-2064 738,-2064 738,-2100"/>
-<text text-anchor="middle" x="679" y="-2079.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">ResourceFactory</text>
+<polygon fill="none" stroke="#000000" points="738,-2046 620,-2046 620,-2010 738,-2010 738,-2046"/>
+<text text-anchor="middle" x="679" y="-2025.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">ResourceFactory</text>
 </g>
 <!-- \\acdhOeaw\\util\\IndexerException -->
-<g id="node18" class="node">
+<g id="node19" class="node">
 <title>\\acdhOeaw\\util\\IndexerException</title>
-<polygon fill="none" stroke="#000000" points="741.5,-1992 616.5,-1992 616.5,-1956 741.5,-1956 741.5,-1992"/>
-<text text-anchor="middle" x="679" y="-1971.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">IndexerException</text>
+<polygon fill="none" stroke="#000000" points="741.5,-1938 616.5,-1938 616.5,-1902 741.5,-1902 741.5,-1938"/>
+<text text-anchor="middle" x="679" y="-1917.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">IndexerException</text>
 </g>
 <!-- \\acdhOeaw\\util\\IndexerException&#45;&gt;\\Exception -->
 <g id="edge11" class="edge">
 <title>\\acdhOeaw\\util\\IndexerException&#45;&gt;\\Exception</title>
-<path fill="none" stroke="#000000" d="M616.4685,-1959.3336C611.2868,-1956.021 606.6478,-1951.965 603,-1947 477.7839,-1776.569 654.9219,-216.3743 531,-45 526.241,-38.4186 519.6851,-33.44 512.4469,-29.674"/>
-<polygon fill="none" stroke="#000000" points="513.5606,-26.3405 502.9973,-25.5231 510.7453,-32.7495 513.5606,-26.3405"/>
+<path fill="none" stroke="#000000" d="M616.4742,-1905.3295C611.2914,-1902.0176 606.6506,-1897.963 603,-1893 481.2424,-1727.468 651.5006,-211.4493 531,-45 526.2373,-38.4213 519.6796,-33.444 512.4405,-29.6786"/>
+<polygon fill="none" stroke="#000000" points="513.5538,-26.3449 502.9905,-25.5281 510.7388,-32.754 513.5538,-26.3449"/>
 </g>
 <!-- \\acdhOeaw\\util\\MetadataCollection -->
-<g id="node19" class="node">
+<g id="node20" class="node">
 <title>\\acdhOeaw\\util\\MetadataCollection</title>
-<polygon fill="none" stroke="#000000" points="748,-2046 610,-2046 610,-2010 748,-2010 748,-2046"/>
-<text text-anchor="middle" x="679" y="-2025.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">MetadataCollection</text>
+<polygon fill="none" stroke="#000000" points="748,-1992 610,-1992 610,-1956 748,-1956 748,-1992"/>
+<text text-anchor="middle" x="679" y="-1971.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">MetadataCollection</text>
 </g>
 <!-- \\EasyRdf\\Graph -->
 <g id="node58" class="node">
@@ -263,20 +269,14 @@
 <!-- \\acdhOeaw\\util\\MetadataCollection&#45;&gt;\\EasyRdf\\Graph -->
 <g id="edge29" class="edge">
 <title>\\acdhOeaw\\util\\MetadataCollection&#45;&gt;\\EasyRdf\\Graph</title>
-<path fill="none" stroke="#000000" d="M611.7854,-2009.8782C608.4984,-2007.3009 605.523,-2004.3586 603,-2001 521.6419,-1892.6953 541.8636,-919.0223 531,-784 509.5554,-517.4671 472.9305,-195.8919 461.8026,-100.173"/>
-<polygon fill="none" stroke="#000000" points="465.2661,-99.6561 460.6319,-90.1286 458.3132,-100.4665 465.2661,-99.6561"/>
+<path fill="none" stroke="#000000" d="M611.7962,-1955.8701C608.5065,-1953.2948 605.5276,-1950.3552 603,-1947 525.0974,-1843.5903 541.5598,-913.0383 531,-784 509.1907,-517.4967 472.8143,-195.9013 461.7748,-100.1752"/>
+<polygon fill="none" stroke="#000000" points="465.2389,-99.662 460.6136,-90.1301 458.2852,-100.4659 465.2389,-99.662"/>
 </g>
 <!-- \\acdhOeaw\\util\\KeepTransactionAlive -->
-<g id="node20" class="node">
-<title>\\acdhOeaw\\util\\KeepTransactionAlive</title>
-<polygon fill="none" stroke="#000000" points="755,-1938 603,-1938 603,-1902 755,-1902 755,-1938"/>
-<text text-anchor="middle" x="679" y="-1917.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">KeepTransactionAlive</text>
-</g>
-<!-- \\acdhOeaw\\util\\UriNorm -->
 <g id="node21" class="node">
-<title>\\acdhOeaw\\util\\UriNorm</title>
-<polygon fill="none" stroke="#000000" points="711,-1884 647,-1884 647,-1848 711,-1848 711,-1884"/>
-<text text-anchor="middle" x="679" y="-1863.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">UriNorm</text>
+<title>\\acdhOeaw\\util\\KeepTransactionAlive</title>
+<polygon fill="none" stroke="#000000" points="755,-1884 603,-1884 603,-1848 755,-1848 755,-1884"/>
+<text text-anchor="middle" x="679" y="-1863.2" font-family="Courier,monospace" font-size="11.00" fill="#000000">KeepTransactionAlive</text>
 </g>
 <!-- \\acdhOeaw\\fedora\\dissemination\\parameter\\UriPart -->
 <g id="node22" class="node">

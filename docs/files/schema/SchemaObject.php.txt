@@ -198,6 +198,7 @@ abstract class SchemaObject {
             $binaryContent = $this->getBinaryData();
             if ($uploadBinary && $binaryContent !== '') {
                 $this->res->updateContent($binaryContent, true);
+                $this->res->getContent(true)->getBody()->close(); // try to fetch resource binary - will raise an error if the upload failed silently
             }
         }
 
