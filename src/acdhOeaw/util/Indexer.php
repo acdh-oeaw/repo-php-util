@@ -544,7 +544,7 @@ class Indexer {
         }
         if (!$skip && !$skip2) {
             try {
-                $res                                 = $this->performUpdate($i, $file, $parent, $upload);
+                $res                                 = $this->performUpdate($i, $file, $upload);
                 $this->indexedRes[$i->getPathname()] = $res;
                 $this->handleAutoCommit();
             } catch (MetaLookupException $e) {
@@ -656,12 +656,11 @@ class Indexer {
      * Performs file upload taking care of versioning.
      * @param DirectoryIterator $iter
      * @param File $file
-     * @param string $parent
      * @param bool $upload
      * @return FedoraResource
      */
     public function performUpdate(DirectoryIterator $iter, File $file,
-                                  string $parent, bool $upload): FedoraResource {
+                                  bool $upload): FedoraResource {
         // check versioning conditions
         $versioning = $this->versioningMode !== self::VERSIONING_NONE && !$iter->isDir();
         if ($versioning) {
