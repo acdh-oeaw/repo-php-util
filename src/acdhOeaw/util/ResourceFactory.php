@@ -108,7 +108,7 @@ class ResourceFactory {
                 if (preg_match('|^https?://|', $i)) {
                     $meta->addResource($p, $i);
                 } else {
-                    $meta->addLiteral($p, $i);
+                    $meta->addLiteral($p, $i, 'en');
                 }
             }
         }
