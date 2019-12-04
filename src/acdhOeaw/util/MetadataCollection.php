@@ -291,7 +291,7 @@ class MetadataCollection extends Graph {
                         $title = substr($id, strlen(RC::get('fedoraIdNamespace')));
                     }
                 }
-                $meta->addLiteral(RC::titleProp(), $title);
+                $meta->addLiteral(RC::titleProp(), $title, 'en');
                 $fedoraRes = $this->fedora->createResource($meta);
                 $found     = 'new';
                 $this->handleAutoCommit();
@@ -411,7 +411,7 @@ class MetadataCollection extends Graph {
         }
 
         if (count($res->allLiterals(RC::titleProp())) == 0) {
-            $res->addLiteral(RC::titleProp(), $res->getResource(RC::idProp()));
+            $res->addLiteral(RC::titleProp(), $res->getResource(RC::idProp()), 'en');
         }
 
         if ($res->isA('http://xmlns.com/foaf/0.1/Person') || $res->isA('http://xmlns.com/foaf/0.1/Agent')) {
