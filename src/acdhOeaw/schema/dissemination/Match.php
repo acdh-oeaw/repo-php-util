@@ -121,7 +121,7 @@ class Match extends SchemaObject {
 
         $meta->addResource(RC::relProp(), $this->service->getResource()->getId());
         $meta->addResource(RC::idProp(), $this->getId());
-        $meta->addLiteral(RC::titleProp(), 'A dissemination service matching rule');
+        $meta->addLiteral(RC::titleProp(), 'A dissemination service matching rule', 'en');
 
         $meta->addResource(RC::get('fedoraServiceMatchProp'), $this->property);
         $meta->addLiteral(RC::get('fedoraServiceMatchValue'), $this->value);
