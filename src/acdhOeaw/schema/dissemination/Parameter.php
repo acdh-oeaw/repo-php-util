@@ -111,7 +111,7 @@ class Parameter extends SchemaObject {
         $meta->addType(RC::get('fedoraServiceParamClass'));
 
         $titleProp = RC::get('fedoraTitleProp');
-        $meta->addLiteral($titleProp, $this->name);
+        $meta->addLiteral($titleProp, $this->name, 'en');
 
         $defaultValueProp = RC::get('fedoraServiceParamDefaultValueProp');
         $meta->addLiteral($defaultValueProp, $this->defaultValue);

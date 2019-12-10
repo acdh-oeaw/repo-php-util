@@ -174,7 +174,7 @@ class Service extends SchemaObject {
 
         $meta->addResource(RC::idProp(), $this->getId());
 
-        $meta->addLiteral(RC::titleProp(), $this->getId());
+        $meta->addLiteral(RC::titleProp(), $this->getId(), 'en');
 
         $meta->addLiteral(RC::get('fedoraServiceLocProp'), $this->location);
 
