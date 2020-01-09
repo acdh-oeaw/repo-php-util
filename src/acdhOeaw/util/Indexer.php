@@ -51,9 +51,9 @@ class Indexer {
 
     const MATCH             = 1;
     const SKIP              = 2;
-    const SKIP_NONE         = 1;
-    const SKIP_NOT_EXIST    = 2;
-    const SKIP_EXIST        = 3;
+    const SKIP_NONE         = 0;
+    const SKIP_NOT_EXIST    = 1;
+    const SKIP_EXIST        = 2;
     const SKIP_BINARY_EXIST = 4;
     const VERSIONING_NONE   = 1;
     const VERSIONING_ALWAYS = 2;
@@ -298,15 +298,11 @@ class Indexer {
      * their (not)existance in Fedora.
      * 
      * @param int $skipMode mode either Indexer::SKIP_NONE (default), 
-     *   Indexer::SKIP_NOT_EXIST, Indexer::SKIP_EXIST or 
-     *   Indexer::SKIP_BINARY_EXIST
+     *   Indexer::SKIP_NOT_EXIST, Indexer::SKIP_EXIST, 
+     *   Indexer::SKIP_BINARY_EXIST or combination (sum) of any of them
      * @return \acdhOeaw\util\Indexer
      */
     public function setSkip(int $skipMode): Indexer {
-        if (!in_array($skipMode, [self::SKIP_NONE, self::SKIP_NOT_EXIST, self::SKIP_EXIST,
-                self::SKIP_BINARY_EXIST])) {
-            throw new BadMethodCallException('Wrong skip mode');
-        }
         $this->skipMode = $skipMode;
         return $this;
     }
@@ -554,7 +550,7 @@ class Indexer {
                     throw $e;
                 }
             } catch (NotFound $e) {
-                if ($this->skipMode === self::SKIP_NOT_EXIST) {
+                if ($this->skipMode & self::SKIP_NOT_EXIST) {
                     $skip = true;
                 } else {
                     throw $e;
@@ -596,12 +592,12 @@ class Indexer {
      * @throws MetaLookupException
      */
     private function isSkippedExisting(File $file): bool {
-        if (!in_array($this->skipMode, [self::SKIP_EXIST, self::SKIP_BINARY_EXIST])) {
+        if (0 === ($this->skipMode & self::SKIP_EXIST) + ($this->skipMode & self::SKIP_BINARY_EXIST)) {
             return false;
         }
         try {
             $res = $file->getResource(false, false);
-            return $res->isBinary() || $this->skipMode === self::SKIP_EXIST;
+            return $res->isBinary() || (bool) ($this->skipMode & self::SKIP_EXIST);
         } catch (MetaLookupException $e) {
             if ($this->metaLookupRequire) {
                 return true;
