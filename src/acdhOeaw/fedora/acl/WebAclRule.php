@@ -291,7 +291,7 @@ class WebAclRule extends FedoraResource {
     public function getAclMetadata(): Resource {
         $meta = (new Graph())->resource($this->uri ? $this->uri : '.');
         $meta->addType('http://www.w3.org/ns/auth/acl#Authorization');
-        $meta->addLiteral(RC::titleProp(), 'Fedora WebAC rule');
+        $meta->addLiteral(RC::titleProp(), 'Fedora WebAC rule', 'en');
         foreach ($this->resources as $i) {
             $meta->addResource('http://www.w3.org/ns/auth/acl#accessTo', $i->getUri(true));
         }

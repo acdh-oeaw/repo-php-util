@@ -443,7 +443,7 @@ class WebAcl {
 
         $aclMeta = (new Graph())->resource('.');
         $aclMeta->addType(self::ACL_CLASS);
-        $aclMeta->addLiteral(RC::titleProp(), 'ACL');
+        $aclMeta->addLiteral(RC::titleProp(), 'ACL', 'en');
         $id      = preg_replace('|^[^:]+|', 'acl', $this->res->getUri(true));
         $aclMeta->addResource(RC::idProp(), $id);
 
