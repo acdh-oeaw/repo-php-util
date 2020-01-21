@@ -49,6 +49,8 @@ class MetadataCollection extends Graph {
     const SKIP   = 1;
     const CREATE = 2;
 
+    static public $titleStub = '__TITLE STUB__';
+
     /**
      * Turns debug messages on
      * @var bool
@@ -209,6 +211,12 @@ class MetadataCollection extends Graph {
             echo self::$debug ? "\tupdating " . $fedoraRes->getUri(true) . "\n" : "";
             $meta = $fedoraRes->getMetadata();
             $meta->merge($res, array(RC::idProp()));
+            // remove the title stub AFTER merging with the current metadata
+            foreach ($meta->allLiterals(RC::titleProp()) as $i) {
+                if ((string) $i === self::$titleStub) {
+                    $meta->delete(RC::titleProp(), $i);
+                }
+            }
             $fedoraRes->setMetadata($meta, false);
             $fedoraRes->updateMetadata();
             $this->handleAutoCommit();
@@ -281,17 +289,12 @@ class MetadataCollection extends Graph {
             try {
                 $fedoraRes = $this->fedora->getResourceByIds($ids);
             } catch (NotFound $e) {
-                $meta  = (new Graph())->resource('.');
-                $title = 'title stub created by the MetadataCollection';
+                $meta = (new Graph())->resource('.');
                 foreach ($ids as $id) {
                     $id = UriNorm::standardize((string) $id);
-                    
                     $meta->addResource(RC::idProp(), $id);
-                    if (strpos($id, RC::get('fedoraIdNamespace')) === 0) {
-                        $title = substr($id, strlen(RC::get('fedoraIdNamespace')));
-                    }
                 }
-                $meta->addLiteral(RC::titleProp(), $title, 'en');
+                $meta->addLiteral(RC::titleProp(), self::$titleStub, 'en');
                 $fedoraRes = $this->fedora->createResource($meta);
                 $found     = 'new';
                 $this->handleAutoCommit();
@@ -399,7 +402,7 @@ class MetadataCollection extends Graph {
             // don't do anything when it's purely-id resource
             return $res;
         }
-        
+
         // maintain geonames ids
         UriNorm::standardizeMeta($res);
 
@@ -408,10 +411,6 @@ class MetadataCollection extends Graph {
         if ($this->containsWrongRefs($res, $namespace)) {
             echo $res->copy()->getGraph()->serialise('ntriples') . "\n";
             throw new InvalidArgumentException('resource contains references to blank nodes');
-        }
-
-        if (count($res->allLiterals(RC::titleProp())) == 0) {
-            $res->addLiteral(RC::titleProp(), $res->getResource(RC::idProp()), 'en');
         }
 
         if ($res->isA('http://xmlns.com/foaf/0.1/Person') || $res->isA('http://xmlns.com/foaf/0.1/Agent')) {
