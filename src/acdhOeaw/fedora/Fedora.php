@@ -682,6 +682,7 @@ class Fedora {
         }
         $this->txUrl = $loc[0];
 
+        $this->killKeepTransactionAlive();
         if (function_exists('pcntl_fork')) {
             $this->txProcPid = pcntl_fork();
             if ($this->txProcPid === 0) {
@@ -803,7 +804,7 @@ class Fedora {
         if ($this->txProcPid > 0) {
             posix_kill($this->txProcPid, \SIGKILL);
             $status          = null;
-            pcntl_wait($status);
+            while (pcntl_wait($status) >= 0);
             $this->txProcPid = null;
         }
         if ($this->txProc) {
