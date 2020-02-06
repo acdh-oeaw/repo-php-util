@@ -787,13 +787,22 @@ class Fedora {
      * Keeps transaction alive (used in separate process)
      */
     private function keepTransactionAlive() {
-        while (true) {
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => $this->txUrl . '/fcr:tx',
+            CURLOPT_POST           => 1,
+            CURLOPT_FAILONERROR    => 1,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_HTTPAUTH       => CURLAUTH_BASIC,
+            CURLOPT_USERPWD        => RC::get('fedoraUser') . ':' . RC::get('fedoraPswd'),
+        ]);
+        $flag = true;
+        while ($flag) {
             sleep($this->txKeepAlive);
-            try {
-                $this->prolong();
-            } catch (RequestException $ex) {
-                // it's possible that the transaction is closed on the Fedora side but the doorkeeper is still processing post-transaction handles
-            }
+            curl_exec($ch);
+            $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $flag = !in_array($code, [410, 500]);
         }
     }
 
