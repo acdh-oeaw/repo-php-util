@@ -313,9 +313,6 @@ class Fedora {
      * @throws RequestException
      */
     public function sendRequest(Request $request, array $options = []): Response {
-        if ($this->txUrl && time() - $this->txTimestamp > $this->txKeepAlive) {
-            $this->prolong();
-        }
         try {
             $response = $this->client->send($request, $options);
 
