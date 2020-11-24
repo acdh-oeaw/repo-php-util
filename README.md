@@ -1,8 +1,10 @@
 # repo-php-util
 
-Travis build demo
-
 Set of classes for working with the ACDH repository stack.
+
+# Deprecation info
+
+ACHD switched from Fedora Commons to [ARCHE](https://github.com/acdh-oeaw/arche-core) which makes this library **obsolete**.
 
 # Installation
 
